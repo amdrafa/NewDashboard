@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { GiConfirmed } from "react-icons/gi";
+import {getMonth} from '../util'
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -121,6 +122,9 @@ const options = {
 const series = [{ name: "series1", data: [31, 120, 10, 28, 61, 18, 109] }];
 
 export default function Dashboard() {
+
+  console.log(getMonth())
+
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,

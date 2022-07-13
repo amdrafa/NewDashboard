@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/services/server.js", "src/pages/api/disablespeedway"  ],
+, "src/services/server.js", "src/pages/api/disablespeedway", "src/components/Calendar/Month.tsx"  ],
   "exclude": [
     "node_modules"
   ]

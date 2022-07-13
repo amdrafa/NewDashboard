@@ -59,6 +59,7 @@ const createUserFormSchema = yup.object().shape({
 });
 
 export default function Settings() {
+  
   const [status, setStatus] = useState(0);
 
   useEffect(() => {
