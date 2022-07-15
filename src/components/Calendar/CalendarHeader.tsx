@@ -1,4 +1,4 @@
-import { Button, Flex, Icon, Text } from "@chakra-ui/react"
+import { Button, Flex, Heading, Icon, Text } from "@chakra-ui/react"
 import dayjs from "dayjs"
 import { useContext } from "react"
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri"
@@ -21,11 +21,9 @@ export function CalendarHeader(){
     }
 
     return (
-        <Flex  px={'4'} py={'2'} alignItems='center'> 
-            <Text mr={'10'} fontSize='xl' color={'gray.200'} fontWeight='medium'>
-                Calendar
-            </Text>
-            <Button onClick={() => {handleResetDate()}} rounded={'base'} height='8' py='2' px='4' mr='5' colorScheme={'blue'}>
+        <Flex  px={'4'} alignItems='center'> 
+            
+            <Button onClick={() => {handleResetDate()}} rounded={'base'} py='2' px='4' mr='5' colorScheme={'blue'}>
                 Today
             </Button>
             

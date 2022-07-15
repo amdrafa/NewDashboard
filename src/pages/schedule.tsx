@@ -16,6 +16,7 @@ import {
   Link,
   Link as ChakraLink,
   Spinner,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -31,7 +32,7 @@ import {
   RiMotorbikeLine,
 } from "react-icons/ri";
 import { GiMineTruck } from "react-icons/gi";
-import { FaTruckMonster } from "react-icons/fa";
+import { FaCircle, FaTruckMonster } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Modal from "react-modal";
 import { LoginContext } from "../contexts/LoginContext";
@@ -41,50 +42,72 @@ import { errors } from "faunadb";
 import { ChooseVehicle } from "../components/ChooseVehicle";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
+import { CalendarHeader } from "../components/Calendar/CalendarHeader";
+import { CalendarIndex } from "../components/Calendar";
 
-interface speedwayProps{
+interface speedwayProps {
   speedway: string;
   vehicles_limit: number;
   description: string;
 }
 
-interface dataProps{
+interface dataProps {
   data: speedwayProps;
   ref: string;
   ts: number;
 }
 
+
 export default function Schedule() {
- 
+
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
+
+  function AddTimeSlot(slot: string){
+    
+  let updatedSlots = selectedSlots
+
+  updatedSlots.push(slot)
+
+  setSelectedSlots(updatedSlots)
+
+  return ;
+
+  }
+
+
+
+  const isWideVersioon = useBreakpointValue({
+    base: false,
+    lg: true,
+  });
+
 
   const [speedway, setSpeedway] = useState("");
   const [vehicle, setVehicle] = useState("Light vehicle");
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
 
-  const [status, setStatus] = useState(0)
+  const [page, setPage] = useState(1)
+
+  const [status, setStatus] = useState(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  const [speedwayList, setSpeedwayList] = useState<speedwayProps>();
-
-  const { isAuthenticated, user } = useContext(LoginContext)
+  const { isAuthenticated, user } = useContext(LoginContext);
 
   useEffect(() => {
-    status == 200 && toast.success("Appointment scheduled") 
-    setStatus(0)
-  }, [status])
-  
-  
-  const { data, isLoading, error } = useQuery<dataProps[]>(`SpeedwayList`, async () => {
-    const response = await api.get(`getspeedwaylist`)
-    const {speedways} = response.data;
-    
-    return speedways;
-  });
-  
-  console.log(data)
+    status == 200 && toast.success("Appointment scheduled");
+    setStatus(0);
+  }, [status]);
+
+  const { data, isLoading, error } = useQuery<dataProps[]>(
+    `SpeedwayList`,
+    async () => {
+      const response = await api.get(`getspeedwaylist`);
+      const { speedways } = response.data;
+
+      return speedways;
+    }
+  );
+
 
   function handleOpenModal() {
     setIsModalOpen(true);
@@ -94,42 +117,29 @@ export default function Schedule() {
     setIsModalOpen(false);
   }
 
-  const handleSelect = (ranges) => {
-    setStartDate(ranges.selection.startDate);
-    setEndDate(ranges.selection.endDate);
-  };
+  console.log(speedway, vehicle, selectedSlots);
 
-  const selectionRange = {
-    startDate: startDate,
-    endDate: endDate,
-    key: "selection",
-  };
+  async function CreateSchedule(event: FormEvent) {
+    event.preventDefault();
 
-  console.log(startDate, endDate, speedway, vehicle);
+    console.log('passed here')
 
-  async function CreateSchedule(event:FormEvent) {
+    console.log(user.userId);
+    await api
+      .post("scheduletime", {
+        selectedSlots,
+        vehicle,
+        speedway,
+        userId: user.userId,
+      })
+      .then((response) => setStatus(response.status))
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
+      });
 
-    event.preventDefault()
-
-    if(speedway  == ''){
-      toast.error('Complete all required fields')
-      return;
-    }
-    
-    
-    console.log(user.userId)
-    await api.post('scheduletime', {startDate, endDate, vehicle, speedway, userId: user.userId})
-    .then(response => setStatus(response.status))
-    .catch(err => {
-      console.log(err)
-      toast.error('Something went wrong')
-    })
-
-    setVehicle('Light vehicle')
-    setSpeedway('Select option')
-    setStartDate(new Date())
-    setEndDate(new Date())
-    
+    setVehicle("Light vehicle");
+    setSpeedway("Select option");
     
   }
   return (
@@ -138,137 +148,183 @@ export default function Schedule() {
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        <Box as="form" flex="1" borderRadius={8} bg="gray.800" p="8" mt={5} onSubmit={CreateSchedule}>
-          <Heading size="lg" fontWeight="normal">
-            Schedule
-          </Heading>
+        {page == 1? (
+           <Box
 
-          <Divider my="6" borderColor="gray.700" />
+           flex="1"
+           borderRadius={8}
+           bg="gray.800"
+           p="8"
+           mt={5}
+         >
+           <Flex justifyContent={"space-between"} align="center">
+             <Heading size="lg" fontWeight="normal">
+               Schedule
+             </Heading>
+             
+ 
+             <Box mr={1}>
+               <Icon fontSize={12} mr={2} color={"blue.500"} as={FaCircle} />
+               <Icon fontSize={12} as={FaCircle} color={"gray.600"} />
+             </Box>
+           </Flex>
+ 
+           <Divider my="6" borderColor="gray.700" />
+ 
+           <VStack spacing="8">
+             <Text w="100%" fontSize="20">
+               Select a vehicle:
+             </Text>
+ 
+             <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+               <ChooseVehicle
+                 icon={RiCarLine}
+                 vehicleType="Light vehicle"
+                 onClick={() => {
+                   setVehicle("Light vehicle");
+                 }}
+                 isActive={vehicle == "Light vehicle"}
+               />
+ 
+               <ChooseVehicle
+                 icon={FaTruckMonster}
+                 vehicleType="Heavy vehicle"
+                 onClick={() => {
+                   setVehicle("Heavy vehicle");
+                 }}
+                 isActive={vehicle == "Heavy vehicle"}
+               />
+ 
+               <ChooseVehicle
+                 icon={GiMineTruck}
+                 vehicleType="Truck"
+                 onClick={() => {
+                   setVehicle("Truck");
+                 }}
+                 isActive={vehicle == "Truck"}
+               />
+ 
+               <ChooseVehicle
+                 icon={RiMotorbikeLine}
+                 vehicleType="Motorcycle"
+                 onClick={() => {
+                   setVehicle("Motorcycle");
+                 }}
+                 isActive={vehicle == "Motorcycle"}
+               />
+             </SimpleGrid>
+ 
+             <Text ml="1" w="100%" fontSize="18">
+               Speedway
+             </Text>
+             <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+               <Select
+                 mt="-4"
+                 onChange={(e) => setSpeedway(e.target.value)}
+                 placeholder="Select option"
+                 color="gray.300"
+                 bg="gray.900"
+                 border="none"
+                 height="45px"
+               >
+                 {isLoading ? (
+                   <option value={"loading"}>loading</option>
+                 ) : (
+                   data.map((speed) => (
+                     <option
+                       key={speed.data.speedway}
+                       value={speed.data.speedway}
+                     >
+                       {speed.data.speedway}
+                     </option>
+                   ))
+                 )}
+               </Select>
+             </SimpleGrid>
+           </VStack>
+ 
+           <Flex mt="8" justify="flex-end">
+             <HStack spacing="4">
+               <Link href="/dashboard">
+                 <Button colorScheme="whiteAlpha">Cancel</Button>
+               </Link>
+               <Button colorScheme="blue" onClick={() => {
 
-          <VStack spacing="8">
-            <Text w="100%" fontSize="20">
-              Select a vehicle:
-            </Text>
-
-            <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-              <ChooseVehicle
-                icon={RiCarLine}
-                vehicleType="Light vehicle"
-                onClick={() => {setVehicle('Light vehicle')}}
-                isActive={vehicle == "Light vehicle"}
-                
-              />
-
-              <ChooseVehicle
-                icon={FaTruckMonster}
-                vehicleType="Heavy vehicle"
-                onClick={() => {setVehicle('Heavy vehicle')}}
-                isActive={vehicle == "Heavy vehicle"}
-              />
-
-              <ChooseVehicle
-                icon={GiMineTruck}
-                vehicleType="Truck"
-                onClick={() => {setVehicle('Truck')}}
-                isActive={vehicle == "Truck"}
-              />
-
-              <ChooseVehicle
-                icon={RiMotorbikeLine}
-                vehicleType="Motorcycle"
-                onClick={() => {setVehicle('Motorcycle')}}
-                isActive={vehicle == 'Motorcycle'}
-              />
-            </SimpleGrid>
-
-            <Text ml="1" w="100%" fontSize="18">
-              Speedway
-            </Text>
-            <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-              <Select
-                mt="-4"
-                onChange={(e) => setSpeedway(e.target.value)}
-                placeholder="Select option"
-                color="gray.300"
-                bg="gray.900"
-                border="none"
-                height="45px"
-                
-              >
-                
-                {isLoading? (
-                  <option value={"loading"}>loading</option>
-                ): (
-                  data.map((speed) => (<option key={speed.data.speedway} value={speed.data.speedway}>{speed.data.speedway}</option>))
+                {speedway == '' ? (toast.info('You need to select a speedway')) : (
+                  setPage(2)
                 )}
-              </Select>
 
-              
-            </SimpleGrid>
-
-            <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-              <Flex
-                background="gray.900"
-                p="3"
-                borderRadius="lg"
-                alignItems="center"
-                shadow="md"
-                color="gray.100"
-                justify="space-between"
-                onClick={handleOpenModal}
-                cursor="pointer"
-              >
-                <Flex>
-                  <Icon
-                    as={RiCalendarLine}
-                    fontSize="25"
-                    mr="2"
-                    color="gray.200"
-                  />
-                  <Text color="gray.200">{startDate.toDateString()}</Text>
-                </Flex>
-                <Icon as={IoMdArrowDropdown} fontSize="25" mr="2" />
-              </Flex>
-
-              <Flex
-                background="gray.900"
-                p="3"
-                borderRadius="lg"
-                alignItems="center"
-                shadow="md"
-                color="gray.100"
-                justify="space-between"
-                onClick={handleOpenModal}
-                cursor="pointer"
-              >
-                <Flex>
-                  <Icon
-                    color="gray.200"
-                    as={RiCalendarLine}
-                    fontSize="25"
-                    mr="2"
-                  />
-                  <Text color="gray.200">{endDate.toDateString()}</Text>
-                </Flex>
-                <Icon as={IoMdArrowDropdown} fontSize="25" mr="2" />
-              </Flex>
-            </SimpleGrid>
-          </VStack>
-
-          <Flex mt="8" justify="flex-end">
-            <HStack spacing="4">
-              <Link href="/dashboard">
-                <Button colorScheme="whiteAlpha">
-                  Cancel
-                </Button>
-              </Link>
-              <Button type="submit" colorScheme="blue">
-                Save
-              </Button>
-            </HStack>
-          </Flex>
-        </Box>
-        <Modal
+                
+               }}>
+                 Next
+               </Button>
+             </HStack>
+           </Flex>
+         </Box>
+        ) : (
+          
+          <Box
+           borderRadius={8}
+           bg="gray.800"
+           p="8"
+           mt={5}
+           height='100%'
+           w={isWideVersioon ? '' : '100%'}
+         >
+           <Flex justifyContent={"space-between"} align="center">
+            <Flex>
+            <Heading mr={4} size="lg" fontWeight="normal">
+               Schedule
+             </Heading>
+             
+             <CalendarHeader />
+            </Flex>
+             
+ 
+             <Box mr={1}>
+               <Icon fontSize={12} mr={2} color={"gray.600"} as={FaCircle} />
+               <Icon fontSize={12} as={FaCircle} color={"blue.500"} />
+             </Box>
+           </Flex>
+ 
+           <Divider my="6" borderColor="gray.700" />
+ 
+           <Box sx={
+            { "&::-webkit-scrollbar": {
+                width: "4px",
+                
+              },
+              "&::-webkit-scrollbar-track": {
+                width: "6px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "blackAlpha.400",
+                borderRadius: "24px",
+              },
+            }
+  } border={'8px'} borderColor='gray.800' overflowX={'auto'} maxW={1180} as="form" flex="1" borderRadius={8} bg="gray.800" py="2" mt={5} onSubmit={CreateSchedule} h='100%' marginTop={'0'}>
+            
+            <Box>
+            <CalendarIndex
+            addTimeSlot={AddTimeSlot}
+            selectedSlots={selectedSlots}
+            setSelectedSlots={setSelectedSlots}
+            />
+            </Box>
+            
+          </Box>
+ 
+           <Flex mt="4" justify="flex-end">
+             <HStack spacing="4">
+          
+                <Button onClick={() => {setPage(1)}} colorScheme="whiteAlpha">Back</Button>
+               
+               <Button colorScheme="blue" onClick={() => {setIsModalOpen(true)}}>
+                 Next
+               </Button>
+             </HStack>
+           </Flex>
+           <Modal
           isOpen={isModalOpen}
           onRequestClose={handleCloseModal}
           overlayClassName="react-modal-overlay"
@@ -276,42 +332,42 @@ export default function Schedule() {
           ariaHideApp={false}
         >
           <SimpleGrid
+            as={'form'}
             flex="1"
             gap="1"
             minChildWidth="320px"
             alignItems="flex-start"
+            onSubmit={CreateSchedule}
           >
-            <Box display="flex" justifyContent="space-around">
-              <DateRangePicker
-                ranges={[selectionRange]}
-                minDate={new Date()}
-                onChange={handleSelect}
-                className="CalendarStyle"
-              />
+            <Flex justifyContent="flex-start">
+              <Text fontSize={24} fontWeight='bold' color={'gray.100'}>Confirm appointment</Text>
+            </Flex>
+
+            <Box my='4'>
+            <Divider/>
+            <Text mt={6} mb={2} fontSize={18} >
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting.
+            </Text>
             </Box>
-            <Divider mt="-5" orientation="horizontal" />
-            <Box
-              mb="1.5"
-              display="flex"
-              justifyContent="space-between"
-              px="5"
-              alignItems="center"
-            >
-              <ChakraLink href="/dashboard">
-                <Button onClick={handleCloseModal} bg="red.600">
-                  Dashboard
+
+            <HStack spacing={4} justify='end'>
+            <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
+                  Cancel
                 </Button>
-              </ChakraLink>
+              
 
-              <Text color="gray.600">15 de janeiro, 2022</Text>
-
-              <Button type="submit" onClick={handleCloseModal} bg="green.600">
-                Continue
+              <Button type="submit" colorScheme="green">
+                Confirm
               </Button>
-            </Box>
+            </HStack>
           </SimpleGrid>
         </Modal>
+           
+         </Box> 
+         )}
       </Flex>
+      
     </Box>
+    
   );
 }

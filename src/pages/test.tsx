@@ -134,7 +134,7 @@ import { CalendarHeader } from "../components/Calendar/CalendarHeader";
        
     }
     return (
-      <Box mt={-3}>
+      <Box >
         <Header />
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />

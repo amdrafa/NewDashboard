@@ -4,8 +4,7 @@ import { query as q } from 'faunadb'
 import { authenticated } from "./login";
 
 interface bodyProps {
-    startDate: string;
-    endDate: string;
+    selectedSlots: string[];
     speedway: string;
     vehicle: string;
     userId: number;
@@ -17,15 +16,15 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
     
     if(request.method === 'POST'){
 
-        const {startDate, endDate, speedway, vehicle, userId } = request.body
+        const {selectedSlots, speedway, vehicle, userId }:bodyProps = request.body
 
-        console.log("heyyyy, new appointment created", startDate, endDate, speedway, vehicle, userId)
+        console.log("heyyyy, new appointment created", selectedSlots, speedway, vehicle, userId)
         
         try{
             await fauna.query(
                 q.Create(
                     q.Collection('schedules'),
-                    { data: {startDate, endDate, speedway, vehicle, userId} }
+                    { data: {selectedSlots, speedway, vehicle, userId} }
                 )
             )
 

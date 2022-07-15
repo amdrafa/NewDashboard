@@ -1,16 +1,35 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { HourSlot } from "../hourslot";
+
+interface slotInterface {
+    slot: string;
+}
 
 interface DayProps {
     day: dayjs.Dayjs;
     rowIdx: number;
+    addTimeSlot: (slot:string) => void;
+    selectedSlots: string[];
+    setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 // dayjs.Dayjs = type for day js
 
-export function Day({day, rowIdx}:DayProps){
+export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:DayProps){
 
-    console.log(day)
+    const [slot8AmIsSelected, setSlot8AmIsSelected] = useState(false)
+    const [slot9AmIsSelected, setSlot9AmIsSelected] = useState(false)
+    const [slot10AmIsSelected, setSlot10AmIsSelected] = useState(false)
+    const [slot11AmIsSelected, setSlot11AmIsSelected] = useState(false)
+    const [slot12AmIsSelected, setSlot12AmIsSelected] = useState(false)
+    const [slot13AmIsSelected, setSlot13AmIsSelected] = useState(false)
+    const [slot14AmIsSelected, setSlot14AmIsSelected] = useState(false)
+    const [slot15AmIsSelected, setSlot15AmIsSelected] = useState(false)
+    const [slot16AmIsSelected, setSlot16AmIsSelected] = useState(false)
+    const [slot17AmIsSelected, setSlot17AmIsSelected] = useState(false)
+
 
     function getCurrentDay(){
         return day.format('DD-MM-YY') == dayjs().format('DD-MM-YY') ? 'blue.600' : 'blackAlpha.300'
@@ -19,7 +38,6 @@ export function Day({day, rowIdx}:DayProps){
     function getCurrentDayColor(){
         return day.format('DD-MM-YY') == dayjs().format('DD-MM-YY') ? 'blue.600' : ''
     }
-
 
     return (
         <>
@@ -39,65 +57,115 @@ export function Day({day, rowIdx}:DayProps){
                     </Text>
     
     
-                    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'green.600'}} cursor='pointer'>
-                        <Text>
-                            8:00am - 9:00am
-                        </Text>
-                    </Flex>
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'green.600'}} cursor='pointer'>
-                        <Text>
-                            9:00am - 10:00am
-                        </Text>
-                    </Flex>
-                    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'green.600'}} cursor='pointer'>
-                        <Text>
-                            10:00am - 11:00am
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'green.600'}} cursor='pointer'>
-                        <Text>
-                            11:00am - 12:00am
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'red.400'} rounded='md' cursor={'not-allowed'}>
-                        <Text>
-                            12:00am - 13:00pm
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md'_hover={{bg: 'green.600'}} cursor='pointer'>
-                        <Text>
-                            13:00pm - 14:00pm
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'blue.600'}} cursor='pointer'>
-                        <Text>
-                        14:00pm - 15:00pm
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'blue.600'}} cursor='pointer'>
-                        <Text>
-                            15:00pm - 16:00pm
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'blue.600'}} cursor='pointer'>
-                        <Text>
-                            16:00pm - 17:00pm
-                        </Text>
-                    </Flex>
-    
-                    <Flex mb={2} justify={'center'} p={'2'} w={'100%'} border={'1px'} borderColor='blackAlpha.300' bg={'gray.800'} rounded='md' _hover={{bg: 'blue.600'}} cursor='pointer'>
-                        <Text>
-                            17:00pm - 18:00pm
-                        </Text>
-                    </Flex>
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot8AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 8).toString()}
+                        hourSlotLabel='8:00am - 9:00am'
+                        userClick={setSlot8AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot9AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 9).toString()}
+                        hourSlotLabel='9:00am - 10:00am'
+                        userClick={setSlot9AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot10AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 10).toString()}
+                        hourSlotLabel='10:00am - 11:00am'
+                        userClick={setSlot10AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot11AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 11).toString()}
+                        hourSlotLabel='11:00am - 12:00am'
+                        userClick={setSlot11AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot12AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 12).toString()}
+                        hourSlotLabel='12:00am - 13:00pm'
+                        userClick={setSlot12AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot13AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 13).toString()}
+                        hourSlotLabel='13:00pm - 14:00pm'
+                        userClick={setSlot13AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot14AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 14).toString()}
+                        hourSlotLabel='14:00pm - 15:00pm'
+                        userClick={setSlot14AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot15AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 15).toString()}
+                        hourSlotLabel='15:00pm - 16:00pm'
+                        userClick={setSlot15AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot16AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 16).toString()}
+                        hourSlotLabel='16:00pm - 17:00pm'
+                        userClick={setSlot16AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
+
+                    <HourSlot 
+                        isAvaiable={true}
+                        isSelected={slot17AmIsSelected}
+                        hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 17).toString()}
+                        hourSlotLabel='17:00pm - 18:00pm'
+                        userClick={setSlot17AmIsSelected}
+                        addTimeSlot={addTimeSlot}
+                        selectedSlots={selectedSlots}
+                        setSelectedSlots={setSelectedSlots}
+                    />
     
                     
                     {/* <Flex>

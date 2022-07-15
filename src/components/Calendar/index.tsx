@@ -6,7 +6,14 @@ import { CalendarHeader } from "./CalendarHeader";
 import { CalendarSidebar } from "./CalendarSideBar";
 import { Month } from "./Month";
 
-export function CalendarIndex(){
+
+interface CalendarIndexProps{
+    addTimeSlot: (slot: string) => void;
+    selectedSlots: string[];
+    setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export function CalendarIndex({addTimeSlot, selectedSlots, setSelectedSlots}:CalendarIndexProps){
 
     const [ currentMonth, setCurrentMonth] = useState(getMonth())
 
@@ -28,6 +35,9 @@ export function CalendarIndex(){
                     
                     <Month 
                     month={currentMonth}
+                    addTimeSlot={addTimeSlot}
+                    selectedSlots={selectedSlots}
+                    setSelectedSlots={setSelectedSlots}
                     />
                 </Flex>
             </Flex>
