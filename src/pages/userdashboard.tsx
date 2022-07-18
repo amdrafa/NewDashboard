@@ -31,7 +31,8 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { GiConfirmed } from "react-icons/gi";
-import {getMonth} from '../util'
+import { getMonth } from "../util";
+import dayjs from "dayjs";
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -41,9 +42,8 @@ interface appointmentsDataProps {
 
 interface appointmentProps {
   speedway: string;
-  startDate: string;
-  endDate: string;
   vehicle: string;
+  selectedSlots: string[];
 }
 
 const Chart = dynamic(async () => await import("react-apexcharts"), {
@@ -122,8 +122,7 @@ const options = {
 const series = [{ name: "series1", data: [31, 120, 10, 28, 61, 18, 109] }];
 
 export default function Dashboard() {
-
-  console.log(getMonth())
+  console.log(getMonth());
 
   const isWideVersioon = useBreakpointValue({
     base: false,
@@ -138,7 +137,7 @@ export default function Dashboard() {
 
   const [companies, setCompanies] = useState<appointmentsDataProps[]>([]);
 
-  const [needsLessHeight, setNeedsLessHeight] = useState('');
+  const [needsLessHeight, setNeedsLessHeight] = useState("");
 
   const { data, isLoading, error } = useQuery<appointmentsDataProps[]>(
     `userappointmentslist${page}`,
@@ -147,16 +146,12 @@ export default function Dashboard() {
         `getalluserappointments?page=${page}&limit=${limit}`
       );
       const { PaginateData: ReturnedData, totalcount } = response.data;
-    
 
       setTotal(totalcount);
-      
+
       return ReturnedData;
     }
   );
-
-
-  
 
   return (
     <>
@@ -166,170 +161,180 @@ export default function Dashboard() {
         <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
 
-        <Box w={"100%"} px={6} ml={6}>
-
-        
-          <SimpleGrid
-            flex="1"
-            gap="4"
-            minChildWidth="320px"
-            alignItems="flex-start"
-            mt="6"
-          >
-            <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-              <Text fontSize="lg" mb="4">
-                Month appointments
-              </Text>
-              <Chart
-                options={options}
-                series={series}
-                type="area"
-                height={160}
-              />
-            </Box>
-
-            <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-              <Text fontSize="lg" mb="4">
-                Speedway usage
-              </Text>
-              <Chart
-                options={options}
-                series={series}
-                type="area"
-                height={160}
-              />
-            </Box>
-          </SimpleGrid>
-
-
-
-
-          <Box
-            flex="1"
-            borderRadius={8}
-            bg="gray.800"
-            p="8" 
-            mt={20}
-            mb={20}
-            maxWidth={1600}
-            
-          >
-            <Flex mb="8" justify="space-between" align="center">
-              <Heading size="lg" fontWeight="normal">
-                My appointments
-              </Heading>
-
-              <Link href="/schedule">
-              <Button
-                size="sm"
-                fontSize="sm"
-                colorScheme="blue"
-                leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-              >
-                Schedule an appointment
-              </Button>
-            </Link>
-            </Flex>
-
-            {isLoading ? (
-              <Flex justify="center">
-                <Spinner mt="10" mb="80px" />
-              </Flex>
-            ) : error ? (
-              <Flex justify="center">
-                <Text>The requisition failed</Text>
-              </Flex>
-            ) : (
-              total > 0? (<>
-                <Table colorScheme="whiteAlpha">
-                  <Thead>
-                    <Tr>
-                      <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Speedway</Text>
-                      </Th>
-
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>From</Text>
-                      </Th>
-
-                      <Th>To</Th>
-
-                      {isWideVersioon && <Th>Vehicle</Th>}
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Status</Text>
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data.map((appointment) => (
-                      <Tr key={appointment.ts}>
-                        <Td>
-                          <Text fontWeight="bold">
-                            {appointment.data.speedway}
-                          </Text>
-                        </Td>
-                        <Td>
-                          <Text>
-                            {new Date(
-                              appointment.data.startDate
-                            ).toLocaleDateString()}
-                          </Text>
-                        </Td>
-                        {isWideVersioon && (
-                          <Td>
-                            {new Date(
-                              appointment.data.endDate
-                            ).toLocaleDateString()}
-                          </Td>
-                        )}
-
-                        {isWideVersioon && <Td>{appointment.data.vehicle}</Td>}
-
-                        <Td>
-                          <Flex>
-                            <Icon
-                              color={"blue.500"}
-                              ml={4}
-                              as={GiConfirmed}
-                              fontSize="20"
-                            />
-                          </Flex>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-                <Pagination
-                  totalCountOfRegisters={total + 2}
-                  currentPage={page}
-                  onPageChanges={setPage}
+          <Box w={"100%"} px={6} ml={6}>
+            <SimpleGrid
+              flex="1"
+              gap="4"
+              minChildWidth="320px"
+              alignItems="flex-start"
+              mt="6"
+            >
+              <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
+                <Text fontSize="lg" mb="4">
+                  Month appointments
+                </Text>
+                <Chart
+                  options={options}
+                  series={series}
+                  type="area"
+                  height={160}
                 />
-              </>) : (
-                total == -1 ? (
-                  <Flex justify="center">
-                <Spinner mt="10" mb="80px" />
-              </Flex>
-                ) : (
-                  (<Flex w="100%" justifyContent="center"> 
-                <Box justifyContent="center" my={10}>
-                    <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">You still don't have any appointment.</Text>         
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">           
-                <Text fontSize={18}>Go to the schedule page and book an appointment.</Text>
-                </Flex> 
-                </Box>
-              </Flex>)
-                )
-              )
-            )}
-          </Box>
+              </Box>
 
+              <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
+                <Text fontSize="lg" mb="4">
+                  Speedway usage
+                </Text>
+                <Chart
+                  options={options}
+                  series={series}
+                  type="area"
+                  height={160}
+                />
+              </Box>
+            </SimpleGrid>
+
+            <Box
+              flex="1"
+              borderRadius={8}
+              bg="gray.800"
+              p="8"
+              mt={20}
+              mb={20}
+              maxWidth={1600}
+            >
+              <Flex mb="8" justify="space-between" align="center">
+                <Heading size="lg" fontWeight="normal">
+                  My appointments
+                </Heading>
+
+                <Link href="/schedule">
+                  <Button
+                    size="sm"
+                    fontSize="sm"
+                    colorScheme="blue"
+                    leftIcon={<Icon as={RiAddLine} fontSize="20" />}
+                  >
+                    Schedule an appointment
+                  </Button>
+                </Link>
+              </Flex>
+
+              {isLoading ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
+                </Flex>
+              ) : error ? (
+                <Flex justify="center">
+                  <Text>The requisition failed</Text>
+                </Flex>
+              ) : total > 0 ? (
+                <>
+                  <Table colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>Speedway</Text>
+                        </Th>
+
+
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Date</Text>
+                        </Th>
+
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Slots</Text>
+                        </Th>
+
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Status</Text>
+                        </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {data.map((appointment) => (
+                        <Tr key={appointment.ts}>
+                          <Td>
+                            <Box>
+                            <Text fontWeight="bold">
+                              {appointment.data.speedway}
+                            </Text>
+                            <Text color={'gray.300'}>
+                              {appointment.data.vehicle}
+                            </Text>
+                            </Box>
+                          </Td>
+
+                          <Td>
+                            <Text >
+                              {dayjs(appointment.data.selectedSlots[0]).format('DD/MM/YYYY')}
+                            </Text>
+                          </Td>
+
+                          <Td>
+                            <Text whiteSpace={"pre-line"}>
+                              {appointment.data.selectedSlots.map((slot) => {
+                                return (
+                                  <Flex py={"1"}>
+                                    
+
+                                    <Text
+                                      color={"blue.400"}
+                                      fontWeight={"bold"}
+                                      ml='2'
+                                    >
+                                      {dayjs(slot).format("H")}:00 to{" "}
+                                      {Number(dayjs(slot).format("H")) + 1}:00
+                                    </Text>
+                                  </Flex>
+                                );
+                              })}
+                            </Text>
+                          </Td>
+
+                          <Td>
+                            <Flex>
+                              <Icon
+                                color={"blue.500"}
+                                ml={4}
+                                as={GiConfirmed}
+                                fontSize="20"
+                              />
+                            </Flex>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                  <Pagination
+                    totalCountOfRegisters={total + 2}
+                    currentPage={page}
+                    onPageChanges={setPage}
+                  />
+                </>
+              ) : total == -1 ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
+                </Flex>
+              ) : (
+                <Flex w="100%" justifyContent="center">
+                  <Box justifyContent="center" my={10}>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={22} fontWeight="bold">
+                        You still don't have any appointment.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={18}>
+                        Go to the schedule page and book an appointment.
+                      </Text>
+                    </Flex>
+                  </Box>
+                </Flex>
+              )}
+            </Box>
           </Box>
         </Flex>
-
-        
-        
       </Box>
     </>
   );

@@ -7,9 +7,10 @@ interface MonthProps {
     addTimeSlot: (slot: string) => void;
     selectedSlots: string[];
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
+    setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots}:MonthProps){
+export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading}:MonthProps){
 
     return (         // Let teams apparence, horizontal direction
                     // flex={'1'} gridTemplateColumns={'repeat(7, 1fr)'}
@@ -24,6 +25,7 @@ export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots}:Mont
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                         />
                     ))}
                 </Flex>

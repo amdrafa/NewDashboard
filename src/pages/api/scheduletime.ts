@@ -18,7 +18,6 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
 
         const {selectedSlots, speedway, vehicle, userId }:bodyProps = request.body
 
-        console.log("heyyyy, new appointment created", selectedSlots, speedway, vehicle, userId)
         
         try{
             await fauna.query(

@@ -1,11 +1,11 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
+import { api } from "../../services/axios";
 import { HourSlot } from "../hourslot";
 
-interface slotInterface {
-    slot: string;
-}
+
 
 interface DayProps {
     day: dayjs.Dayjs;
@@ -13,12 +13,14 @@ interface DayProps {
     addTimeSlot: (slot:string) => void;
     selectedSlots: string[];
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
+    setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // dayjs.Dayjs = type for day js
 
-export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:DayProps){
+export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading}:DayProps){
 
+    
     const [slot8AmIsSelected, setSlot8AmIsSelected] = useState(false)
     const [slot9AmIsSelected, setSlot9AmIsSelected] = useState(false)
     const [slot10AmIsSelected, setSlot10AmIsSelected] = useState(false)
@@ -58,7 +60,6 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
     
     
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot8AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 8).toString()}
                         hourSlotLabel='8:00am - 9:00am'
@@ -66,10 +67,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot9AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 9).toString()}
                         hourSlotLabel='9:00am - 10:00am'
@@ -77,10 +78,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot10AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 10).toString()}
                         hourSlotLabel='10:00am - 11:00am'
@@ -88,10 +89,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot11AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 11).toString()}
                         hourSlotLabel='11:00am - 12:00am'
@@ -99,10 +100,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot12AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 12).toString()}
                         hourSlotLabel='12:00am - 13:00pm'
@@ -110,10 +111,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot13AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 13).toString()}
                         hourSlotLabel='13:00pm - 14:00pm'
@@ -121,10 +122,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot14AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 14).toString()}
                         hourSlotLabel='14:00pm - 15:00pm'
@@ -132,10 +133,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot15AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 15).toString()}
                         hourSlotLabel='15:00pm - 16:00pm'
@@ -143,10 +144,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot16AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 16).toString()}
                         hourSlotLabel='16:00pm - 17:00pm'
@@ -154,10 +155,10 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
 
                     <HourSlot 
-                        isAvaiable={true}
                         isSelected={slot17AmIsSelected}
                         hourSlot={new Date(Number(day.format('YYYY')), Number(day.format('MM')) - 1, Number(day.format('D')), 17).toString()}
                         hourSlotLabel='17:00pm - 18:00pm'
@@ -165,6 +166,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots}:
                         addTimeSlot={addTimeSlot}
                         selectedSlots={selectedSlots}
                         setSelectedSlots={setSelectedSlots}
+                        setIsSlotLoading={setIsSlotLoading}
                     />
     
                     

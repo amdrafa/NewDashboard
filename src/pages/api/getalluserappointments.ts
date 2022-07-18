@@ -19,8 +19,7 @@ interface appointmentProps{
     data: {
         startDate: string;
         endDate: string;
-        speedway: string;
-        vehicle: string;
+        selectedSlots: string[];
         userId: string;
     }
     

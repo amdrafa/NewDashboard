@@ -60,15 +60,24 @@ interface dataProps {
 
 export default function Schedule() {
 
+  const [isSlotLoading, setIsSlotLoading] = useState(false)
+
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
 
   function AddTimeSlot(slot: string){
     
-  let updatedSlots = selectedSlots
+  let updatedSlots = [...selectedSlots]
 
-  updatedSlots.push(slot)
+  const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot == slot)
 
-  setSelectedSlots(updatedSlots)
+  if(slotIndex >= 0){
+    updatedSlots.splice(slotIndex, 1)
+    setSelectedSlots(updatedSlots)
+  }else{
+    updatedSlots.push(slot)
+    setSelectedSlots(updatedSlots)
+  }
+
 
   return ;
 
@@ -81,6 +90,7 @@ export default function Schedule() {
     lg: true,
   });
 
+  useEffect(() => {console.log(isSlotLoading)}, [isSlotLoading])
 
   const [speedway, setSpeedway] = useState("");
   const [vehicle, setVehicle] = useState("Light vehicle");
@@ -94,7 +104,11 @@ export default function Schedule() {
   const { isAuthenticated, user } = useContext(LoginContext);
 
   useEffect(() => {
-    status == 200 && toast.success("Appointment scheduled");
+    if(status == 200){
+      setIsModalOpen(false)
+      toast.success("Appointment scheduled")
+      Router.push('/userdashboard')
+    }
     setStatus(0);
   }, [status]);
 
@@ -117,14 +131,12 @@ export default function Schedule() {
     setIsModalOpen(false);
   }
 
-  console.log(speedway, vehicle, selectedSlots);
+
 
   async function CreateSchedule(event: FormEvent) {
     event.preventDefault();
 
-    console.log('passed here')
 
-    console.log(user.userId);
     await api
       .post("scheduletime", {
         selectedSlots,
@@ -138,6 +150,7 @@ export default function Schedule() {
         toast.error("Something went wrong");
       });
 
+    
     setVehicle("Light vehicle");
     setSpeedway("Select option");
     
@@ -305,11 +318,21 @@ export default function Schedule() {
   } border={'8px'} borderColor='gray.800' overflowX={'auto'} maxW={1180} as="form" flex="1" borderRadius={8} bg="gray.800" py="2" mt={5} onSubmit={CreateSchedule} h='100%' marginTop={'0'}>
             
             <Box>
-            <CalendarIndex
-            addTimeSlot={AddTimeSlot}
-            selectedSlots={selectedSlots}
-            setSelectedSlots={setSelectedSlots}
-            />
+              {isSlotLoading ? (
+                <CalendarIndex
+                addTimeSlot={AddTimeSlot}
+                selectedSlots={selectedSlots}
+                setSelectedSlots={setSelectedSlots}
+                setIsSlotLoading={setIsSlotLoading}
+                />
+              ) : (
+                <CalendarIndex
+                addTimeSlot={AddTimeSlot}
+                selectedSlots={selectedSlots}
+                setSelectedSlots={setSelectedSlots}
+                setIsSlotLoading={setIsSlotLoading}
+                />
+              )}
             </Box>
             
           </Box>
@@ -317,9 +340,14 @@ export default function Schedule() {
            <Flex mt="4" justify="flex-end">
              <HStack spacing="4">
           
-                <Button onClick={() => {setPage(1)}} colorScheme="whiteAlpha">Back</Button>
+              <Button onClick={() => {
+                setPage(1)
+                setSelectedSlots([])
+                }} colorScheme="whiteAlpha">Back</Button>
                
-               <Button colorScheme="blue" onClick={() => {setIsModalOpen(true)}}>
+               <Button colorScheme="blue" onClick={() => {
+                  selectedSlots.length <= 0? toast.info('Select a slot') : setIsModalOpen(true)
+                }}>
                  Next
                </Button>
              </HStack>
