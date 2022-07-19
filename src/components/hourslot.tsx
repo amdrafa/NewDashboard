@@ -2,6 +2,7 @@ import { Flex, Text } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { toast } from "react-toastify";
 import { api } from "../services/axios";
 
 interface busySlotsProps {
@@ -23,6 +24,10 @@ interface HourSlotProps {
 
 export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading}: HourSlotProps) {
 
+  const [isSameDay, setIsSameDay] = useState(true)
+
+  const [selectedDay, setSelectedDay] = useState(0)
+
   const [isAvaiable, setIsAvaiable] = useState(false)
 
   const { data: dataBusySlots, isLoading: isLoadingBusylots, error: errorBusylots } = useQuery<busySlotsProps>(
@@ -37,18 +42,16 @@ export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTim
 
 useEffect(() => {
     
-    
     if(isLoadingBusylots){
-      setIsSlotLoading(isLoadingBusylots)
         return ;
     }else{
-      setIsSlotLoading(isLoadingBusylots)
-        setIsAvaiable(dataBusySlots.busySlots.find(slot => slot == hourSlot) ? true : false)
+        setIsAvaiable(dataBusySlots.busySlots.find(slot => slot == hourSlot) ? false : true)
+
+        // setIsAvaiable(selectedSlots.length > 0 && dataBusySlots.busySlots.find(slot => Number(dayjs(slot).format('D')) == Number(dayjs(hourSlot).format('D'))) ? true : false)
     }
 
 }, [isLoadingBusylots])
 
-  
 
   return (
     <Flex
@@ -58,23 +61,32 @@ useEffect(() => {
       w={"100%"}
       border={"1px"}
       borderColor="blackAlpha.300"
-      bg={!isAvaiable ?  isSelected ? 'blue.500' : 'gray.800' : 'red.400'}
+      bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ?  isSelected ? 'green.500' : 'gray.800' : 'red.400')}
       rounded="md"
-      cursor={!isAvaiable ? 'pointer' : "not-allowed"}
-      _hover={!isAvaiable ? {bg: 'blue.500'} : {bg: 'red.500'} }
+      cursor={isAvaiable ? 'pointer' : "not-allowed"}
+      _hover={isAvaiable ? {bg: 'blue.500'} : {bg: 'red.500'} }
       onClick={() => {
         isSelected ? userClick(false) : userClick(true)
 
-        console.log(hourSlot)
+        
 
-        addTimeSlot(hourSlot)
+        if(selectedSlots.length == 0){
+          setSelectedDay(Number(dayjs(hourSlot).format('D')))
+        }else{
+          if(selectedSlots.length > 0 && dataBusySlots.busySlots.find(slot => Number(dayjs(slot).format('D')) == Number(dayjs(hourSlot).format('D')))){
+            toast.info('DSADSA')
+          }
+        }
+        
 
-        console.log(hourSlot)
+        if(isAvaiable){
+          addTimeSlot(hourSlot)
+        }
 
-        console.log(selectedSlots)
+
       }}
     >
-      <Text>{hourSlotLabel}</Text>
+      <Text color={isLoadingBusylots? 'gray.500' : ''}>{hourSlotLabel}</Text>
     </Flex>
   );
 }

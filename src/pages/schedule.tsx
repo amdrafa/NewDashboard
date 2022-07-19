@@ -60,7 +60,7 @@ interface dataProps {
 
 export default function Schedule() {
 
-  const [isSlotLoading, setIsSlotLoading] = useState(false)
+  const [isSlotLoading, setIsSlotLoading] = useState(true)
 
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
 
@@ -68,7 +68,7 @@ export default function Schedule() {
     
   let updatedSlots = [...selectedSlots]
 
-  const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot == slot)
+  const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot === slot)
 
   if(slotIndex >= 0){
     updatedSlots.splice(slotIndex, 1)
@@ -77,7 +77,6 @@ export default function Schedule() {
     updatedSlots.push(slot)
     setSelectedSlots(updatedSlots)
   }
-
 
   return ;
 
@@ -90,7 +89,6 @@ export default function Schedule() {
     lg: true,
   });
 
-  useEffect(() => {console.log(isSlotLoading)}, [isSlotLoading])
 
   const [speedway, setSpeedway] = useState("");
   const [vehicle, setVehicle] = useState("Light vehicle");
@@ -102,6 +100,15 @@ export default function Schedule() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { isAuthenticated, user } = useContext(LoginContext);
+
+  useEffect(() => {
+    if(page == 2){
+      setTimeout(() => {
+        setIsSlotLoading(false);
+      }, 4000)
+    }
+    
+  }, [page])
 
   useEffect(() => {
     if(status == 200){
@@ -289,7 +296,7 @@ export default function Schedule() {
             <Heading mr={4} size="lg" fontWeight="normal">
                Schedule
              </Heading>
-             
+             {selectedSlots.map(slot => (slot))}
              <CalendarHeader />
             </Flex>
              
@@ -318,21 +325,19 @@ export default function Schedule() {
   } border={'8px'} borderColor='gray.800' overflowX={'auto'} maxW={1180} as="form" flex="1" borderRadius={8} bg="gray.800" py="2" mt={5} onSubmit={CreateSchedule} h='100%' marginTop={'0'}>
             
             <Box>
-              {isSlotLoading ? (
-                <CalendarIndex
-                addTimeSlot={AddTimeSlot}
-                selectedSlots={selectedSlots}
-                setSelectedSlots={setSelectedSlots}
-                setIsSlotLoading={setIsSlotLoading}
-                />
-              ) : (
-                <CalendarIndex
-                addTimeSlot={AddTimeSlot}
-                selectedSlots={selectedSlots}
-                setSelectedSlots={setSelectedSlots}
-                setIsSlotLoading={setIsSlotLoading}
-                />
-              )}
+                {isSlotLoading? (
+                  <Flex w={'1170px'} justifyContent='center'>
+                    <Spinner my={'32'}/>
+                  </Flex>
+                ) : (
+                  <CalendarIndex
+                  addTimeSlot={AddTimeSlot}
+                  selectedSlots={selectedSlots}
+                  setSelectedSlots={setSelectedSlots}
+                  setIsSlotLoading={setIsSlotLoading}
+                  />
+                )}
+              
             </Box>
             
           </Box>
