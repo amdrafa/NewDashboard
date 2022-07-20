@@ -44,6 +44,7 @@ import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { CalendarHeader } from "../components/Calendar/CalendarHeader";
 import { CalendarIndex } from "../components/Calendar";
+import dayjs from "dayjs";
 
 interface speedwayProps {
   speedway: string;
@@ -60,6 +61,8 @@ interface dataProps {
 
 export default function Schedule() {
 
+  const [isSameDay, setIsSameDay] = useState(true)
+
   const [isSlotLoading, setIsSlotLoading] = useState(true)
 
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
@@ -69,16 +72,22 @@ export default function Schedule() {
   let updatedSlots = [...selectedSlots]
 
   const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot === slot)
+    
 
   if(slotIndex >= 0){
     updatedSlots.splice(slotIndex, 1)
     setSelectedSlots(updatedSlots)
   }else{
-    updatedSlots.push(slot)
-    setSelectedSlots(updatedSlots)
+    if(dayjs(selectedSlots[0]).format('D') == dayjs(slot).format('D') || selectedSlots.length == 0){
+      setIsSameDay(true)
+      updatedSlots.push(slot)
+      setSelectedSlots(updatedSlots)
+    }else{
+      setIsSameDay(false)
+      
+    }
+    
   }
-
-  return ;
 
   }
 
@@ -296,7 +305,7 @@ export default function Schedule() {
             <Heading mr={4} size="lg" fontWeight="normal">
                Schedule
              </Heading>
-             {selectedSlots.map(slot => (slot))}
+             {/* {selectedSlots.map(slot => (slot))} */}
              <CalendarHeader />
             </Flex>
              
@@ -335,6 +344,7 @@ export default function Schedule() {
                   selectedSlots={selectedSlots}
                   setSelectedSlots={setSelectedSlots}
                   setIsSlotLoading={setIsSlotLoading}
+                  sameDay={isSameDay}
                   />
                 )}
               

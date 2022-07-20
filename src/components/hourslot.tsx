@@ -18,15 +18,16 @@ interface HourSlotProps {
     selectedSlots: string[];
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    sameDay: boolean;
 }
 
 
 
-export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading}: HourSlotProps) {
+export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay}: HourSlotProps) {
 
-  const [isSameDay, setIsSameDay] = useState(true)
-
-  const [selectedDay, setSelectedDay] = useState(0)
+  
+  const [isAnotherDay, setIsAnotherDay] = useState(false)
+  
 
   const [isAvaiable, setIsAvaiable] = useState(false)
 
@@ -50,7 +51,17 @@ useEffect(() => {
         // setIsAvaiable(selectedSlots.length > 0 && dataBusySlots.busySlots.find(slot => Number(dayjs(slot).format('D')) == Number(dayjs(hourSlot).format('D'))) ? true : false)
     }
 
-}, [isLoadingBusylots])
+    
+
+}, [isLoadingBusylots, selectedSlots])
+
+  useEffect(() => {
+    if(selectedSlots.length > 0 && sameDay == false){
+      setIsAvaiable(false)
+    }
+  }, [selectedSlots])
+
+
 
 
   return (
@@ -63,21 +74,23 @@ useEffect(() => {
       borderColor="blackAlpha.300"
       bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ?  isSelected ? 'green.500' : 'gray.800' : 'red.400')}
       rounded="md"
-      cursor={isAvaiable ? 'pointer' : "not-allowed"}
+      cursor={isAvaiable ? '-webkit-grab' : "not-allowed"}
       _hover={isAvaiable ? {bg: 'blue.500'} : {bg: 'red.500'} }
       onClick={() => {
-        isSelected ? userClick(false) : userClick(true)
-
         
+        isSelected? userClick(false) : userClick(true)
 
-        if(selectedSlots.length == 0){
-          setSelectedDay(Number(dayjs(hourSlot).format('D')))
-        }else{
-          if(selectedSlots.length > 0 && dataBusySlots.busySlots.find(slot => Number(dayjs(slot).format('D')) == Number(dayjs(hourSlot).format('D')))){
-            toast.info('DSADSA')
-          }
+        if(dayjs(selectedSlots[0]).format('D') != dayjs(hourSlot).format('D') && selectedSlots.length > 0){
+          userClick(false)
+          toast.info('You can schedule only one day at time')
+          return ;
         }
+
+        // if(selectedSlots.length == 0){
+        //   setSelectedDay(Number(dayjs(hourSlot).format('D')))
+        // }
         
+
 
         if(isAvaiable){
           addTimeSlot(hourSlot)
