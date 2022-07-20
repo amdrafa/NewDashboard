@@ -44,7 +44,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
 
     return (
         <>
-            {(day.format('DD-MM-YY') >= dayjs().format('DD-MM-YY') && day.format('MM') == dayjs().format('MM')) || day.format('MM') > dayjs().format('MM') ? (
+            {(day.format('DD-MM-YY') >= dayjs().format('DD-MM-YY') && day.format('MM') == dayjs().format('MM')) || day.format('MM') > dayjs().format('MM') || day.format('YYYY') > dayjs().format('YYYY')? (
                 <Flex height={'100%'} pt={'4'} border={'4px'} borderColor={'gray.900' } direction={'column'} rounded='lg' bg={'blackAlpha.300'} m='1' w={'200px'} p='2'>
                 <Flex  flexDirection={'column'} alignItems='center'>
     
@@ -70,6 +70,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -82,6 +83,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -94,6 +96,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -106,6 +109,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -118,6 +122,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -130,6 +135,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -142,6 +148,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -154,6 +161,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -166,6 +174,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
 
                     <HourSlot 
@@ -178,6 +187,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        day={day}
                     />
     
                     

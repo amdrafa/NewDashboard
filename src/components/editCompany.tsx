@@ -24,6 +24,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaUnlockAlt } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
 
 type EditCompanyFormData = {
   company: string;
@@ -59,6 +60,8 @@ export default function EditCompany({
     resolver: yupResolver(EditCompanyFormSchema),
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { errors } = formState;
 
   const handleEditCompany: SubmitHandler<EditCompanyFormData> = async ({
@@ -87,6 +90,19 @@ export default function EditCompany({
       });
   };
 
+  function deleteCompany(id: string){
+    api.delete('deletecompany', {data: {id}})
+    .then((response) => {
+      toast.success("company deleted");
+      window.location.reload()
+    })
+    .catch((err) => {
+      toast.error("Something went wrong");
+    });
+  }
+
+  
+
   return (
     <Box
       as="form"
@@ -97,9 +113,15 @@ export default function EditCompany({
       mt={5}
       onSubmit={handleSubmit(handleEditCompany)}
     >
+      <Flex justify={'space-between'} align='center'>
       <Heading size="lg" fontWeight="normal">
         Edit company
       </Heading>
+      <Button bg='red.500' _hover={{bg:'red.400'}} onClick={() => setIsModalOpen(true)}>
+            <Icon mr={1.5} as={FiTrash2} />
+            Delete company
+          </Button>
+      </Flex>
 
       <Divider my="6" borderColor="gray.700" />
 
@@ -186,6 +208,70 @@ export default function EditCompany({
       </Flex>
 
       
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        overlayClassName="react-modal-overlay"
+        className="react-modal-delete-message"
+        ariaHideApp={false}
+      >
+        <SimpleGrid
+          flex="1"
+          gap="1"
+          minChildWidth="320px"
+          alignItems="flex-start"
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems={"center"}
+            mb={2}
+          >
+            <Text fontSize={"2xl"}>Delete company</Text>
+            <Icon
+              fontSize={20}
+              as={IoMdClose}
+              onClick={() => {
+                setIsModalOpen(false);
+              }}
+              cursor={"pointer"}
+            />
+          </Box>
+          <Divider orientation="horizontal" />
+
+          <Box my={"4"}>
+            <Text mb={2} fontSize={"md"}>
+              Do you really want to delete this speedway? All users registered to this company will be deleted too.
+            </Text>
+            <Text color={"gray.300"} mb={2} fontSize={"md"}>
+              An e-mail will be sent to the responsable for the company informing it was deleted.
+            </Text>
+          </Box>
+
+          <Flex justify={"flex-end"}>
+            <HStack spacing={4}>
+              <Button
+                type="submit"
+                onClick={() => setIsModalOpen(false)}
+                colorScheme={"whiteAlpha"}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                type="submit"
+                onClick={() => {
+                  deleteCompany(companyId)
+                }}
+                colorScheme={"red"}
+              >
+                Delete
+              </Button>
+            </HStack>
+          </Flex>
+        </SimpleGrid>
+      </Modal>
     </Box>
   );
 }

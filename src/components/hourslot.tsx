@@ -1,8 +1,9 @@
 import { Flex, Text } from "@chakra-ui/react";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
+import { CalendarContext } from "../contexts/CalendarContext";
 import { api } from "../services/axios";
 
 interface busySlotsProps {
@@ -19,17 +20,20 @@ interface HourSlotProps {
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sameDay: boolean;
+    day: dayjs.Dayjs;
 }
 
 
 
-export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay}: HourSlotProps) {
+export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, day}: HourSlotProps) {
+
+  const {monthIndex} = useContext(CalendarContext)
 
   
   const [isAnotherDay, setIsAnotherDay] = useState(false)
   
 
-  const [isAvaiable, setIsAvaiable] = useState(false)
+  const [isAvaiable, setIsAvaiable] = useState(true)
 
   const { data: dataBusySlots, isLoading: isLoadingBusylots, error: errorBusylots } = useQuery<busySlotsProps>(
     `busySlotsList`,
@@ -53,7 +57,7 @@ useEffect(() => {
 
     
 
-}, [isLoadingBusylots, selectedSlots])
+}, [isLoadingBusylots, selectedSlots, monthIndex, day])
 
   useEffect(() => {
     if(selectedSlots.length > 0 && sameDay == false){
@@ -72,7 +76,7 @@ useEffect(() => {
       w={"100%"}
       border={"1px"}
       borderColor="blackAlpha.300"
-      bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ?  isSelected ? 'green.500' : 'gray.800' : 'red.400')}
+      bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ? (isSelected ? 'green.500' : 'gray.800') : 'red.400')}
       rounded="md"
       cursor={isAvaiable ? '-webkit-grab' : "not-allowed"}
       _hover={isAvaiable ? {bg: 'blue.500'} : {bg: 'red.500'} }

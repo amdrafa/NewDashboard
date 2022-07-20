@@ -23,7 +23,7 @@ import Router from "next/router";
 import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import {FaLock, FaUnlockAlt} from 'react-icons/fa'
+import { FaLock, FaUnlockAlt } from "react-icons/fa";
 
 type EditSpeedwayFormData = {
   speedway: string;
@@ -133,9 +133,27 @@ export default function EditSpeedway({
       mt={5}
       onSubmit={handleSubmit(handleEditSpeedway)}
     >
-      <Heading size="lg" fontWeight="normal">
-        Edit speedway
-      </Heading>
+      <Flex justify={"space-between"} alignItems="center">
+        <Heading justifyContent={"space-between"} size="lg" fontWeight="normal">
+          Edit speedway
+        </Heading>
+        {speedway_status == "active" ? (
+          <Button bg='red.500' onClick={() => setIsModalOpen(true)} _hover={{bg:'red.400'}}>
+            <Icon mr={1.5} as={FaLock} />
+            Disable speedway
+          </Button>
+        ) : (
+          <Button
+            display={"flex"}
+            alignItems={"center"}
+            colorScheme="blue"
+            onClick={() => setIsEnableModalOpen(true)}
+          >
+            <Icon mr={1.5} as={FaUnlockAlt} />
+            Unblock speedway
+          </Button>
+        )}
+      </Flex>
 
       <Divider my="6" borderColor="gray.700" />
 
@@ -170,7 +188,7 @@ export default function EditSpeedway({
         </SimpleGrid>
       </VStack>
 
-      <Flex mt="8" justify="space-between">
+      <HStack justify={"end"} spacing="4" mt={8}>
         <Button
           cursor={"pointer"}
           onClick={() => {
@@ -182,30 +200,15 @@ export default function EditSpeedway({
           Cancel
         </Button>
 
-        <Flex>
-          <HStack spacing="4">
-            {speedway_status == 'active'? (
-              <Button colorScheme="whiteAlpha" onClick={() => setIsModalOpen(true)}>
-                <Icon mr={1.5} as={FaLock}/>
-                Disable speedway
-            </Button>
-            ) : (
-              <Button display={'flex'} alignItems={'center'} colorScheme="whiteAlpha" _hover={{bg: 'blue.600'}} onClick={() => setIsEnableModalOpen(true)}>
-                <Icon mr={1.5} as={FaUnlockAlt}/>
-                Unblock speedway
-              </Button>
-            )}
+        <Button
+          isLoading={formState.isSubmitting}
+          type="submit"
+          colorScheme="blue"
+        >
+          Save
+        </Button>
+      </HStack>
 
-            <Button
-              isLoading={formState.isSubmitting}
-              type="submit"
-              colorScheme="blue"
-            >
-              Save
-            </Button>
-          </HStack>
-        </Flex>
-      </Flex>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -248,32 +251,29 @@ export default function EditSpeedway({
             </Text>
           </Box>
 
-          <Flex justify={'flex-end'}>
+          <Flex justify={"flex-end"}>
             <HStack spacing={4}>
+              <Button
+                type="submit"
+                onClick={() => setIsModalOpen(false)}
+                colorScheme={"whiteAlpha"}
+              >
+                Cancel
+              </Button>
 
-            <Button
-              type="submit"
-              onClick={() => setIsModalOpen(false)}
-              colorScheme={'whiteAlpha'}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              type="submit"
-              onClick={() => {
-                disableSpeedway(speedwayId);
-              }}
-              colorScheme={'red'}
-            >
-              Disable
-            </Button>
-
+              <Button
+                type="submit"
+                onClick={() => {
+                  disableSpeedway(speedwayId);
+                }}
+                colorScheme={"red"}
+              >
+                Disable
+              </Button>
             </HStack>
           </Flex>
         </SimpleGrid>
       </Modal>
-
 
       <Modal
         isOpen={isEnableModalOpen}
@@ -308,34 +308,34 @@ export default function EditSpeedway({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to enable this speedway? From this moment, everyone will be able to schedule an appointment at this speedway.
+              Do you really want to enable this speedway? From this moment,
+              everyone will be able to schedule an appointment at this speedway.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              Be sure the speedway is working properly before enabling the test track.
+              Be sure the speedway is working properly before enabling the test
+              track.
             </Text>
           </Box>
 
-          <Flex justify={'flex-end'}>
+          <Flex justify={"flex-end"}>
             <HStack spacing={4}>
+              <Button
+                type="submit"
+                onClick={() => setIsEnableModalOpen(false)}
+                colorScheme={"whiteAlpha"}
+              >
+                Cancel
+              </Button>
 
-            <Button
-              type="submit"
-              onClick={() => setIsEnableModalOpen(false)}
-              colorScheme={'whiteAlpha'}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              type="submit"
-              onClick={() => {
-                enableSpeedway(speedwayId);
-              }}
-              colorScheme={'blue'}
-            >
-              Enable
-            </Button>
-
+              <Button
+                type="submit"
+                onClick={() => {
+                  enableSpeedway(speedwayId);
+                }}
+                colorScheme={"blue"}
+              >
+                Enable
+              </Button>
             </HStack>
           </Flex>
         </SimpleGrid>

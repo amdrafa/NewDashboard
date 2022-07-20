@@ -1,0 +1,35 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { fauna } from "../../services/fauna";
+import { query as q } from "faunadb";
+import { authenticated } from "./login";
+
+export default authenticated(
+  async (request: NextApiRequest, response: NextApiResponse) => {
+    if (request.method === "DELETE") {
+      const {
+        id,
+      } = request.body;
+
+
+      try {
+        const updatedData = await fauna.query(
+          q.Delete(q.Ref(q.Collection("companies"), id))
+        );
+
+        // const deleteUsers = await fauna.query(
+        //     q.Delete(
+        //         q.Match(q.Index("user_by_companyRef"), id)
+        //     )
+        // )
+
+        return response.status(200).json({ message: "Company deleted" });
+      } catch (err) {
+        console.log("Error when deleting company", err);
+        return response.status(400).json({ message: "Something went wrong" });
+      }
+    } else {
+      response.setHeader("Allow", "DELETE");
+      response.status(405).end("Method not allowed");
+    }
+  }
+);

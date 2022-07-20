@@ -201,7 +201,7 @@ export default function CompanyList() {
                         companyId: company.ref["@ref"].id
                       })
                     }}
-                    _hover={{bg: 'gray.900', color: 'blue.400', transition: '0.2s', cursor: 'pointer'}}
+                    _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
                     key={company.data.cnpj}>
                       <Td px={["4", "4", "6"]}>
                         <Text>{company.data.company}</Text>

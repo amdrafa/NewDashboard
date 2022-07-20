@@ -181,7 +181,7 @@ export default function Speedwaylist() {
                           });
                         }}
                         key={speed.ts}
-                        _hover={{ color: "blue.300", cursor: "pointer", bg:'gray.900', transition: '0.2s' }}
+                        _hover={{ color: "gray.200", cursor: "pointer", bg:'gray.900', transition: '0.2s' }}
                       >
                         <Td px={["4", "4", "6"]}>
                           <Text>{speed.data.speedway}</Text>
