@@ -15,7 +15,11 @@ import {
     useBreakpointValue,
     Input,
     Spinner,
+    Divider,
+    HStack,
+    SimpleGrid,
   } from "@chakra-ui/react";
+  import Modal from "react-modal";
   import Link from "next/link";
   import {useState, useEffect } from "react";
   import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
@@ -25,20 +29,36 @@ import {
   import { Sidebar } from "../../components/Sidebar";
   import { api } from "../../services/axios";
   import { useQuery } from "react-query";
+import { IoMdClose } from "react-icons/io";
+import { toast } from "react-toastify";
+import EditAdministrator from "../../components/editAdministrator";
 
   
   interface AdmDataProps {
     data: AdmProps;
-    ref: string;
+    ref: {
+      "@ref": {
+        id: string;
+      } 
+    }
     ts: number;
   }
   
   interface AdmProps {
     name: string;
     email: string;
-    companyRef: {
-        id: number;
-    }
+    workRole: string;
+    cpf: number;
+    
+  }
+
+  interface AdmEditProps {
+    name: string;
+    email: string;
+    workRole: string;
+    cpf: number;
+    admId: string;
+    
   }
   
   export default function AdmList() {
@@ -46,6 +66,14 @@ import {
       base: false,
       lg: true,
     });
+    
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [cpf, setcpf] = useState(0);
+    const [role, setRole] = useState('');
+    const [admId, setAdmId] = useState('');
+
+    const [isEditMode, setIsEditMode] = useState(false);
   
     const [page, setPage] = useState(1);
   
@@ -54,8 +82,39 @@ import {
     const [total, setTotal] = useState(1);
   
     const [users, setUsers] = useState<AdmDataProps[]>([]);
+    
+    function handleEditAdm({
+      cpf,
+      email,
+      name,
+      workRole,
+      admId
+    }: AdmEditProps){
+      
+    setName(name)
+    setcpf(cpf)
+    setEmail(email)
+    setRole(workRole)
+    setAdmId(admId)
+    
 
+    setIsEditMode(true);
 
+    return;
+    }
+
+    function deleteAdm(id: string){
+      
+    api.delete('deleteadm', {data: {id}})
+    .then((response) => {
+      toast.success("Administrator deleted");
+      window.location.reload()
+    })
+    .catch((err) => {
+      toast.error("Something went wrong");
+    });
+
+    }
   
     const { data, isLoading, error } = useQuery<AdmDataProps[]>(
       `admlist${page}`,
@@ -65,9 +124,7 @@ import {
         console.log(ReturnedData);
         
         setTotal(totalcount)
-      
-  
-        setTotal(totalcount);
+
   
         return ReturnedData;
       }
@@ -82,7 +139,17 @@ import {
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
   
-          <Box flex="1" borderRadius={8} bg="gray.800" height={'100%'} p="8" mt={5}>
+          {isEditMode ? (
+            <EditAdministrator 
+            admId={admId}
+            cpf={cpf}
+            email={email}
+            name={name}
+            setIsEditMode={setIsEditMode}
+            workRole={role}
+            />
+          ) : (
+            <Box flex="1" borderRadius={8} bg="gray.800" height={'100%'} p="8" mt={5}>
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
                 Administrators list
@@ -119,13 +186,23 @@ import {
                     <Text>Administrator</Text>
                   </Th>
                   <Th>Created by</Th>
+                  <Th>Role</Th>
                   {isWideVersioon && <Th>Register date</Th>}
-                  <Th w="8"></Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {data.map((adm) => (
-                    <Tr key={adm.ts}>
+                    <Tr key={adm.ts} onClick={() => {
+                      handleEditAdm({
+                        cpf: adm.data.cpf,
+                        email: adm.data.email,
+                        name: adm.data.name,
+                        workRole: adm.data.workRole,
+                        admId: adm.ref["@ref"].id
+                      })
+                      return ;
+                    }} _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
+                    >
                     <Td px={["4", "4", "6"]}>
                       <Box>
                         <Text fontWeight="bold">{adm.data.name}</Text>
@@ -135,21 +212,10 @@ import {
                       </Box>
                     </Td>
                     <Td>
-                      <Text>{adm.ts}</Text>
+                      <Text>{adm.ref["@ref"].id}</Text>
                     </Td>
+                    <Td>{adm.data.workRole}</Td>
                     {isWideVersioon && <Td>18 de maio, 2022</Td>}
-                    <Td display="flex" justifyContent="right" mt="2">
-                      <Button
-                        as="a"
-                        size="sm"
-                        fontSize="sm"
-                        colorScheme="gray"
-                        color="gray.900"
-                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                      >
-                        Edit
-                      </Button>
-                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -174,7 +240,10 @@ import {
             
             
           </Box>
+          )}
         </Flex>
+
+        
       </Box>
     );
   }

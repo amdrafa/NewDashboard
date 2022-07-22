@@ -83,7 +83,7 @@ export default function EditCompany({
         companyId
       })
       .then((response) => {
-        toast.success("company updated");
+        toast.success("Company updated");
       })
       .catch((err) => {
         toast.error("Something went wrong");

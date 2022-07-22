@@ -25,26 +25,64 @@ import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/axios";
 import { useQuery } from "react-query";
+import dayjs from "dayjs";
+import { EditUser } from "../../components/editUser";
 
 interface UserDataProps {
   data: UserProps;
-  ref: string;
+  ref: {
+    "@ref": {
+      id: number;
+    };
+  };
   ts: number;
 }
 
 interface UserProps {
   name: string;
   email: string;
-  companyRef: {
-      id: number;
-  }
+  companyName: string;
+  phone: number;
+  register_number: string;
+  expires_at: string;
+  cpf: number;
+  driver_category: string;
+  
 }
+
+interface UserFunctionProps {
+  name: string;
+  email: string;
+  companyName: string;
+  phone: number;
+  register_number: string;
+  expires_at: string;
+  cpf: number;
+  driver_category: string;
+  userId: string;
+}
+
 
 export default function UserList() {
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,
   });
+
+  const [name, setName] = useState('')
+  const [cpf, setCpf] = useState(0)
+  const [phone, setPhone] = useState(0)
+  const [email, setEmail] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [userId, setUserId] = useState('')
+
+  const [registerNumber, setRegisterNumber] = useState('')
+  const [expires_at, setExpires_at] = useState('')
+  const [driver_category, setDriver_category] = useState('')
+  
+
+
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [page, setPage] = useState(1);
 
@@ -55,6 +93,37 @@ export default function UserList() {
   const [users, setUsers] = useState<UserDataProps[]>([]);
 
   const [needsLessHeight, setNeedsLessHeight] = useState('');
+
+
+  function handleEditUser({
+    name,
+    email,
+    companyName,
+    phone,
+    register_number,
+    expires_at,
+    cpf,
+    driver_category,
+    userId,
+  }): UserFunctionProps {
+   
+    
+    setName(name)
+    setEmail(email)
+    setCpf(cpf)
+    setCompanyName(companyName)
+    setPhone(phone)
+    setRegisterNumber(register_number)
+    setExpires_at(expires_at)
+    setDriver_category(driver_category)
+    setUserId(userId)
+      
+
+    setIsEditMode(true);
+
+    return;
+  }
+
 
   const { data, isLoading, error } = useQuery<UserDataProps[]>(
     `userlist${page}`,
@@ -79,7 +148,19 @@ export default function UserList() {
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        <Box flex="1" borderRadius={8} bg="gray.800" height="100%" p="8" mt={5}>
+        {isEditMode ? (
+          <EditUser 
+          name={name}
+          cpf={cpf}
+          email={email}
+          phone={phone}
+          driver_category={driver_category}
+          expires_at={expires_at}
+          register_number={registerNumber}
+          setIsEditMode={setIsEditMode}
+          />
+        ) : (
+          <Box flex="1" borderRadius={8} bg="gray.800" height="100%" p="8" mt={5}>
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               Users list
@@ -127,13 +208,29 @@ export default function UserList() {
                     <Text>User</Text>
                   </Th>
                   <Th>Company</Th>
-                  {isWideVersioon && <Th>Register date</Th>}
-                  <Th w="8"></Th>
+                  <Th>CPF</Th>
+                  
+                  {isWideVersioon && <Th>Driver licence</Th>}
                 </Tr>
               </Thead>
               <Tbody>
                 {data.map((user) => (
-                    <Tr key={user.ts}>
+                    <Tr 
+                    onClick={() => {
+                      handleEditUser({
+                        companyName: user.data.companyName,
+                        cpf: user.data.cpf,
+                        name: user.data.name,
+                        email: user.data.email,
+                        phone: user.data.phone,
+                        userId: user.ref["@ref"].id,
+                        driver_category: user.data.driver_category,
+                        expires_at: user.data.expires_at,
+                        register_number: user.data.register_number
+                      })
+                    }}
+                    _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
+                    key={user.ts}>
                     <Td px={["4", "4", "6"]}>
                       <Box>
                         <Text fontWeight="bold">{user.data.name}</Text>
@@ -142,28 +239,29 @@ export default function UserList() {
                         </Text>
                       </Box>
                     </Td>
+                    <Td>{user.data.companyName}</Td>
+                    {isWideVersioon && <Td>{user.data.cpf}</Td>}
                     <Td>
-                      <Text>{user.ts}</Text>
-                    </Td>
-                    {isWideVersioon && <Td>18 de maio, 2022</Td>}
-                    <Td display="flex" justifyContent="right" mt="2">
-                      <Button
-                        as="a"
-                        size="sm"
-                        fontSize="sm"
-                        colorScheme="gray"
-                        color="gray.900"
-                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                      >
-                        Edit
-                      </Button>
+                    <Box>
+                        <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
+                        <Text fontSize="sm" color="gray.300">
+                          {dayjs(user.data.expires_at).format('DD/MM/YYYY') > dayjs().format('DD/MM/YYYY') ? (
+                            <Text color={'red.400'}>Expired</Text>
+                          ) : (
+                            <Text color={'blue.500'}>{`Expires at: ${dayjs(user.data.expires_at).format('DD/MM/YYYY')}`}</Text>
+                            
+                            
+                          )}
+                          
+                        </Text>
+                      </Box>
                     </Td>
                   </Tr>
                 ))}
               </Tbody>
             </Table>
             <Pagination
-              totalCountOfRegisters={total + 2}
+              totalCountOfRegisters={total}
               currentPage={page}
               onPageChanges={setPage}
             />
@@ -182,6 +280,8 @@ export default function UserList() {
           
           
         </Box>
+        )}
+        
       </Flex>
     </Box>
   );

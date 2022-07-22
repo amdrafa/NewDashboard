@@ -249,6 +249,8 @@ export default function CompanyList() {
         </Box>
         )}
       </Flex>
+
+      
     </Box>   
   );
 }

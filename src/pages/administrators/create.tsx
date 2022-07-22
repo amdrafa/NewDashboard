@@ -19,7 +19,7 @@ type CreateAdmFormData = {
     role: string;
   }
   
-  const createUserFormSchema = yup.object().shape({
+  const createAdmFormSchema = yup.object().shape({
     name: yup.string().required(),  
     email: yup.string().required().email(),
     cpf: yup.number().required().min(11, 'Minimum 11 letters.'),
@@ -30,7 +30,7 @@ type CreateAdmFormData = {
 export default function CreateAdm(){
 
     const { register, handleSubmit, formState, resetField } = useForm({
-        resolver: yupResolver(createUserFormSchema)
+        resolver: yupResolver(createAdmFormSchema)
     })
 
     const {errors} = formState

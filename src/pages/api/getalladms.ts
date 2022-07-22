@@ -13,6 +13,7 @@ interface AdmProps{
         name: string;
     email: string;
     companyRef: string;
+    workRole: string;
     roles: string[];
     }
     
@@ -57,10 +58,6 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
                 }
             })
 
-            console.log(allAdms)
-            
-            
-
             let totalcount = allAdms.length
 
             let page = request.url.substr(21, 1)
@@ -77,7 +74,6 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
            
             
             const PaginateData = slicedData()
-            
             
             
             return response.status(200).json({PaginateData, totalcount})
