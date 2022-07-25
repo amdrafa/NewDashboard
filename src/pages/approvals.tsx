@@ -46,80 +46,6 @@ interface appointmentProps {
   userId: string;
 }
 
-const Chart = dynamic(async () => await import("react-apexcharts"), {
-  ssr: false,
-});
-
-const options = {
-  chart: {
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    forecolor: theme.colors.gray[500],
-  },
-  grid: {
-    show: false,
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  tooltip: {
-    enabled: false,
-  },
-  xaxis: {
-    axisBorder: {
-      color: theme.colors.gray[600],
-    },
-    axisTicks: {
-      color: theme.colors.gray[600],
-    },
-    categories: [
-      new Date("2022-03-23T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-24T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-25T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-26T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-27T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-28T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-      new Date("2022-03-29T00:00:00.000Z").toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      }),
-    ],
-  },
-
-  fill: {
-    opacity: 0.3,
-    type: "gradient",
-    gradient: {
-      shade: "dark",
-      opacityFrom: 0.7,
-      opacityTo: 0.3,
-    },
-  },
-};
-
-const series = [{ name: "series1", data: [31, 120, 10, 28, 61, 18, 109] }];
 
 export default function Dashboard() {
   const isWideVersioon = useBreakpointValue({
@@ -129,7 +55,7 @@ export default function Dashboard() {
 
   const [page, setPage] = useState(1);
 
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(6);
 
   const [total, setTotal] = useState(1);
 
@@ -160,44 +86,106 @@ export default function Dashboard() {
         <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
           <Box w={'100%'} px={6} ml={6}>
-            <SimpleGrid
-            flex="1"
-            gap="4"
-            minChildWidth="320px"
-            alignItems="flex-start"
-            mt="6"
-            
-          >
-            <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-              <Text fontSize="lg" mb="4">
-                New customers
-              </Text>
-              <Chart
-                options={options}
-                series={series}
-                type="area"
-                height={160}
-              />
-            </Box>
 
-            <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-              <Text fontSize="lg" mb="4">
-                Speedway usage
-              </Text>
-              <Chart
-                options={options}
-                series={series}
-                type="area"
-                height={160}
-              />
-            </Box>
-          </SimpleGrid>
-          
-          
+          <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
+            <Flex mb="8" justify="space-between" align="center">
+              <Heading size="lg" fontWeight="normal">
+                Approvals
+              </Heading>
+              
+            </Flex>
+
+            {isLoading ? (
+              <Flex justify="center">
+                <Spinner mt="10" mb="80px"/>
+              </Flex>
+            ) : error ? (
+              <Flex justify="center">
+                <Text>The requisition failed</Text>
+              </Flex>
+            ) : (
+              total > 0? (<>
+                <Table colorScheme="whiteAlpha">
+                  <Thead>
+                    <Tr>
+                      <Th px={["4", "4", "6"]} color="gray.300" >
+                        <Text>Speedway</Text>
+                      </Th>
+
+                      <Th px={["4", "4", "6"]} >
+                        <Text>Company</Text>
+                      </Th>
+
+                      <Th px={["4", "4", "6"]}>
+                        <Text>From</Text>
+                      </Th>
+
+                      <Th>To</Th>
+
+                      {isWideVersioon && <Th>Vehicle</Th>}
+                      <Th px={["4", "4", "6"]} width="">
+                        
+                      </Th>
+
+                      
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {data.map((appointment) => (
+                      <Tr key={appointment.ts}>
+                        <Td >
+                          <Text fontWeight="bold">{appointment.data.speedway}</Text>
+                        </Td>
+                        <Td>
+                          <Text>
+                            {appointment.data.userId}
+                          </Text>
+                        </Td>
+                        <Td>
+                          <Text>
+                            {new Date(appointment.data.startDate).toLocaleDateString()}
+                          </Text>
+                        </Td>
+                        {isWideVersioon && <Td>{new Date(appointment.data.endDate).toLocaleDateString()}</Td>}
+
+                        {isWideVersioon && <Td>{appointment.data.vehicle}</Td>}
+
+                        <Td display={'flex'} justifyContent={'right'}> 
+                        <Button
+                        as="a"
+                        size="sm"
+                        fontSize="sm"
+                        colorScheme="gray"
+                        color="gray.900"
+                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      >
+                        Edit
+                      </Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+                <Pagination
+                  totalCountOfRegisters={total}
+                  currentPage={page}
+                  onPageChanges={setPage}
+                />  
+              </>) : (<Flex w="100%" justifyContent="center"> 
+                <Box justifyContent="center" my={10}>
+                    <Flex w="100%" justifyContent="center">
+                        <Text fontSize={22} fontWeight="bold">Nobody scheduled an appointment.</Text>         
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">           
+                <Text fontSize={18}>Go to the schedule page and book an appointment.</Text>
+                </Flex> 
+                </Box>
+              </Flex>)
+            )}
+          </Box>
 
 
-
-          <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={20} mb={20} maxWidth={1600}>
+          <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
                 All Appointments

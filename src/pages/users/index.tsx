@@ -150,6 +150,7 @@ export default function UserList() {
 
         {isEditMode ? (
           <EditUser 
+          userId={userId}
           name={name}
           cpf={cpf}
           email={email}
@@ -242,7 +243,11 @@ export default function UserList() {
                     <Td>{user.data.companyName}</Td>
                     {isWideVersioon && <Td>{user.data.cpf}</Td>}
                     <Td>
-                    <Box>
+
+                      {!user.data.register_number || user.data.register_number == '' ? (
+                        <Text color={'gray.300'}>Not registered</Text>
+                      ) : (
+                        <Box>
                         <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
                         <Text fontSize="sm" color="gray.300">
                           {dayjs(user.data.expires_at).format('DD/MM/YYYY') > dayjs().format('DD/MM/YYYY') ? (
@@ -255,6 +260,8 @@ export default function UserList() {
                           
                         </Text>
                       </Box>
+                      )}
+
                     </Td>
                   </Tr>
                 ))}

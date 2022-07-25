@@ -4,8 +4,6 @@ import { query as q } from 'faunadb'
 import { useState } from "react";
 import { authenticated } from "./login";
 
-
-
 interface appointmentProps{
     company: string;
     cnpj: string;
@@ -26,11 +24,11 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
     if(request.method === 'GET'){
 
 
-        console.log("TEST GETTING ALL APPOINTMENTS")
-        
+        console.log("TEST GETTING ALL ADM APPOINTMENTS")
+
         
         try{
-
+            
 
             const {data} = await fauna.query<appointmentsDataProps>(
                 q.Map(
@@ -61,7 +59,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             
             return response.status(200).json({PaginateData, totalcount})
         }catch(err){
-            console.log('error when getting all user appointments', err)
+            console.log('error when getting all adm appointments', err)
             return false
         }
         

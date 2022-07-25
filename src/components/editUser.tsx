@@ -26,15 +26,14 @@ import { MdLogin } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
 import { BsFillPersonFill } from "react-icons/bs";
 import { FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 type EditUserFormSchema = {
   name: string;
   email: string;
   cpf: number;
   phone: number;
-  email_confirmation: string;
-  password: string;
-  password_confirmation: string;
   register_number?: number;
   driver_category?: string;
   expires_at?: Date;
@@ -48,10 +47,11 @@ type EditUserFormData = {
   register_number?: string;
   driver_category?: string;
   expires_at?: string;
+  userId: string;
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const SignInFormSchema = yup.object().shape({
+const EditUserFormSchema = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().required().email(),
   cpf: yup
@@ -64,17 +64,9 @@ const SignInFormSchema = yup.object().shape({
     .required()
     .min(10, "Minimum 10 letters.")
     .max(14, "Maximum 14 characteres"),
-  email_confirmation: yup
-    .string()
-    .oneOf([null, yup.ref("email")], "The e-mails need to be the same"),
-  password: yup.string().required().min(6, "Minimum 6 letters."),
-  password_confirmation: yup
-    .string()
-    .required()
-    .oneOf([null, yup.ref("password")], "The passwords need to be the same"),
   register_number: yup.string().max(11),
   driver_category: yup.string(),
-  expires_at: yup.date(),
+  expires_at: yup.string()
 });
 
 export function EditUser({
@@ -85,23 +77,33 @@ export function EditUser({
   register_number,
   driver_category,
   expires_at,
-  setIsEditMode
+  setIsEditMode,
+  userId  
 }: EditUserFormData) {
-  const [page, setPage] = useState(1);
 
   const [hasDriverLicence, setHasDriverLicence] = useState(false);
 
   const { createUser } = useContext(LoginContext);
 
   const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(SignInFormSchema),
+    resolver: yupResolver(EditUserFormSchema),
   });
 
   const { errors, isSubmitting } = formState;
 
-  const handleSignin: SubmitHandler<EditUserFormSchema> = async ({
+  function deleteUser(id: string){
+    api.delete('deleteuser', {data: {id}})
+    .then((response) => {
+      toast.success("User deleted");
+      window.location.reload()
+    })
+    .catch((err) => {
+      toast.error("Something went wrong");
+    });
+  }
+
+  const handleEditUser: SubmitHandler<EditUserFormSchema> = async ({
     email,
-    password,
     name,
     cpf,
     phone,
@@ -110,22 +112,50 @@ export function EditUser({
     expires_at,
     
   }) => {
-    //   await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log(
-      email,
-      name,
-      cpf,
-      phone,
-      register_number,
-      driver_category,
-      expires_at
-    );
+    register_number.toString() == '' ? (
+        api.put('edituser', {email,
+            name,
+            cpf,
+            phone,
+            register_number,
+            driver_category,
+            expires_at,
+            userId
+            })
+        .then((response) => {
+          toast.success("User updated");
+          window.location.reload()
+        })
+        .catch((err) => {
+          toast.error("Something went wrong");
+        })
+    ) : (
+        api.put('edituser', {email,
+            name,
+            cpf,
+            phone,
+            register_number,
+            driver_category,
+            expires_at,
+            userId
+            })
+        .then((response) => {
+          toast.success("User updated");
+          window.location.reload()
+        })
+        .catch((err) => {
+          toast.error("Something went wrong");
+        })
+    )
+    
     return;
   };
 
   return (
-    <Box as="form" flex="1" borderRadius={8} bg="gray.800" p="8" mt={5}>
+    <Box as="form" flex="1" borderRadius={8} bg="gray.800" p="8" mt={5} onSubmit={handleSubmit(handleEditUser)}>
       <VStack spacing={4}>
         
           
@@ -138,7 +168,10 @@ export function EditUser({
               <Heading size="lg" fontWeight="normal">
                 Edit user
               </Heading>
-              <Button bg="red.500" _hover={{ bg: "red.400" }}>
+              <Button onClick={() => {
+                deleteUser(userId)
+                return ;
+              }} bg="red.500" _hover={{ bg: "red.400" }}>
                 <Icon mr={1.5} as={FiTrash2} />
                 Delete user
               </Button>
@@ -215,13 +248,12 @@ export function EditUser({
                 </Text>
               </Box>
               <Input
-                defaultValue={'15-12-22'}
+                defaultValue={`${dayjs(expires_at).format('YYYY')}-${dayjs(expires_at).format('MM')}-${dayjs(expires_at).format('DD')}`}
                 name="expires_at"
                 type="date"
                 label="Expires at"
                 {...register("expires_at")}
                 error={errors.expires_at}
-                colorScheme="whatsapp"
                 css={`
                   ::-webkit-calendar-picker-indicator {
                     opacity: 0.15;

@@ -28,8 +28,8 @@ export function SidebarNav() {
         </NavLink>
 
         <Can roles={["ADMINISTRATOR"]}>
-          <NavLink hrefs="/dashboard" icon={RiDashboardLine}>
-            Adm Dashboard
+          <NavLink hrefs="/approvals" icon={RiDashboardLine}>
+            Approvals
           </NavLink>
         </Can>
 

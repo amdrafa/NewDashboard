@@ -53,7 +53,6 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
                 const pageEnd = pageStart + per_page
                 const mySlicedData = data.slice(pageStart,pageEnd)
                 
-                console.log(mySlicedData)
                 return mySlicedData
             }
            

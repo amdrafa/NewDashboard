@@ -349,7 +349,6 @@ export default function Register() {
                   label="Expires at"
                   {...register("expires_at")}
                   error={errors.expires_at}
-                  colorScheme="whatsapp"
                   css={`
                     ::-webkit-calendar-picker-indicator {
                       opacity: 0.15;
