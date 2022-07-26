@@ -19,6 +19,7 @@ import {
   Divider,
   Spinner,
   Input,
+  HStack,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -131,13 +132,9 @@ export default function Dashboard() {
 
   const [page, setPage] = useState(1);
 
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(6);
 
   const [total, setTotal] = useState(-1);
-
-  const [companies, setCompanies] = useState<appointmentsDataProps[]>([]);
-
-  const [needsLessHeight, setNeedsLessHeight] = useState("");
 
   const { data, isLoading, error } = useQuery<appointmentsDataProps[]>(
     `userappointmentslist${page}`,
@@ -272,31 +269,34 @@ export default function Dashboard() {
                           </Td>
 
                           <Td>
-                            <Text whiteSpace={"pre-line"}>
+                          <HStack>
                               {appointment.data.selectedSlots.map((slot) => {
                                 return (
-                                  <Flex py={"1"}>
+                                  
                                     
-
                                     <Text
-                                      color={"blue.400"}
+                                      color={"gray.100"}
                                       fontWeight={"bold"}
                                       ml='2'
+                                      p={2}
+                                      rounded='lg'
+                                      bg={'blue.600'}
                                     >
                                       {dayjs(slot).format("H")}:00 to{" "}
                                       {Number(dayjs(slot).format("H")) + 1}:00
                                     </Text>
-                                  </Flex>
+                                  
                                 );
                               })}
-                            </Text>
+                            </HStack>
                           </Td>
 
                           <Td>
                             <Flex>
+                              <Text fontWeight={'bold'} color='blue.500'>Approved</Text>
                               <Icon
                                 color={"blue.500"}
-                                ml={4}
+                                ml={1.5}
                                 as={GiConfirmed}
                                 fontSize="20"
                               />
@@ -307,7 +307,7 @@ export default function Dashboard() {
                     </Tbody>
                   </Table>
                   <Pagination
-                    totalCountOfRegisters={total + 2}
+                    totalCountOfRegisters={total}
                     currentPage={page}
                     onPageChanges={setPage}
                   />

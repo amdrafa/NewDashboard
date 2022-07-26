@@ -8,7 +8,7 @@ interface bodyProps {
     speedway: string;
     vehicle: string;
     userId: number;
-      
+    companyName: string;
 }
 
 
@@ -16,14 +16,14 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
     
     if(request.method === 'POST'){
 
-        const {selectedSlots, speedway, vehicle, userId }:bodyProps = request.body
+        const {selectedSlots, speedway, vehicle, userId, companyName }:bodyProps = request.body
 
         
         try{
             await fauna.query(
                 q.Create(
                     q.Collection('schedules'),
-                    { data: {selectedSlots, speedway, vehicle, userId} }
+                    { data: {selectedSlots, speedway, companyName, vehicle, userId} }
                 )
             )
 

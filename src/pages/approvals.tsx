@@ -19,6 +19,7 @@ import {
   Divider,
   Spinner,
   Input,
+  HStack,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -31,6 +32,8 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { GiConfirmed } from "react-icons/gi";
+import dayjs from "dayjs";
+import { FaExchangeAlt } from "react-icons/fa";
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -40,9 +43,9 @@ interface appointmentsDataProps {
 
 interface appointmentProps {
   speedway: string;
-  startDate: string;
-  endDate: string;
   vehicle: string;
+  selectedSlots: string[];
+  companyName: string;
   userId: string;
 }
 
@@ -52,6 +55,8 @@ export default function Dashboard() {
     base: false,
     lg: true,
   });
+
+  const [isApprovalsOpen, setIsApprovalsOpen] = useState(true)
 
   const [page, setPage] = useState(1);
 
@@ -87,12 +92,25 @@ export default function Dashboard() {
           <Sidebar />
           <Box w={'100%'} px={6} ml={6}>
 
-          <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
+          {isApprovalsOpen ? (
+            <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
                 Approvals
               </Heading>
-              
+            
+                <Button
+                    size="sm"
+                    fontSize="sm"
+                    colorScheme="blue"
+                    leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
+                    onClick={() => {
+                      setIsApprovalsOpen(false)
+                    }}
+                  >
+                    Switch to all appointments
+                </Button>
+
             </Flex>
 
             {isLoading ? (
@@ -117,51 +135,70 @@ export default function Dashboard() {
                       </Th>
 
                       <Th px={["4", "4", "6"]}>
-                        <Text>From</Text>
+                        <Text>Date</Text>
                       </Th>
 
-                      <Th>To</Th>
-
-                      {isWideVersioon && <Th>Vehicle</Th>}
-                      <Th px={["4", "4", "6"]} width="">
-                        
-                      </Th>
+                      <Th>Slots</Th>
 
                       
                     </Tr>
                   </Thead>
                   <Tbody>
                     {data.map((appointment) => (
-                      <Tr key={appointment.ts}>
+                      <Tr key={appointment.ts}  _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}>
                         <Td >
                           <Text fontWeight="bold">{appointment.data.speedway}</Text>
                         </Td>
                         <Td>
                           <Text>
-                            {appointment.data.userId}
+                            {appointment.data.companyName}
                           </Text>
                         </Td>
                         <Td>
                           <Text>
-                            {new Date(appointment.data.startDate).toLocaleDateString()}
+                            {dayjs(appointment.data.selectedSlots[0]).format('DD/MM/YYYY')}
                           </Text>
                         </Td>
-                        {isWideVersioon && <Td>{new Date(appointment.data.endDate).toLocaleDateString()}</Td>}
+                        <Td>
+                          <HStack wordBreak={'-moz-initial'}>
+                              {appointment.data.selectedSlots.map((slot) => {
+                                return (
+                                  
+                                    
+                                    <Text
+                                      color={"gray.100"}
+                                      fontWeight={"bold"}
+                                      ml='2'
+                                      p={2}
+                                      rounded='lg'
+                                      bg={'blue.500'}
+                                    >
+                                      {dayjs(slot).format("H")}:00 to{" "}
+                                      {Number(dayjs(slot).format("H")) + 1}:00
+                                    </Text>
+                                  
+                                );
+                              })}
+                            </HStack>
+                          </Td>
 
-                        {isWideVersioon && <Td>{appointment.data.vehicle}</Td>}
-
-                        <Td display={'flex'} justifyContent={'right'}> 
-                        <Button
-                        as="a"
-                        size="sm"
-                        fontSize="sm"
-                        colorScheme="gray"
-                        color="gray.900"
-                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                      >
-                        Edit
-                      </Button>
-                        </Td>
+                          {/* <Td>
+                            <HStack spacing={2}>
+                              
+                              <Button colorScheme={'green'}>
+                                <Icon
+                                as={GiConfirmed}
+                                fontSize="20"
+                              />
+                              </Button>
+                              <Button colorScheme={'red'}>
+                                <Icon
+                                as={GiConfirmed}
+                                fontSize="20"
+                              />
+                              </Button>
+                            </HStack>
+                          </Td> */}
                       </Tr>
                     ))}
                   </Tbody>
@@ -171,49 +208,38 @@ export default function Dashboard() {
                   currentPage={page}
                   onPageChanges={setPage}
                 />  
-              </>) : (<Flex w="100%" justifyContent="center"> 
+              </>) : (<Flex w="100%" justifyContent="center" h='200px'> 
                 <Box justifyContent="center" my={10}>
                     <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">Nobody scheduled an appointment.</Text>         
+                        <Text fontSize={22} fontWeight="bold">There are not new appointments.</Text>         
                     </Flex>
                     <Flex w="100%" justifyContent="center">           
-                <Text fontSize={18}>Go to the schedule page and book an appointment.</Text>
+                <Text color={'gray.200'} fontSize={18}>All appointment requests are goint to appear here.</Text>
                 </Flex> 
                 </Box>
               </Flex>)
             )}
           </Box>
 
-
-          <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
+          ) : (
+            <Box flex="1" borderRadius={8} bg="gray.800" p="8"  mt={8} mb={20} maxWidth={1600}>
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
-                All Appointments
+                All appointments
               </Heading>
+            
+                <Button
+                    size="sm"
+                    fontSize="sm"
+                    colorScheme="blue"
+                    leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
+                    onClick={() => {
+                      setIsApprovalsOpen(true)
+                    }}
+                  >
+                    Switch to approvals
+                </Button>
 
-              <Flex
-              as="label"
-              flex="1"
-              py="2"
-              px="8"
-              ml="6"
-              maxWidth={230}
-              alignSelf="center"
-              color="gray.200"
-              position="relative"
-              bg="gray.900"
-              borderRadius="full"
-            >
-              <Input
-                color="gray.50"
-                variant="unstyled"
-                px="4"
-                mr="4"
-                placeholder="Search company"
-                _placeholder={{ color: "gray.400" }}
-              />
-              <Icon as={RiSearchLine} fontSize="20" />
-            </Flex>
             </Flex>
 
             {isLoading ? (
@@ -238,51 +264,70 @@ export default function Dashboard() {
                       </Th>
 
                       <Th px={["4", "4", "6"]}>
-                        <Text>From</Text>
+                        <Text>Date</Text>
                       </Th>
 
-                      <Th>To</Th>
-
-                      {isWideVersioon && <Th>Vehicle</Th>}
-                      <Th px={["4", "4", "6"]} width="">
-                        
-                      </Th>
+                      <Th>Slots</Th>
 
                       
                     </Tr>
                   </Thead>
                   <Tbody>
                     {data.map((appointment) => (
-                      <Tr key={appointment.ts}>
+                      <Tr key={appointment.ts}  _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}>
                         <Td >
                           <Text fontWeight="bold">{appointment.data.speedway}</Text>
                         </Td>
                         <Td>
                           <Text>
-                            {appointment.data.userId}
+                            {appointment.data.companyName}
                           </Text>
                         </Td>
                         <Td>
                           <Text>
-                            {new Date(appointment.data.startDate).toLocaleDateString()}
+                            {dayjs(appointment.data.selectedSlots[0]).format('DD/MM/YYYY')}
                           </Text>
                         </Td>
-                        {isWideVersioon && <Td>{new Date(appointment.data.endDate).toLocaleDateString()}</Td>}
+                        <Td>
+                          <HStack wordBreak={'-moz-initial'}>
+                              {appointment.data.selectedSlots.map((slot) => {
+                                return (
+                                  
+                                    
+                                    <Text
+                                      color={"gray.100"}
+                                      fontWeight={"bold"}
+                                      ml='2'
+                                      p={2}
+                                      rounded='lg'
+                                      bg={'blue.500'}
+                                    >
+                                      {dayjs(slot).format("H")}:00 to{" "}
+                                      {Number(dayjs(slot).format("H")) + 1}:00
+                                    </Text>
+                                  
+                                );
+                              })}
+                            </HStack>
+                          </Td>
 
-                        {isWideVersioon && <Td>{appointment.data.vehicle}</Td>}
-
-                        <Td display={'flex'} justifyContent={'right'}> 
-                        <Button
-                        as="a"
-                        size="sm"
-                        fontSize="sm"
-                        colorScheme="gray"
-                        color="gray.900"
-                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                      >
-                        Edit
-                      </Button>
-                        </Td>
+                          {/* <Td>
+                            <HStack spacing={2}>
+                              
+                              <Button colorScheme={'green'}>
+                                <Icon
+                                as={GiConfirmed}
+                                fontSize="20"
+                              />
+                              </Button>
+                              <Button colorScheme={'red'}>
+                                <Icon
+                                as={GiConfirmed}
+                                fontSize="20"
+                              />
+                              </Button>
+                            </HStack>
+                          </Td> */}
                       </Tr>
                     ))}
                   </Tbody>
@@ -292,18 +337,21 @@ export default function Dashboard() {
                   currentPage={page}
                   onPageChanges={setPage}
                 />  
-              </>) : (<Flex w="100%" justifyContent="center"> 
+              </>) : (<Flex w="100%" justifyContent="center" h='200px'> 
                 <Box justifyContent="center" my={10}>
                     <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">Nobody scheduled an appointment.</Text>         
+                        <Text fontSize={22} fontWeight="bold">There are not new appointments.</Text>         
                     </Flex>
                     <Flex w="100%" justifyContent="center">           
-                <Text fontSize={18}>Go to the schedule page and book an appointment.</Text>
+                <Text color={'gray.200'} fontSize={18}>All appointment requests are goint to appear here.</Text>
                 </Flex> 
                 </Box>
               </Flex>)
             )}
           </Box>
+          )}
+
+          
           </Box>
           
         </Flex>

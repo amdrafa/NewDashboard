@@ -91,8 +91,6 @@ export default function Schedule() {
 
   }
 
-
-
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,
@@ -151,7 +149,7 @@ export default function Schedule() {
 
   async function CreateSchedule(event: FormEvent) {
     event.preventDefault();
-
+    console.log(user.companyName)
 
     await api
       .post("scheduletime", {
@@ -159,6 +157,7 @@ export default function Schedule() {
         vehicle,
         speedway,
         userId: user.userId,
+        companyName: user.companyName
       })
       .then((response) => setStatus(response.status))
       .catch((err) => {
