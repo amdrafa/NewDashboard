@@ -202,7 +202,7 @@ export default function Dashboard() {
             >
               <Flex mb="8" justify="space-between" align="center">
                 <Heading size="lg" fontWeight="normal">
-                  My appointments
+                  My appointmentsssssssss
                 </Heading>
 
                 <Link href="/schedule">
