@@ -299,7 +299,7 @@ export default function Schedule() {
            height='100%'
            w={isWideVersioon ? '' : '100%'}
          >
-           <Flex justifyContent={"space-between"} align="center">
+           <Flex justifyContent={"space-between"} align="center" minW={'1180'}>
             <Flex>
             <Heading mr={4} size="lg" fontWeight="normal">
                Schedule

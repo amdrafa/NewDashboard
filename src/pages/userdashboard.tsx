@@ -152,57 +152,26 @@ export default function Dashboard() {
 
   return (
     <>
-      <Box mt={-3}>
+      <Box >
         <Header />
 
         <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
 
           <Box w={"100%"} px={6} ml={6}>
-            <SimpleGrid
-              flex="1"
-              gap="4"
-              minChildWidth="320px"
-              alignItems="flex-start"
-              mt="6"
-            >
-              <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-                <Text fontSize="lg" mb="4">
-                  Month appointments
-                </Text>
-                <Chart
-                  options={options}
-                  series={series}
-                  type="area"
-                  height={160}
-                />
-              </Box>
-
-              <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
-                <Text fontSize="lg" mb="4">
-                  Speedway usage
-                </Text>
-                <Chart
-                  options={options}
-                  series={series}
-                  type="area"
-                  height={160}
-                />
-              </Box>
-            </SimpleGrid>
 
             <Box
               flex="1"
               borderRadius={8}
               bg="gray.800"
               p="8"
-              mt={20}
+              mt={4}
               mb={20}
               maxWidth={1600}
             >
               <Flex mb="8" justify="space-between" align="center">
                 <Heading size="lg" fontWeight="normal">
-                  My appointmentsssssssss
+                  My appointments
                 </Heading>
 
                 <Link href="/schedule">

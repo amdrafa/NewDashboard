@@ -23,7 +23,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             await fauna.query(
                 q.Create(
                     q.Collection('schedules'),
-                    { data: {selectedSlots, speedway, companyName, vehicle, userId} }
+                    { data: {selectedSlots, speedway, companyName, vehicle, userId, status: 'pending'} }
                 )
             )
 
