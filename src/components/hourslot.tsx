@@ -76,10 +76,10 @@ useEffect(() => {
       w={"100%"}
       border={"1px"}
       borderColor="blackAlpha.300"
-      bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ? (isSelected ? 'green.500' : 'gray.800') : 'red.400')}
+      bg={isLoadingBusylots ? 'gray.900' : (isAvaiable ? (isSelected ? 'green.500' : 'gray.800') : 'red.500')}
       rounded="md"
       cursor={isAvaiable ? '-webkit-grab' : "not-allowed"}
-      _hover={isAvaiable ? {bg: 'blue.500'} : {bg: 'red.500'} }
+      _hover={isAvaiable ? {bg: 'blue.500'} : {bg: 'red.600'} }
       onClick={() => {
         
         isSelected? userClick(false) : userClick(true)

@@ -7,11 +7,14 @@ import { authenticated } from "./login";
 
 
 interface appointmentProps{
-    company: string;
-    cnpj: string;
-    responsable_name: string;
-    email: string;
-    companySecretKey: string;
+    data: {
+    selectedSlots: string[];
+    speedway: string;
+    companyName: string;
+    vehicle: string;
+    userId: string;
+    status: string;
+    }
 }
 
 
@@ -41,7 +44,15 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
                 )
             )
 
-            let totalcount = data.length
+            const filteredData = []
+
+            data.map((appointment) => {
+                if(appointment.data.status == "pending"){
+                    filteredData.push(appointment)
+                }
+            })
+
+            let totalcount = filteredData.length
 
             const {page, limit} = request.query
             const per_page = limit
@@ -49,7 +60,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             const slicedData = () => {
                 const pageStart = (Number(page) - 1)*(Number(per_page))
                 const pageEnd = pageStart + Number(per_page)
-                const mySlicedData = data.slice(pageStart,pageEnd)
+                const mySlicedData = filteredData.slice(pageStart,pageEnd)
                 
                 
                 return mySlicedData

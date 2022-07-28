@@ -25,8 +25,8 @@ export function ApprovalTimeCard({slot, timeLabel, isBusy, isCurrentUserAppointm
               ml='2'
               p={2}
               rounded='lg'
-              bg={isCurrentUserAppointment ? 'blue.500' : isBusy? 'red.400' : 'gray.900'}
-              _hover={isCurrentUserAppointment ? {bg: 'blue.600', cursor: 'pointer'} : isBusy? {bg: 'red.500', cursor: 'not-allowed'} : {bg: 'green.500', cursor: 'pointer'}}
+              bg={isCurrentUserAppointment ? 'blue.500' : isBusy? 'red.500' : 'gray.900'}
+              _hover={isCurrentUserAppointment ? {bg: 'blue.600', cursor: 'not-allowed'} : isBusy? {bg: 'red.600', cursor: 'not-allowed'} : {bg: 'gray.700', cursor: 'not-allowed'}}
             >
               {dayjs(slot).format("H")}:00 to{" "}
               {Number(dayjs(slot).format("H")) + 1}:00
