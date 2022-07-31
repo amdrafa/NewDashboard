@@ -157,7 +157,6 @@ import EditAdministrator from "../../components/editAdministrator";
   
               <Link href="/administrators/create" passHref>
               <Button
-                as="a"
                 size="sm"
                 fontSize="sm"
                 colorScheme="blue"

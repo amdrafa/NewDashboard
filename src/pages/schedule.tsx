@@ -45,6 +45,17 @@ import { toast } from "react-toastify";
 import { CalendarHeader } from "../components/Calendar/CalendarHeader";
 import { CalendarIndex } from "../components/Calendar";
 import dayjs from "dayjs";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  name: string;
+}
 
 interface speedwayProps {
   speedway: string;
@@ -413,3 +424,36 @@ export default function Schedule() {
     
   );
 }
+
+
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+//   const {auth} = parseCookies(ctx)
+
+//   const decodedUser = decode(auth as string) as DecodedToken;
+
+//   const necessaryRoles = ['ADMINISTRATOR']
+  
+//   if(necessaryRoles?.length > 0){
+//     const hasAllRoles = necessaryRoles.some(role => {
+//       return decodedUser.roles.includes(role)
+//   });
+
+//   if(!hasAllRoles){
+//     console.log(hasAllRoles)
+//     return {
+//       redirect: {
+//         destination: '/userdashboard',
+//         permanent: false
+//       }
+//     }
+//   }
+//   }
+
+  
+  
+
+//   return {
+//     props: {}
+//   }
+// }

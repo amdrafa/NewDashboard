@@ -68,7 +68,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
 
             data.forEach(schedule => {
                 if(Number(schedule.data.userId) == userId){
-                    allUserSchedules.push(schedule)
+                    allUserSchedules.unshift(schedule)
                 }
             })
 

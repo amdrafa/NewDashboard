@@ -367,7 +367,6 @@ export default function Register() {
                 <Button
                   bg={"gray.300"}
                   cursor={"pointer"}
-                  isLoading={isSubmitting}
                 >
                   Return
                 </Button>

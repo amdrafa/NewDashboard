@@ -240,18 +240,17 @@ export default function Dashboard() {
       <Box mt={-3}>
         <Header />
 
-        <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
+        <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
-          <Box w={"100%"} px={6} ml={6}>
+          
             {isApprovalsOpen ? (
               <Box
                 flex="1"
                 borderRadius={8}
                 bg="gray.800"
                 p="8"
-                mt={8}
-                mb={20}
-                maxWidth={1600}
+                mt={5}
+                height='100%'
               >
                 <Flex mb="8" justify="space-between" align="center">
                   <Heading size="lg" fontWeight="normal">
@@ -323,10 +322,15 @@ export default function Dashboard() {
                             }}
                           >
                             <Td>
-                              <Text fontWeight="bold">
-                                {appointment.data.speedway}
-                              </Text>
-                            </Td>
+                            <Box>
+                            <Text fontWeight="bold">
+                              {appointment.data.speedway}
+                            </Text>
+                            <Text color={'gray.300'}>
+                              {appointment.data.vehicle}
+                            </Text>
+                            </Box>
+                          </Td>
                             <Td>
                               <Text>{appointment.data.companyName}</Text>
                             </Td>
@@ -428,10 +432,9 @@ export default function Dashboard() {
                 flex="1"
                 borderRadius={8}
                 bg="gray.800"
+                height={'100%'}
                 p="8"
-                mt={8}
-                mb={20}
-                maxWidth={1600}
+                mt={5}
               >
                 <Flex mb="8" justify="space-between" align="center">
                   <Heading size="lg" fontWeight="normal">
@@ -503,10 +506,15 @@ export default function Dashboard() {
                             }}
                           >
                             <Td>
-                              <Text fontWeight="bold">
-                                {appointment.data.speedway}
-                              </Text>
-                            </Td>
+                            <Box>
+                            <Text fontWeight="bold">
+                              {appointment.data.speedway}
+                            </Text>
+                            <Text color={'gray.300'}>
+                              {appointment.data.vehicle}
+                            </Text>
+                            </Box>
+                          </Td>
                             <Td>
                               <Text>{appointment.data.companyName}</Text>
                             </Td>
@@ -543,11 +551,11 @@ export default function Dashboard() {
                                   <Text
                                     mr={1}
                                     fontWeight={"bold"}
-                                    color="blue.500"
+                                    color="whatsapp.400"
                                   >
                                     Approved
                                   </Text>
-                                  <Icon as={BsCheckLg} color="blue.500" />
+                                  <Icon as={BsCheckLg} color="whatsapp.400" />
                                 </Flex>
                               ) : (
                                 appointment.data.status == "rejected"? (
@@ -631,7 +639,7 @@ export default function Dashboard() {
                 )}
               </Box>
             )}
-          </Box>
+          
         </Flex>
 
         <Modal
@@ -1111,7 +1119,11 @@ export default function Dashboard() {
 
         <Modal
           isOpen={isModalOpenAllAppointments}
-          onRequestClose={() => setIsModalOpenAllAppointments(false)}
+          onRequestClose={() => {
+            setIsConfirmMessageOpen(false)
+            setIsModalOpenAllAppointments(false)
+
+          }}
           overlayClassName="react-modal-overlay"
           className="react-modal-delete-message"
           ariaHideApp={false}
@@ -1169,6 +1181,7 @@ export default function Dashboard() {
                 fontSize={20}
                 as={IoMdClose}
                 onClick={() => {
+                  setIsConfirmMessageOpen(false)
                   setIsModalOpenAllAppointments(false);
                 }}
                 cursor={"pointer"}
@@ -1582,7 +1595,7 @@ export default function Dashboard() {
             appointmentStatus == "rejected" ? (
               <Button
                     type="submit"
-                    ml={4}
+                    ml={2}
                     w={'20'}
                     onClick={() => {
                       setIsConfirmMessageOpen(false);
@@ -1590,20 +1603,21 @@ export default function Dashboard() {
                     }}
                     colorScheme={"whiteAlpha"}
                   >
-                    Return
+                    Back
                   </Button>
             ) : (
-              <Flex justify={"end"}>
-                <HStack spacing={4}>
+              <Flex justify={"space-between"}>
+                
                   <Button
                     type="submit"
+                    ml={2}
                     onClick={() => {
                       setIsConfirmMessageOpen(false);
                       setIsModalOpenAllAppointments(false);
                     }}
                     colorScheme={"whiteAlpha"}
                   >
-                    Return
+                    Back
                   </Button>
 
                   {isConfirmMessageOpen ? (
@@ -1625,7 +1639,7 @@ export default function Dashboard() {
                 >
                   Cancel appointment
                 </Button>}
-                </HStack>
+                
               </Flex>
             )}
           </SimpleGrid>

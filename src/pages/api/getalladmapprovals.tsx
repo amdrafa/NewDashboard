@@ -48,7 +48,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
 
             data.map((appointment) => {
                 if(appointment.data.status == "pending"){
-                    filteredData.push(appointment)
+                    filteredData.unshift(appointment)
                 }
             })
 

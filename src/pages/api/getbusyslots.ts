@@ -14,6 +14,7 @@ interface BusySlotsProps{
         speedway: string;
         vehicle: string;
         userId: string;
+        status: string;
     }
     
 }
@@ -48,9 +49,13 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             )
 
             data.forEach(slot => {
-                slot.data.selectedSlots.map(selectedSlot => {
-                    busySlots.push(selectedSlot)
-                })
+                if(slot.data.status == 'canceled' || slot.data.status == 'rejected'){
+                    return ;
+                }else{
+                    slot.data.selectedSlots.map(selectedSlot => {
+                        busySlots.push(selectedSlot)
+                    })
+                }
             })
             
             return response.status(200).json({busySlots})
