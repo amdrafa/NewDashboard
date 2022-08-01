@@ -3,7 +3,8 @@ import { useCan } from "../hooks/useCan";
 
 interface canProps {
     children: ReactNode;
-    roles: string[];
+    roles?: string[];
+    permissions?: string[];
 }
 
 

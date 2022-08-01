@@ -20,6 +20,7 @@ interface UserDataProps {
   createdAt: string;
   companyRef: string;
   roles: string[];
+  permissions: string[]
 }
 
 export const authenticated =
@@ -60,10 +61,12 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
             sub: userData.data.email,
             name: userData.data.name,
             roles: userData.data.roles,
+            permissions: userData.data.permissions,
             userId: userData.ref.id
           };
 
           const jwt = sign(claims, "supersecretkey", { expiresIn: "1h" });
+
           response.setHeader('Set-Cookie', cookie.serialize('auth', jwt, {
               httpOnly: false,
               secure: process.env.NODE_ENV !== 'development',
@@ -71,6 +74,8 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
               maxAge: 3600,
               path: '/'
           }))
+
+          // Setar cookies atualizados quando a permissão é adicionada, pois isso só é feito no momento de login
           
           return response.status(200).json({ message: "Welcome, correct password" });
         } else {

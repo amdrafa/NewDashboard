@@ -45,7 +45,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
               q.Exists(q.Match(q.Index("user_by_email"), q.Casefold(email)))
             ),
             q.Create(q.Collection("users"), {
-              data: { name, email, password: hash, createdAt, createdBy, workRole, roles: ["ADMINISTRATOR"] },
+              data: { name, email, password: hash, createdAt, createdBy, workRole, roles: ["ADMINISTRATOR"], permissions: ["EDIT", "CREATE"] },
             }),
             q.Abort("Email already exists")
           )

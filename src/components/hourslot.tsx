@@ -50,7 +50,7 @@ useEffect(() => {
     if(isLoadingBusylots){
         return ;
     }else{
-        setIsAvaiable(dataBusySlots.busySlots.find(slot => slot == hourSlot) ? false : true)
+        setIsAvaiable(dataBusySlots?.busySlots.find(slot => slot == hourSlot) ? false : true)
 
         // setIsAvaiable(selectedSlots.length > 0 && dataBusySlots.busySlots.find(slot => Number(dayjs(slot).format('D')) == Number(dayjs(hourSlot).format('D'))) ? true : false)
     }

@@ -15,57 +15,113 @@ import { NavSection } from "./NavSection";
 import { MdOutlineBadge } from "react-icons/md";
 import { Can } from "../can";
 import { LoginContext } from "../../contexts/LoginContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  permissions: string[];
+  name: string;
+};
 
 export function SidebarNav() {
+
   const { user } = useContext(LoginContext);
+
+  let hasSchedulePermission = false;
+
+  const necessaryPermissions = ["SCHEDULE"]
+
+  useEffect(() => {
+    const waitAuthenticationLoad = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if(user) {
+          hasSchedulePermission = true
+      }
+    };
+  }, [user]);
 
   return (
     <Stack spacing="12" align="flex-start">
       <NavSection title="GENERAL">
-        <NavLink hrefs="/home" icon={HiOutlineHome}>
+        <NavLink hasPermission={true} hrefs="/home" icon={HiOutlineHome}>
           Home
         </NavLink>
 
         <Can roles={["ADMINISTRATOR"]}>
-          <NavLink hrefs="/approvals" icon={RiDashboardLine}>
+          <NavLink
+            hasPermission={true}
+            hrefs="/approvals"
+            icon={RiDashboardLine}
+          >
             Approvals
           </NavLink>
         </Can>
 
-        <NavLink hrefs="/userdashboard" icon={RiDashboardLine}>
+        <NavLink
+          hasPermission={true}
+          hrefs="/userdashboard"
+          icon={RiDashboardLine}
+        >
           Dashboard
         </NavLink>
 
-        <NavLink hrefs="/schedule" icon={RiTimeLine}>
-          Schedule
-        </NavLink>
+        {user ? 
+          user.permissions.every(permission => permission == "SCHEDULE") ? (
+            <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
+            Schedule
+          </NavLink>
+          ) : (
+            <NavLink hasPermission={false} hrefs="/schedule" icon={RiTimeLine}>
+            Schedule
+          </NavLink>
+          )
+         : (
+          'dsasd'
+        )}
 
         <Can roles={["ADMINISTRATOR"]}>
-          <NavLink hrefs="/users" icon={RiContactsLine}>
+          <NavLink hasPermission={true} hrefs="/users" icon={RiContactsLine}>
             Users
           </NavLink>
-          <NavLink hrefs="/administrators" icon={RiContactsLine}>
+          <NavLink
+            hasPermission={true}
+            hrefs="/administrators"
+            icon={RiContactsLine}
+          >
             Administrators
           </NavLink>
-          <NavLink hrefs="/companies" icon={BiBuilding}>
+          <NavLink hasPermission={true} hrefs="/companies" icon={BiBuilding}>
             Companies
           </NavLink>
-          <NavLink hrefs="/speedways" icon={BsSpeedometer2}>
+          <NavLink
+            hasPermission={true}
+            hrefs="/speedways"
+            icon={BsSpeedometer2}
+          >
             Speedways
           </NavLink>
         </Can>
       </NavSection>
 
       <NavSection title="CONFIGURATIONS">
-        <NavLink hrefs="/settings" icon={VscSettingsGear}>
+        <NavLink hasPermission={true} hrefs="/settings" icon={VscSettingsGear}>
           Settings
         </NavLink>
-        <NavLink hrefs="/driverlicence" icon={MdOutlineBadge}>
+        <NavLink
+          hasPermission={true}
+          hrefs="/driverlicence"
+          icon={MdOutlineBadge}
+        >
           Driver Licence
         </NavLink>
         <Can roles={["USER"]}>
-          <NavLink hrefs="/company" icon={BiBuilding}>
+          <NavLink hasPermission={true} hrefs="/company" icon={BiBuilding}>
             Company
           </NavLink>
         </Can>

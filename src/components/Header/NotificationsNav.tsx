@@ -2,25 +2,17 @@ import {
   HStack,
   Text,
   Icon,
-  Spinner,
   Popover,
-  PopoverTrigger,
   PopoverContent,
-  PopoverArrow,
   PopoverCloseButton,
   PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  Button,
   Link,
   Box,
   Flex,
-  Divider,
 } from "@chakra-ui/react";
-import { GetStaticProps } from "next";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { BsCheckCircle, BsExclamationCircle } from "react-icons/bs";
-import { RiNotificationLine, RiUserAddLine } from "react-icons/ri";
+import { RiNotificationLine } from "react-icons/ri";
 import { LoginContext } from "../../contexts/LoginContext";
 import { MyPopoverTrigger } from "../PopOverTriggerComponent";
 
@@ -150,3 +142,5 @@ export function NotificationsNav() {
     </>
   );
 }
+
+

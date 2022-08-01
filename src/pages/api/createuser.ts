@@ -26,7 +26,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
               q.Exists(q.Match(q.Index("user_by_email"), q.Casefold(email)))
             ),
             q.Create(q.Collection("users"), {
-              data: { name, cpf, phone, email, password: hash, createdAt, register_number, driver_category, expires_at,  companyRef: "", roles: ["USER"] },
+                data: { name, cpf, phone, email, password: hash, createdAt, register_number, driver_category, expires_at,  companyRef: "", roles: ["USER"], permissions: [""] },
             }),
             q.Abort("Email already exists")
           )

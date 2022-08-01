@@ -13,6 +13,7 @@ import { authenticated } from "./login";
     companyRef?: string;
     companyName?: string;
     roles: string[];
+    permissions: string[];
     expires_at?: string;
     cpf: string;
     phone: string;
@@ -55,8 +56,6 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
 
             const email = decoded.sub;
 
-            console.log()
-
             if(decoded.exp > new Date().getTime()){
               return response.status(401).json({message: "Token expired. Please login again."})
             }
@@ -75,7 +74,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
               userData.data.expires_at = null
             }
             
-            return response.status(200).json({name: userData.data.name, email: userData.data.email, roles: userData.data.roles, userId: userData.ref.id, driver_expiration: userData.data.expires_at, companyRef: userData.data.companyRef, companyName: userData.data.companyName, cpf: userData.data.cpf, phone: userData.data.phone })
+            return response.status(200).json({name: userData.data.name, email: userData.data.email, roles: userData.data.roles, permissions:userData.data.permissions , userId: userData.ref.id, driver_expiration: userData.data.expires_at, companyRef: userData.data.companyRef, companyName: userData.data.companyName, cpf: userData.data.cpf, phone: userData.data.phone })
         }catch(err){
             console.log('error when calling "me" route. ', err)
             return response.status(400).json({error: err})

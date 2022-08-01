@@ -54,6 +54,7 @@ export type DecodedToken = {
   iat: number;
   exp: number;
   roles: string[];
+  permissions: string[];
   name: string;
 }
 
@@ -426,34 +427,57 @@ export default function Schedule() {
 }
 
 
-// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-//   const {auth} = parseCookies(ctx)
+  const {auth} = parseCookies(ctx)
 
-//   const decodedUser = decode(auth as string) as DecodedToken;
+  const decodedUser = decode(auth as string) as DecodedToken;
 
-//   const necessaryRoles = ['ADMINISTRATOR']
+
+  // const necessaryPermissions = ["SCHEDULE"]
+
+  // if(necessaryPermissions?.length > 0){
+  //   const hasAllPermissions = necessaryPermissions.every(permission => {
+  //     return decodedUser?.permissions.includes(permission)
+  //   })
+
+
+  //   if(!hasAllPermissions){
+  //     return {
+  //       redirect: {
+  //         destination: '/userdashboard',
+  //         permanent: false
+  //       }
+  //     }
+  //   }
+
+  // }
+
   
-//   if(necessaryRoles?.length > 0){
-//     const hasAllRoles = necessaryRoles.some(role => {
-//       return decodedUser.roles.includes(role)
-//   });
 
-//   if(!hasAllRoles){
-//     console.log(hasAllRoles)
-//     return {
-//       redirect: {
-//         destination: '/userdashboard',
-//         permanent: false
-//       }
-//     }
-//   }
-//   }
+  // const necessaryRoles = ['USER']
+  
+  // if(necessaryRoles?.length > 0){
+  //   const hasAllRoles = necessaryRoles.some(role => {
+  //     return decodedUser.roles.includes(role)
+  // });
+
+
+  // if(!hasAllRoles){
+  //   console.log(hasAllRoles)
+  //   return {
+  //     redirect: {
+  //       destination: '/userdashboard',
+  //       permanent: false
+  //     }
+  //   }
+  // }
+  // }
 
   
   
 
-//   return {
-//     props: {}
-//   }
-// }
+  return {
+    props: {}
+  }
+}

@@ -86,7 +86,7 @@ export default function Register() {
     
 
     if(page == 1 && hasDriverLicence){
-      console.log('a')
+  
       setPage(2)
       
       return;
