@@ -434,26 +434,24 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const decodedUser = decode(auth as string) as DecodedToken;
 
 
-  // const necessaryPermissions = ["SCHEDULE"]
+  const necessaryPermissions = ["SCHEDULE"]
 
-  // if(necessaryPermissions?.length > 0){
-  //   const hasAllPermissions = necessaryPermissions.every(permission => {
-  //     return decodedUser?.permissions.includes(permission)
-  //   })
+  if(necessaryPermissions?.length > 0){
+    const hasAllPermissions = necessaryPermissions.some(permission => {
+      return decodedUser?.permissions?.includes(permission)
+    })
 
 
-  //   if(!hasAllPermissions){
-  //     return {
-  //       redirect: {
-  //         destination: '/userdashboard',
-  //         permanent: false
-  //       }
-  //     }
-  //   }
+    if(!hasAllPermissions){
+      return {
+        redirect: {
+          destination: '/userdashboard',
+          permanent: false
+        }
+      }
+    }
 
-  // }
-
-  
+  }
 
   // const necessaryRoles = ['USER']
   
@@ -473,9 +471,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   //   }
   // }
   // }
-
-  
-  
 
   return {
     props: {}

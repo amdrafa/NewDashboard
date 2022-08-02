@@ -10,7 +10,7 @@ type User = {
   name: string;
   email: string;
   roles: string[];
-  permissions: string[];
+  permissions?: string[];
   companyRef: string;
   driver_expiration?: string;
   cpf: string;
@@ -88,7 +88,7 @@ export function LoginContextProvider({ children }: authProviderProps) {
         .then((response) => {
           const { name, email, roles, userId, driver_expiration, companyRef, cpf, phone, companyName, permissions } = response.data;
       
-          setUser({ name, email, roles, companyRef, userId, driver_expiration, cpf, phone, companyName, permissions });
+          setUser({ name, email, roles, companyRef, userId, driver_expiration, cpf, phone, companyName, permissions: permissions ? permissions : [""] });
         })
         .catch((error) => {
           isAuthenticated = false;

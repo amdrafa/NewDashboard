@@ -59,7 +59,7 @@ export function NotificationsNav() {
               
                 {user?.companyRef == '' && (
                   <Link style={{ textDecoration: 'none' }} href="/company" >
-                  <Flex  alignItems={"center"} borderBottom={'2px'} borderBottomColor={'#333442'} pr={2} py={2}  cursor={'pointer'} _hover={{bg: "#21222c"}}>
+                  <Flex borderTop={'1px'} borderColor='gray.700' alignItems={"center"} pr={2} py={2}  cursor={'pointer'} _hover={{bg: "#21222c"}}>
                     
 
                   <Flex p={4}>
@@ -80,13 +80,13 @@ export function NotificationsNav() {
                   ''
                 ) : (
                   <Link style={{ textDecoration: 'none' }} href="/driverlicence"  >
-                  <Flex alignItems={"center"} borderBottom={'2px'} borderBottomColor={'#333442'} pr={2} py={2} cursor={'pointer'} _hover={{bg: "#21222c"}}>
+                  <Flex borderTop={'1px'} borderColor='gray.700' alignItems={"center"} pr={2} py={2} cursor={'pointer'} _hover={{bg: "#21222c"}}>
 
                   <Flex p={4}>
                     <Icon fontSize={30} as={BsExclamationCircle} color={"blue.500"}/>
                   </Flex>
 
-                  <Box>
+                  <Box >
                     <Text fontWeight={600} fontSize={16} color={'blue.500'}>Register driver licence</Text>
                     <Text pr={1.5} fontSize={14} color={'gray.300'}>Go to the configurations page and update the informations.</Text>
                   </Box>
@@ -100,7 +100,7 @@ export function NotificationsNav() {
                 {user?.driver_expiration && (
                   new Date(user?.driver_expiration) <= new Date() ? (
                     <Link style={{ textDecoration: 'none' }} href="/driverlicence" > 
-                  <Flex alignItems={"center"} pr={2} py={3}  borderBottom={'2px'} borderBottomColor={'#333442'}  cursor={'pointer'} _hover={{bg: "#21222c"}}>
+                  <Flex borderTop={'1px'} borderColor='gray.700' alignItems={"center"} pr={2} py={3} cursor={'pointer'} _hover={{bg: "#21222c"}}>
 
                   <Flex p={4}>
                     <Icon fontSize={30} as={BsExclamationCircle} color={"blue.500"}/>

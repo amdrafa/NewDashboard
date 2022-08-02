@@ -353,6 +353,7 @@ export default function Dashboard() {
                                       color={"gray.100"}
                                       fontWeight={"bold"}
                                       ml="2"
+                                      my="1"
                                       p={2}
                                       rounded="lg"
                                       bg={"blue.600"}

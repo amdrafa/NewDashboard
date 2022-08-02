@@ -1,4 +1,4 @@
-import { Stack } from "@chakra-ui/react";
+import { Box, Flex, Icon, Spinner, Stack, Text, Image } from "@chakra-ui/react";
 import {
   RiDashboardLine,
   RiContactsLine,
@@ -19,6 +19,7 @@ import { useContext, useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
+import loading from '../../../public/loading.png'
 
 export type DecodedToken = {
   sub: string;
@@ -45,9 +46,11 @@ export function SidebarNav() {
       }
     };
   }, [user]);
+  
 
   return (
-    <Stack spacing="12" align="flex-start">
+    (user)? (
+      <Stack spacing="12" align="flex-start">
       <NavSection title="GENERAL">
         <NavLink hasPermission={true} hrefs="/home" icon={HiOutlineHome}>
           Home
@@ -72,17 +75,18 @@ export function SidebarNav() {
         </NavLink>
 
         {user ? 
-          user.permissions.every(permission => permission == "SCHEDULE") ? (
+          user.permissions?.some(permission => permission == "SCHEDULE") ? (
             <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
-            Schedule
+            Schedule 
           </NavLink>
           ) : (
-            <NavLink hasPermission={false} hrefs="/schedule" icon={RiTimeLine}>
-            Schedule
-          </NavLink>
+            <Flex cursor={'not-allowed'} alignItems='center'>
+              <Icon as={RiTimeLine} fontSize="20" color={'gray.600'}/>
+                <Text ml="4" fontWeight="semibold" color={'gray.600'}>Schedule</Text>
+            </Flex>
           )
          : (
-          'dsasd'
+          'Loading'
         )}
 
         <Can roles={["ADMINISTRATOR"]}>
@@ -127,5 +131,30 @@ export function SidebarNav() {
         </Can>
       </NavSection>
     </Stack>
+    ) : (
+      <Stack spacing="12" align="flex-start">
+      <NavSection title="GENERAL">
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      
+       
+      </NavSection>
+
+      <NavSection title="CONFIGURATIONS">
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+        
+      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+        
+      </NavSection>
+    </Stack>
+
+    )
   );
 }

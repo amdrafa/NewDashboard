@@ -265,13 +265,17 @@ export default function Dashboard() {
                         </Td>
 
                         <Td>
-                          <HStack>
+                          <Flex
+                                wrap="wrap"
+                                alignSelf={"center"}
+                                alignItems={"center"}>
                             {appointment.data.selectedSlots.map((slot) => {
                               return (
                                 <Text
                                   color={"gray.100"}
                                   fontWeight={"bold"}
                                   ml="2"
+                                  my="1"
                                   p={2}
                                   rounded="lg"
                                   bg={"blue.600"}
@@ -281,7 +285,7 @@ export default function Dashboard() {
                                 </Text>
                               );
                             })}
-                          </HStack>
+                          </Flex>
                         </Td>
 
                         <Td>
