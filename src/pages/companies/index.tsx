@@ -14,6 +14,7 @@ import {
   Text,
   useBreakpointValue,
   Spinner,
+  Image
 } from "@chakra-ui/react";
 import { query as q } from "faunadb";
 import { GetServerSideProps } from "next";
@@ -235,16 +236,25 @@ export default function CompanyList() {
               onPageChanges={setPage}
               />
               
-            </>) : (<Flex w="100%" mt={"110px"} justifyContent="center"> 
-                <Box justifyContent="center">
-                    <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">There is not any company registered.</Text>         
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">           
-                <Text fontSize={18}>Create a company and an e-mail with a secret key will be sent to the responsable for the institution.</Text>
-                </Flex> 
-                </Box>
-              </Flex>)
+            </>) : (
+              <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+              <Box justifyContent="center" mb={8}>
+                <Flex justifyContent={'center'}>
+                  <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
+                </Flex>
+                <Flex w="100%" justifyContent="center">
+                  <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                    There is not any company registered.
+                  </Text>
+                </Flex>
+                <Flex w="100%" justifyContent="center">
+                  <Text fontSize={18} color={'gray.700'}>
+                    Create a company and an e-mail will be sent with its secrety key. 
+                  </Text>
+                </Flex>
+              </Box>
+            </Flex>
+            )
           )}
         </Box>
         )}
@@ -259,31 +269,29 @@ export default function CompanyList() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-  // const {auth} = parseCookies(ctx)
+  const {auth} = parseCookies(ctx)
 
-  // const decodedUser = decode(auth as string) as DecodedToken;
+  const decodedUser = decode(auth as string) as DecodedToken;
 
-  // const necessaryRoles = ['ADMINISTRATOR']
+  const necessaryRoles = ['ADMINISTRATOR']
   
-  // if(necessaryRoles?.length > 0){
-  //   const hasAllRoles = necessaryRoles.some(role => {
-  //     return decodedUser.roles.includes(role)
-  // });
+  if(necessaryRoles?.length > 0){
+    const hasAllRoles = necessaryRoles.some(role => {
+      return decodedUser.roles.includes(role)
+  });
 
-  // if(!hasAllRoles){
-  //   console.log(hasAllRoles)
-  //   return {
-  //     redirect: {
-  //       destination: '/dashboard',
-  //       permanent: false
-  //     }
-  //   }
-  // }
-  // }
+  if(!hasAllRoles){
+    console.log(hasAllRoles)
+    return {
+      redirect: {
+        destination: '/userdashboard',
+        permanent: false
+      }
+    }
+  }
+  }
 
   
-  
-
   return {
     props: {}
   }

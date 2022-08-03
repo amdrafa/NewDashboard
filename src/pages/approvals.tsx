@@ -1,5 +1,6 @@
 import {
   Flex,
+  Image,
   SimpleGrid,
   Box,
   Text,
@@ -40,6 +41,18 @@ import { ApprovalTimeCard } from "../components/approvalTimeCard";
 import { toast } from "react-toastify";
 import { BsCheckLg, BsFillCircleFill } from "react-icons/bs";
 import { FiX } from "react-icons/fi";
+import { GetServerSideProps } from "next";
+import { decode } from "jsonwebtoken";
+import { parseCookies } from "nookies";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  permissions: string[];
+  name: string;
+}
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -412,20 +425,23 @@ export default function Dashboard() {
                     />
                   </>
                 ) : (
-                  <Flex w="100%" justifyContent="center" h="200px">
-                    <Box justifyContent="center" my={10}>
-                      <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">
-                          There are not new appointments.
-                        </Text>
-                      </Flex>
-                      <Flex w="100%" justifyContent="center">
-                        <Text color={"gray.200"} fontSize={18}>
-                          All appointment requests are goint to appear here.
-                        </Text>
-                      </Flex>
-                    </Box>
+                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                <Box justifyContent="center" mb={8} >
+                  <Flex justifyContent={'center'}>
+                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
                   </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                      There are no appointments to approve.
+                    </Text>
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text fontSize={18} color={'gray.700'}>
+                      Wait someone schedule a new appointment.
+                    </Text>
+                  </Flex>
+                </Box>
+              </Flex>
                 )}
               </Box>
             ) : (
@@ -527,23 +543,27 @@ export default function Dashboard() {
                               </Text>
                             </Td>
                             <Td>
-                              <HStack wordBreak={"-moz-initial"}>
+                              <Flex
+                              wrap="wrap"
+                              alignSelf={"center"}
+                              alignItems={"center"}>
                                 {appointment.data.selectedSlots.map((slot) => {
                                   return (
                                     <Text
-                                      color={"gray.100"}
-                                      fontWeight={"bold"}
-                                      ml="2"
-                                      p={2}
-                                      rounded="lg"
-                                      bg={"blue.500"}
+                                    color={"gray.100"}
+                                    fontWeight={"bold"}
+                                    ml="2"
+                                    my="1"
+                                    p={2}
+                                    rounded="lg"
+                                    bg={"blue.600"}
                                     >
                                       {dayjs(slot).format("H")}:00 to{" "}
                                       {Number(dayjs(slot).format("H")) + 1}:00
                                     </Text>
                                   );
                                 })}
-                              </HStack>
+                              </Flex>
                             </Td>
 
                             <Td>
@@ -623,20 +643,23 @@ export default function Dashboard() {
                     />
                   </>
                 ) : (
-                  <Flex w="100%" justifyContent="center" h="200px">
-                    <Box justifyContent="center" my={10}>
-                      <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">
-                          There are not new appointments.
-                        </Text>
-                      </Flex>
-                      <Flex w="100%" justifyContent="center">
-                        <Text color={"gray.200"} fontSize={18}>
-                          All appointment requests are goint to appear here.
-                        </Text>
-                      </Flex>
-                    </Box>
+                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                <Box justifyContent="center" mb={8}>
+                  <Flex justifyContent={'center'}>
+                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
                   </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                      There are not new appointments.
+                    </Text>
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text fontSize={18} color={'gray.700'}>
+                      Wait someone to schedule an appointment.
+                    </Text>
+                  </Flex>
+                </Box>
+              </Flex>
                 )}
               </Box>
             )}
@@ -1648,4 +1671,34 @@ export default function Dashboard() {
       </Box>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+  const {auth} = parseCookies(ctx)
+
+  const decodedUser = decode(auth as string) as DecodedToken;
+
+
+  const necessaryRoles = ['ADMINISTRATOR']
+  
+  if(necessaryRoles?.length > 0){
+    const hasAllRoles = necessaryRoles.some(role => {
+      return decodedUser.roles.includes(role)
+  });
+
+
+  if(!hasAllRoles){
+    return {
+      redirect: {
+        destination: '/userdashboard',
+        permanent: false
+      }
+    }
+  }
+  }
+
+  return {
+    props: {}
+  }
 }

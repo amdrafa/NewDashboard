@@ -13,6 +13,7 @@ import {
   Text,
   useBreakpointValue,
   Spinner,
+  Image
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -23,6 +24,18 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/axios";
 import { useQuery } from "react-query";
 import EditSpeedway from "../../components/editSpeedway";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  permissions: string[];
+  name: string;
+}
 
 interface speedwayDataProps {
   data: speedwayProps;
@@ -216,24 +229,59 @@ export default function Speedwaylist() {
                 />
               </>
             ) : (
-              <Flex w="100%" mt={"110px"} justifyContent="center">
-                <Box justifyContent="center" mb={"36"}>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={22} fontWeight="bold">
-                      There is not any speedway registered.
-                    </Text>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18}>
-                      Register a speedway and wait the users to schedule it.
-                    </Text>
-                  </Flex>
-                </Box>
-              </Flex>
+              <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                  <Box justifyContent="center" mb={8}>
+                    <Flex justifyContent={'center'}>
+                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                        There is not any speedway registered.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={18} color={'gray.700'}>
+                        Create a speedway and wait the users schedule it.
+                      </Text>
+                    </Flex>
+                  </Box>
+                </Flex>
             )}
           </Box>
         )}
       </Flex>
     </Box>
   );
+}
+
+
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+  const {auth} = parseCookies(ctx)
+
+  const decodedUser = decode(auth as string) as DecodedToken;
+
+
+  const necessaryRoles = ['ADMINISTRATOR']
+  
+  if(necessaryRoles?.length > 0){
+    const hasAllRoles = necessaryRoles.some(role => {
+      return decodedUser.roles.includes(role)
+  });
+
+
+  if(!hasAllRoles){
+    return {
+      redirect: {
+        destination: '/userdashboard',
+        permanent: false
+      }
+    }
+  }
+  }
+
+  return {
+    props: {}
+  }
 }

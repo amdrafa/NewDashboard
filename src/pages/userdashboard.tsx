@@ -20,6 +20,7 @@ import {
   Spinner,
   Input,
   HStack,
+  Image,
 } from "@chakra-ui/react";
 import { CgSandClock } from "react-icons/cg";
 import { Header } from "../components/Header";
@@ -41,6 +42,7 @@ import { toast } from "react-toastify";
 import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
 import { ApprovalTimeCard } from "../components/approvalTimeCard";
+import noAppointments from '../../public/noappointments.png'
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -405,15 +407,18 @@ export default function Dashboard() {
                 <Spinner mt="10" mb="80px" />
               </Flex>
             ) : (
-              <Flex w="100%" justifyContent="center">
-                <Box justifyContent="center" my={10}>
+              <Flex w="100%" justifyContent="center" cursor={'not-allowed'} > 
+                <Box justifyContent="center" mb={8} display='flex' flexDirection={'column'}>
+                  <Flex justifyContent={'center'}>
+                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
+                  </Flex>
                   <Flex w="100%" justifyContent="center">
-                    <Text fontSize={22} fontWeight="bold">
+                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
                       You still don't have any appointment.
                     </Text>
                   </Flex>
                   <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18}>
+                    <Text fontSize={18} color={'gray.700'}>
                       Go to the schedule page and book an appointment.
                     </Text>
                   </Flex>

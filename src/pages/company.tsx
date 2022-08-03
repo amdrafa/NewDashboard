@@ -23,6 +23,18 @@ import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
 import { toast } from "react-toastify";
 import { useQuery } from "react-query";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  permissions: string[];
+  name: string;
+}
 
 type UpdateUserCompany = {
   secret_key: string;
@@ -244,4 +256,34 @@ export default function Company() {
       </Flex>
     </Box>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+  const {auth} = parseCookies(ctx)
+
+  const decodedUser = decode(auth as string) as DecodedToken;
+
+
+  const necessaryRoles = ['USER']
+  
+  if(necessaryRoles?.length > 0){
+    const hasAllRoles = necessaryRoles.some(role => {
+      return decodedUser.roles.includes(role)
+  });
+
+
+  if(!hasAllRoles){
+    return {
+      redirect: {
+        destination: '/userdashboard',
+        permanent: false
+      }
+    }
+  }
+  }
+
+  return {
+    props: {}
+  }
 }

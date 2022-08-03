@@ -18,6 +18,7 @@ import {
     Divider,
     HStack,
     SimpleGrid,
+    Image
   } from "@chakra-ui/react";
   import Modal from "react-modal";
   import Link from "next/link";
@@ -32,6 +33,18 @@ import {
 import { IoMdClose } from "react-icons/io";
 import { toast } from "react-toastify";
 import EditAdministrator from "../../components/editAdministrator";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  permissions: string[];
+  name: string;
+}
 
   
   interface AdmDataProps {
@@ -224,16 +237,25 @@ import EditAdministrator from "../../components/editAdministrator";
               currentPage={page}
               onPageChanges={setPage}
             />
-                </>) : (<Flex w="100%" mt={"110px"} justifyContent="center"> 
-                <Box justifyContent="center">
-                    <Flex w="100%" justifyContent="center">
-                        <Text fontSize={22} fontWeight="bold">There is not any administrator registered.</Text>         
+                </>) : (
+                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                  <Box justifyContent="center" mb={8}>
+                    <Flex justifyContent={'center'}>
+                      <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
                     </Flex>
-                    <Flex w="100%" justifyContent="center">           
-                <Text fontSize={18}>Create a new administrator and a passsword will be sent to his e-mail.</Text>
-                </Flex> 
-                </Box>
-              </Flex>)
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                        There is not any administrator registered.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={18} color={'gray.700'}>
+                        Create an administrator and an e-mail will be sent with his temporary password.
+                      </Text>
+                    </Flex>
+                  </Box>
+                </Flex>
+                )
               
             )} 
             
@@ -246,4 +268,36 @@ import EditAdministrator from "../../components/editAdministrator";
       </Box>
     );
   }
+
+
+  export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+    const {auth} = parseCookies(ctx)
+  
+    const decodedUser = decode(auth as string) as DecodedToken;
+  
+  
+    const necessaryRoles = ['ADMINISTRATOR']
+    
+    if(necessaryRoles?.length > 0){
+      const hasAllRoles = necessaryRoles.some(role => {
+        return decodedUser.roles.includes(role)
+    });
+  
+  
+    if(!hasAllRoles){
+      return {
+        redirect: {
+          destination: '/userdashboard',
+          permanent: false
+        }
+      }
+    }
+    }
+  
+    return {
+      props: {}
+    }
+  }
+  
   
