@@ -1,17 +1,15 @@
 import {
   Flex,
   Button,
-  Stack,
   Icon,
   Divider,
   Text,
   VStack,
   SimpleGrid,
   Box,
-  Checkbox,
   Heading,
   HStack,
-} from "@chakra-ui/react";
+  useToast} from "@chakra-ui/react";
 import { Input } from "../components/Form/input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -19,14 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
 import { useContext, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
-import Router from "next/router";
-import Link from "next/link";
-import { RiAddLine } from "react-icons/ri";
-import { MdLogin } from "react-icons/md";
-import { FaCircle } from "react-icons/fa";
-import { BsFillPersonFill } from "react-icons/bs";
 import { FiTrash2 } from "react-icons/fi";
-import { toast } from "react-toastify";
 import dayjs from "dayjs";
 
 type EditUserFormSchema = {
@@ -81,6 +72,8 @@ export function EditUser({
   userId  
 }: EditUserFormData) {
 
+  const toast = useToast()
+
   const [hasDriverLicence, setHasDriverLicence] = useState(false);
 
   const { createUser } = useContext(LoginContext);
@@ -94,11 +87,25 @@ export function EditUser({
   function deleteUser(id: string){
     api.delete('deleteuser', {data: {id}})
     .then((response) => {
-      toast.success("User deleted");
+      toast({
+        title: "User deleted",
+        description: `${name} was deleted successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       window.location.reload()
     })
     .catch((err) => {
-      toast.error("Something went wrong");
+      toast({
+        title: "Something went wrong",
+        description: `Something went wrong when deleting ${name}.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     });
   }
 
@@ -126,11 +133,25 @@ export function EditUser({
             userId
             })
         .then((response) => {
-          toast.success("User updated");
+          toast({
+            title: "User updated",
+            description: `${name} was updated successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
           window.location.reload()
         })
         .catch((err) => {
-          toast.error("Something went wrong");
+          toast({
+            title: "Something went wrong",
+            description: `Something went wrong when deleting ${name}.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
         })
     ) : (
         api.put('edituser', {email,
@@ -143,11 +164,25 @@ export function EditUser({
             userId
             })
         .then((response) => {
-          toast.success("User updated");
+          toast({
+            title: "User updated",
+            description: `${name} was updated successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
           window.location.reload()
         })
         .catch((err) => {
-          toast.error("Something went wrong");
+          toast({
+            title: "Something went wrong",
+            description: `Something went wrong when deleting ${name}.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
         })
     )
     

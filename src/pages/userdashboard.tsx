@@ -21,6 +21,7 @@ import {
   Input,
   HStack,
   Image,
+  useToast
 } from "@chakra-ui/react";
 import { CgSandClock } from "react-icons/cg";
 import { Header } from "../components/Header";
@@ -38,7 +39,6 @@ import { getMonth } from "../util";
 import dayjs from "dayjs";
 import { FiX } from "react-icons/fi";
 import { BsCheckLg, BsFillCircleFill } from "react-icons/bs";
-import { toast } from "react-toastify";
 import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
 import { ApprovalTimeCard } from "../components/approvalTimeCard";
@@ -75,13 +75,10 @@ interface appointmentFunctionProps {
   status: string;
 }
 
-export default function Dashboard() {
+export default function UserDashboard() {
   console.log(getMonth());
 
-  const isWideVersioon = useBreakpointValue({
-    base: false,
-    lg: true,
-  });
+  const toast = useToast()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -155,11 +152,25 @@ export default function Dashboard() {
         id,
       })
       .then((response) => {
-        toast.success("Appointment canceled");
+        toast({
+          title: "Appointment canceled",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was canceled.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} couldn't be canceled.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   }
 
@@ -210,7 +221,7 @@ export default function Dashboard() {
                   <Thead>
                     <Tr>
                       <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Speedway</Text>
+                        <Text>Test track</Text>
                       </Th>
 
                       <Th px={["4", "4", "6"]} width="">
@@ -418,7 +429,7 @@ export default function Dashboard() {
                     </Text>
                   </Flex>
                   <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'gray.700'}>
+                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                       Go to the schedule page and book an appointment.
                     </Text>
                   </Flex>

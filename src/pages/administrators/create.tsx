@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack, Text, useToast } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../../components/Form/input";
 import { Header } from "../../components/Header";
@@ -9,8 +9,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useContext } from "react";
 import { LoginContext } from "../../contexts/LoginContext";
 import { api } from "../../services/axios";
-import Router from "next/router";
-import { toast } from "react-toastify";
 
 type CreateAdmFormData = {
     name: string;
@@ -28,6 +26,8 @@ type CreateAdmFormData = {
 
 
 export default function CreateAdm(){
+
+    const toast = useToast()
 
     const { register, handleSubmit, formState, resetField } = useForm({
         resolver: yupResolver(createAdmFormSchema)
@@ -49,14 +49,28 @@ export default function CreateAdm(){
                 createdBy: user.userId
             })
 
-            toast.success('Administrator created')
+            toast({
+                title: "Administrator created",
+                description: `${name} was created successfully.`,
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
             resetField('name')
             resetField('email')
             resetField('cpf')
             resetField('role')
             
         }catch(err){
-            toast.error('E-mail already registered')
+            toast({
+                title: "E-mail already registered",
+                description: `${email} is already registered in the database.`,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
             console.log(err)
         }
         

@@ -112,7 +112,12 @@ export function LoginContextProvider({ children }: authProviderProps) {
   useEffect(() => {
     
     {
-      statusLogin == 200 && Router.push("/settings");
+      if(statusLogin == 200){
+  
+        Router.push("/home");
+
+      }
+      
     }
   }, [statusLogin]);
 

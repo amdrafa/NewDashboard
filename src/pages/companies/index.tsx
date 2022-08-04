@@ -248,7 +248,7 @@ export default function CompanyList() {
                   </Text>
                 </Flex>
                 <Flex w="100%" justifyContent="center">
-                  <Text fontSize={18} color={'gray.700'}>
+                  <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                     Create a company and an e-mail will be sent with its secrety key. 
                   </Text>
                 </Flex>
@@ -277,14 +277,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   
   if(necessaryRoles?.length > 0){
     const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser.roles.includes(role)
+      return decodedUser?.roles?.includes(role)
   });
 
   if(!hasAllRoles){
     console.log(hasAllRoles)
     return {
       redirect: {
-        destination: '/userdashboard',
+        destination: '/home',
         permanent: false
       }
     }

@@ -22,7 +22,7 @@ const SignInFormSchema = yup.object().shape({
   password: yup.string().required(),
 });
 
-export default function Home() {
+export default function Login() {
 
 
   const { loginAuth } = useContext(LoginContext);
@@ -101,7 +101,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if(auth){
     return {
       redirect: {
-        destination: '/dashboard',
+        destination: '/home',
         permanent: false,
       }
     }

@@ -276,7 +276,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if(!hasAllRoles){
     return {
       redirect: {
-        destination: '/userdashboard',
+        destination: '/home',
         permanent: false
       }
     }

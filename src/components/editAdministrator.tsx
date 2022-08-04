@@ -9,6 +9,7 @@ import {
     SimpleGrid,
     Text,
     VStack,
+    useToast
   } from "@chakra-ui/react";
   import Modal from "react-modal";
   import Link from "next/link";
@@ -19,8 +20,6 @@ import {
   import * as yup from "yup";
   import { yupResolver } from "@hookform/resolvers/yup";
   import { api } from "../services/axios";
-  import Router from "next/router";
-  import { toast, ToastContainer } from "react-toastify";
   import { useEffect, useState } from "react";
   import { IoMdClose } from "react-icons/io";
   import { FaUnlockAlt } from "react-icons/fa";
@@ -50,6 +49,9 @@ import {
     setIsEditMode,
     workRole
   }: EditAdmFormData) {
+
+    const toast = useToast()
+
     const { register, handleSubmit, formState, resetField } = useForm({
       resolver: yupResolver(EditAdmFormSchema),
     });
@@ -59,11 +61,25 @@ import {
     function deleteAdm(id: string){
         api.delete('deleteadministrator', {data: {id}})
         .then((response) => {
-          toast.success("Administrator deleted");
+          toast({
+            title: "Administrator deleted",
+            description: `${name} was deleted successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
           window.location.reload()
         })
         .catch((err) => {
-          toast.error("Something went wrong");
+          toast({
+            title: "Something went wrong",
+            description: `${name} was couldn't be deleted.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
         });
       }
   
@@ -81,10 +97,24 @@ import {
           
         })
         .then((response) => {
-          toast.success("Company updated");
+          toast({
+            title: "Administrator updated",
+            description: `${name} was updated successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
         })
         .catch((err) => {
-          toast.error("Something went wrong");
+          toast({
+            title: "Something went wrong",
+            description: `${name} couldn't be deleted.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
         });
     };
   

@@ -11,7 +11,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
-import { BsCheckCircle, BsExclamationCircle } from "react-icons/bs";
+import { BsCheckCircle, BsExclamationCircle, BsFillCircleFill } from "react-icons/bs";
 import { RiNotificationLine } from "react-icons/ri";
 import { LoginContext } from "../../contexts/LoginContext";
 import { MyPopoverTrigger } from "../PopOverTriggerComponent";
@@ -38,6 +38,7 @@ export function NotificationsNav() {
         <Popover placement={"bottom-end"}>
           <MyPopoverTrigger>
             <Link>
+            <Icon as={BsFillCircleFill} mt='-4' fontSize="6" color={'red.500'} />
               <Icon as={RiNotificationLine} fontSize="20" />
             </Link>
           </MyPopoverTrigger>

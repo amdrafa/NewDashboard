@@ -108,7 +108,7 @@ export function SidebarNav() {
             hrefs="/speedways"
             icon={BsSpeedometer2}
           >
-            Speedways
+            Test tracks
           </NavLink>
         </Can>
       </NavSection>

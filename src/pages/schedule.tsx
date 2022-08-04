@@ -14,6 +14,7 @@ import {
   HStack,
   Input,
   Link,
+  useToast,
   Link as ChakraLink,
   Spinner,
   useBreakpointValue,
@@ -41,7 +42,6 @@ import Router from "next/router";
 import { errors } from "faunadb";
 import { ChooseVehicle } from "../components/ChooseVehicle";
 import { useQuery } from "react-query";
-import { toast } from "react-toastify";
 import { CalendarHeader } from "../components/Calendar/CalendarHeader";
 import { CalendarIndex } from "../components/Calendar";
 import dayjs from "dayjs";
@@ -72,6 +72,8 @@ interface dataProps {
 
 
 export default function Schedule() {
+
+  const toast = useToast()
 
   const [isSameDay, setIsSameDay] = useState(true)
 
@@ -132,7 +134,14 @@ export default function Schedule() {
   useEffect(() => {
     if(status == 200){
       setIsModalOpen(false)
-      toast.success("Appointment scheduled")
+      toast({
+        title: "Appointment scheduled",
+        description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was scheduled successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       Router.push('/userdashboard')
     }
     setStatus(0);
@@ -174,7 +183,14 @@ export default function Schedule() {
       .then((response) => setStatus(response.status))
       .catch((err) => {
         console.log(err);
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was couldn't be canceled.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
 
     
@@ -255,7 +271,7 @@ export default function Schedule() {
              </SimpleGrid>
  
              <Text ml="1" w="100%" fontSize="18">
-               Speedway
+               Test track
              </Text>
              <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                <Select
@@ -290,7 +306,14 @@ export default function Schedule() {
                </Link>
                <Button colorScheme="blue" onClick={() => {
 
-                {speedway == '' ? (toast.info('You need to select a speedway')) : (
+                {speedway == '' ? (toast({
+                  title: "Select a test track",
+                  description: `You need to select a test track to proceed.`,
+                  status: "info",
+                  duration: 5000,
+                  isClosable: true,
+                  position: 'top-right'
+                })) : (
                   setPage(2)
                 )}
 
@@ -372,7 +395,14 @@ export default function Schedule() {
                 }} colorScheme="whiteAlpha">Back</Button>
                
                <Button colorScheme="blue" onClick={() => {
-                  selectedSlots.length <= 0? toast.info('Select a slot') : setIsModalOpen(true)
+                  selectedSlots.length <= 0? toast({
+                    title: "Select a slot",
+                    description: `You need to select at least one slot.`,
+                    status: "info",
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'top-right'
+                  }) : setIsModalOpen(true)
                 }}>
                  Next
                </Button>
@@ -445,7 +475,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     if(!hasAllPermissions){
       return {
         redirect: {
-          destination: '/userdashboard',
+          destination: '/home',
           permanent: false
         }
       }

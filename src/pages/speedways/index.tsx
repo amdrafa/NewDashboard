@@ -139,7 +139,7 @@ export default function Speedwaylist() {
           >
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
-                Speedway list
+                Test tracks list
               </Heading>
 
               <Link href="/speedways/create" passHref>
@@ -169,7 +169,7 @@ export default function Speedwaylist() {
                   <Thead>
                     <Tr>
                       <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Speedway</Text>
+                        <Text>Test track</Text>
                       </Th>
 
                       <Th px={["4", "4", "6"]} width="">
@@ -240,7 +240,7 @@ export default function Speedwaylist() {
                       </Text>
                     </Flex>
                     <Flex w="100%" justifyContent="center">
-                      <Text fontSize={18} color={'gray.700'}>
+                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                         Create a speedway and wait the users schedule it.
                       </Text>
                     </Flex>
@@ -267,14 +267,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   
   if(necessaryRoles?.length > 0){
     const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser.roles.includes(role)
+      return decodedUser?.roles?.includes(role)
   });
 
 
   if(!hasAllRoles){
     return {
       redirect: {
-        destination: '/userdashboard',
+        destination: '/home',
         permanent: false
       }
     }

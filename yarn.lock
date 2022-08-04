@@ -3132,6 +3132,11 @@ npmlog@^5.0.1:
     gauge "^3.0.0"
     set-blocking "^2.0.0"
 
+nuka-carousel@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/nuka-carousel/-/nuka-carousel-5.2.0.tgz#b236e5a633e3ef3abbd7ab21942615fda3eabef8"
+  integrity sha512-mBMS7eXxsb54L87jPTSMst5Ow53u6Ocf28SDY36+THH7RuZ7aJxo8CQAuO8Bov8MkSTGALV+8P7TcaOqnkPYLA==
+
 oauth@^0.9.15:
   version "0.9.15"
   resolved "https://registry.yarnpkg.com/oauth/-/oauth-0.9.15.tgz#bd1fefaf686c96b75475aed5196412ff60cfb9c1"

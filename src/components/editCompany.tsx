@@ -9,6 +9,7 @@ import {
   SimpleGrid,
   Text,
   VStack,
+  useToast
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import Link from "next/link";
@@ -19,8 +20,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
-import Router from "next/router";
-import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaUnlockAlt } from "react-icons/fa";
@@ -60,6 +59,8 @@ export default function EditCompany({
     resolver: yupResolver(EditCompanyFormSchema),
   });
 
+  const toast = useToast()
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { errors } = formState;
@@ -83,21 +84,49 @@ export default function EditCompany({
         companyId
       })
       .then((response) => {
-        toast.success("Company updated");
+        toast({
+          title: "Company updated",
+          description: `${company} was updated successfully.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `${company} couldn't be updated.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   };
 
   function deleteCompany(id: string){
     api.delete('deletecompany', {data: {id}})
     .then((response) => {
-      toast.success("company deleted");
+      toast({
+        title: "Company deleted",
+        description: `${company} was deleted successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       window.location.reload()
     })
     .catch((err) => {
-      toast.error("Something went wrong");
+      toast({
+        title: "Something went wrong",
+        description: `${company} couldn't be deleted.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     });
   }
 

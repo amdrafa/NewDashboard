@@ -297,7 +297,7 @@ export default function UserList() {
                       </Text>
                     </Flex>
                     <Flex w="100%" justifyContent="center">
-                      <Text fontSize={18} color={'gray.700'}>
+                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                         Wait someone register in the platform.
                       </Text>
                     </Flex>
@@ -327,14 +327,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   
   if(necessaryRoles?.length > 0){
     const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser.roles.includes(role)
+      return decodedUser?.roles?.includes(role)
   });
 
 
   if(!hasAllRoles){
     return {
       redirect: {
-        destination: '/userdashboard',
+        destination: '/home',
         permanent: false
       }
     }

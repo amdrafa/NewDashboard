@@ -53,8 +53,6 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
         )
       );
 
-      console.log(userData.ref.id)
-
       compare(password, userData.data.password, function (err, result) {
         if (!err && result) {
           const claims = {
@@ -83,8 +81,8 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
         }
       });
     } catch (err) {
-      console.log("error when adding user to database", err);
-      return response.status(400).json({});
+      console.log("error, login", err);
+      return response.status(400).json({err});
     }
   } else {
     response.setHeader("Allow", "POST");

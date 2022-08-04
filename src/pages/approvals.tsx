@@ -21,6 +21,7 @@ import {
   Spinner,
   Input,
   HStack,
+  useToast,
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import { Header } from "../components/Header";
@@ -38,7 +39,6 @@ import dayjs from "dayjs";
 import { FaExchangeAlt } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { ApprovalTimeCard } from "../components/approvalTimeCard";
-import { toast } from "react-toastify";
 import { BsCheckLg, BsFillCircleFill } from "react-icons/bs";
 import { FiX } from "react-icons/fi";
 import { GetServerSideProps } from "next";
@@ -85,11 +85,13 @@ interface busySlotsProps {
   busySlots: [];
 }
 
-export default function Dashboard() {
+export default function Approvals() {
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,
   });
+
+  const toast = useToast()
 
   const [isConfirmMessageOpen, setIsConfirmMessageOpen] = useState(false);
 
@@ -116,13 +118,13 @@ export default function Dashboard() {
 
   const [limit, setLimit] = useState(6);
 
-  const [total, setTotal] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const [pageAllAppointments, setPageAllAppointments] = useState(1);
 
   const [limitAllAppointments, setLimitAllAppointments] = useState(6);
 
-  const [totalAllAppointments, setTotalAllAppointments] = useState(1);
+  const [totalAllAppointments, setTotalAllAppointments] = useState(0);
 
   const {
     data: dataBusySlots,
@@ -141,11 +143,24 @@ export default function Dashboard() {
         id,
       })
       .then((response) => {
-        toast.success("Appointment canceled");
+        toast({
+          title: "Appointment canceled",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was canceled.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: "An error ocurred when deleting the appointment.",
+          status: "error",
+          duration: 5000,
+          isClosable: true
+        });
       });
   }
 
@@ -154,11 +169,25 @@ export default function Dashboard() {
     api
       .put("rejectappointment", {id})
       .then((response) => {
-        toast.success("appointment rejected");
+        toast({
+          title: "Appointment rejected",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was rejected.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} couldn't be canceled.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
 
     return;
@@ -208,11 +237,25 @@ export default function Dashboard() {
         id,
       })
       .then((response) => {
-        toast.success("Appointment approved");
+        toast({
+          title: "Appointment approved",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was approved.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was couldn't be canceled.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   }
 
@@ -297,7 +340,7 @@ export default function Dashboard() {
                       <Thead>
                         <Tr>
                           <Th px={["4", "4", "6"]} color="gray.300">
-                            <Text>Speedway</Text>
+                            <Text>Test track</Text>
                           </Th>
 
                           <Th px={["4", "4", "6"]}>
@@ -436,7 +479,7 @@ export default function Dashboard() {
                     </Text>
                   </Flex>
                   <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'gray.700'}>
+                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                       Wait someone schedule a new appointment.
                     </Text>
                   </Flex>
@@ -485,7 +528,7 @@ export default function Dashboard() {
                       <Thead>
                         <Tr>
                           <Th px={["4", "4", "6"]} color="gray.300">
-                            <Text>Speedway</Text>
+                            <Text>Test track</Text>
                           </Th>
 
                           <Th px={["4", "4", "6"]}>
@@ -654,7 +697,7 @@ export default function Dashboard() {
                     </Text>
                   </Flex>
                   <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'gray.700'}>
+                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                       Wait someone to schedule an appointment.
                     </Text>
                   </Flex>

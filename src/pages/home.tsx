@@ -1,28 +1,15 @@
 import {
   Box,
   Button,
-  Divider,
   Flex,
-  Heading,
-  HStack,
-  SimpleGrid,
-  VStack,
   Text,
-  Spinner,
-  Icon,
   Image
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { Input } from "../components/Form/input";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
-import { SubmitHandler, useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { api } from "../services/axios";
-import { useContext, useEffect, useState } from "react";
-import { LoginContext } from "../contexts/LoginContext";
-import { toast } from "react-toastify";
+import { CardCarousel } from "../components/carouselCard";
+import Carousel from 'nuka-carousel'
 
 export default function Home() {
   return (
@@ -32,9 +19,9 @@ export default function Home() {
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6" mb={"14"}>
         <Sidebar />
 
-        <Box flex="1" height={"100%"} borderRadius={8} p="8" mt={5}>
+        <Box flex="1" height={"100%"} borderRadius={8} p="8">
           <Flex>
-            <Box w={"60%"}>
+            <Box w={"60%"} >
               <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
@@ -89,6 +76,33 @@ export default function Home() {
             <Image src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
+
+          <Box w={'100%'} py={12} bg={'gray.800'} px='4' rounded={'lg'} mt='10'> 
+          <Carousel  autoplay={true} enableKeyboardControls wrapAround={true}
+    slidesToShow={3} cellSpacing={16}>
+          <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center' pb='8'>
+          <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
+          <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >HSO</Text>
+          </Box>
+          <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center'>
+          <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
+          <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >BMT</Text>
+          </Box>
+          <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center'>
+          <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
+          <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >VDA</Text>
+          </Box>
+          <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center'>
+          <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
+          <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >PHC</Text>
+          </Box>
+          <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center'>
+          <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
+          <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >Comfort Lane</Text>
+          </Box>
+          </Carousel>
+            
+          </Box>
         </Box>
       </Flex>
     </Box>

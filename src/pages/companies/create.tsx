@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack, useToast } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../../components/Form/input";
 import { Header } from "../../components/Header";
@@ -7,8 +7,6 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup' 
 import { api } from "../../services/axios";
-import Router from "next/router";
-import { toast } from "react-toastify";
 
 type CreateCompanyFormData = {
     company: string;
@@ -31,6 +29,8 @@ type CreateCompanyFormData = {
 
 export default function CreateCompany(){
 
+    const toast = useToast()
+
     const { register, handleSubmit, formState, resetField } = useForm({
         resolver: yupResolver(createCompanyFormSchema)
     })
@@ -44,7 +44,14 @@ export default function CreateCompany(){
         await api.post('createcompany', {data: company, cnpj, responsable_name, email, phone, hours})
         .then(response => {
 
-            toast.success('Company created')
+            toast({
+                title: "Company created",
+                description: `${company} was created successfully.`,
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
 
             resetField('company')
             resetField('cnpj')
@@ -55,7 +62,14 @@ export default function CreateCompany(){
 
         })
         .catch(err => {
-            toast.error('Company already exists')
+            toast({
+                title: "Company already exists.",
+                description: `${company} was already registered before.`,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
         })
          
     }

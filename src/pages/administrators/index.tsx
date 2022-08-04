@@ -18,7 +18,8 @@ import {
     Divider,
     HStack,
     SimpleGrid,
-    Image
+    Image,
+    useToast
   } from "@chakra-ui/react";
   import Modal from "react-modal";
   import Link from "next/link";
@@ -31,7 +32,6 @@ import {
   import { api } from "../../services/axios";
   import { useQuery } from "react-query";
 import { IoMdClose } from "react-icons/io";
-import { toast } from "react-toastify";
 import EditAdministrator from "../../components/editAdministrator";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
@@ -79,7 +79,7 @@ export type DecodedToken = {
       base: false,
       lg: true,
     });
-    
+    const toast = useToast()
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [cpf, setcpf] = useState(0);
@@ -120,11 +120,25 @@ export type DecodedToken = {
       
     api.delete('deleteadm', {data: {id}})
     .then((response) => {
-      toast.success("Administrator deleted");
+      toast({
+        title: "Administrator deleted",
+        description: `${name} was deleted successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       window.location.reload()
     })
     .catch((err) => {
-      toast.error("Something went wrong");
+      toast({
+        title: "Something went wrong",
+        description: `${name} couldn't be deleted.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     });
 
     }
@@ -249,7 +263,7 @@ export type DecodedToken = {
                       </Text>
                     </Flex>
                     <Flex w="100%" justifyContent="center">
-                      <Text fontSize={18} color={'gray.700'}>
+                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
                         Create an administrator and an e-mail will be sent with his temporary password.
                       </Text>
                     </Flex>
@@ -288,7 +302,7 @@ export type DecodedToken = {
     if(!hasAllRoles){
       return {
         redirect: {
-          destination: '/userdashboard',
+          destination: '/home',
           permanent: false
         }
       }
