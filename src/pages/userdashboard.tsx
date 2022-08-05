@@ -107,7 +107,7 @@ export default function UserDashboard() {
     isLoading: isLoadingBusylots,
     error: errorBusylots,
   } = useQuery<busySlotsProps>(`busySlotsList`, async () => {
-    const response = await api.get(`getbusyslots`);
+    const response = await api.get(`getbusyslots?testtrack=${speedway}`);
 
     return response.data;
   });

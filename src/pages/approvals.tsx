@@ -131,7 +131,7 @@ export default function Approvals() {
     isLoading: isLoadingBusylots,
     error: errorBusylots,
   } = useQuery<busySlotsProps>(`busySlotsList`, async () => {
-    const response = await api.get(`getbusyslots`);
+    const response = await api.get(`getbusyslots?testtrack=${speedway}`);
 
     return response.data;
   });
@@ -1727,7 +1727,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   
   if(necessaryRoles?.length > 0){
     const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser.roles.includes(role)
+      return decodedUser?.roles?.includes(role)
   });
 
 
