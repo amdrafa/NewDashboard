@@ -25,7 +25,7 @@ export default authenticated(
                 cnpj,
                 email,
                 phone,
-                hours,
+                avaiableHours: hours,
                 responsable_name, 
             },
           })

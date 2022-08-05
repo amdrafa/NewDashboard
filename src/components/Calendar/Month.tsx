@@ -9,9 +9,10 @@ interface MonthProps {
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sameDay: boolean;
+    testTrack: string;
 }
 
-export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay}:MonthProps){
+export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, testTrack}:MonthProps){
 
     return (         // Let teams apparence, horizontal direction
                     // flex={'1'} gridTemplateColumns={'repeat(7, 1fr)'}
@@ -28,6 +29,7 @@ export function Month({month, addTimeSlot, selectedSlots, setSelectedSlots, setI
                         setSelectedSlots={setSelectedSlots}
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
+                        testTrack={testTrack}
                         />
                     ))}
                 </Flex>

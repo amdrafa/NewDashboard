@@ -15,11 +15,12 @@ interface DayProps {
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sameDay: boolean;
+    testTrack: string;
 }
 
 // dayjs.Dayjs = type for day js
 
-export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay}:DayProps){
+export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, testTrack}:DayProps){
 
     
     const [slot8AmIsSelected, setSlot8AmIsSelected] = useState(false)
@@ -71,6 +72,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -84,6 +86,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -97,6 +100,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -110,6 +114,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -123,6 +128,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -136,6 +142,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -149,6 +156,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -162,6 +170,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -175,6 +184,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
 
                     <HourSlot 
@@ -188,6 +198,7 @@ export function Day({day, rowIdx, addTimeSlot, selectedSlots, setSelectedSlots, 
                         setIsSlotLoading={setIsSlotLoading}
                         sameDay={sameDay}
                         day={day}
+                        testTrack={testTrack}
                     />
     
                     

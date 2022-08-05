@@ -13,9 +13,10 @@ interface CalendarIndexProps{
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sameDay: boolean;
+    testTrack: string;
 }
 
-export function CalendarIndex({addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay}:CalendarIndexProps){
+export function CalendarIndex({addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, testTrack}:CalendarIndexProps){
 
     const [ currentMonth, setCurrentMonth] = useState(getMonth())
 
@@ -42,6 +43,7 @@ export function CalendarIndex({addTimeSlot, selectedSlots, setSelectedSlots, set
                     setSelectedSlots={setSelectedSlots}
                     setIsSlotLoading={setIsSlotLoading}
                     sameDay={sameDay}
+                    testTrack={testTrack}
                     />
                 </Flex>
             </Flex>

@@ -1,8 +1,7 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Text, useToast } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import { useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { toast } from "react-toastify";
 import { CalendarContext } from "../contexts/CalendarContext";
 import { api } from "../services/axios";
 
@@ -20,12 +19,15 @@ interface HourSlotProps {
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
     setIsSlotLoading: React.Dispatch<React.SetStateAction<boolean>>;
     sameDay: boolean;
+    testTrack: string;
     day: dayjs.Dayjs;
 }
 
 
 
-export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, day}: HourSlotProps) {
+export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTimeSlot, selectedSlots, setSelectedSlots, setIsSlotLoading, sameDay, day, testTrack}: HourSlotProps) {
+
+  const toast = useToast()
 
   const {monthIndex} = useContext(CalendarContext)
 
@@ -38,7 +40,7 @@ export function HourSlot({isSelected, hourSlot, userClick, hourSlotLabel, addTim
   const { data: dataBusySlots, isLoading: isLoadingBusylots, error: errorBusylots } = useQuery<busySlotsProps>(
     `busySlotsList`,
     async () => {
-      const response = await api.get(`getbusyslots`);
+      const response = await api.get(`getbusyslots?testtrack=${testTrack}`);
       
      
       return response.data;
@@ -86,7 +88,14 @@ useEffect(() => {
 
         if(dayjs(selectedSlots[0]).format('D') != dayjs(hourSlot).format('D') && selectedSlots.length > 0){
           userClick(false)
-          toast.info('You can schedule only one day at time')
+          toast({
+            title: "Invalid option",
+            description: `You can schedule only one day at time`,
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
           return ;
         }
 
@@ -94,7 +103,6 @@ useEffect(() => {
         //   setSelectedDay(Number(dayjs(hourSlot).format('D')))
         // }
         
-
 
         if(isAvaiable){
           addTimeSlot(hourSlot)

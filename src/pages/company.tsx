@@ -9,6 +9,7 @@ import {
   VStack,
   Text,
   Spinner,
+  useToast
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -21,7 +22,6 @@ import { api } from "../services/axios";
 import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
-import { toast } from "react-toastify";
 import { useQuery } from "react-query";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
@@ -57,6 +57,8 @@ export default function Company() {
 
   const [status, setStatus] = useState(0);
 
+  const toast = useToast()
+
   const [responsableName, setResponsableName] = useState("");
   const [responsableEmail, setResponsableEmail] = useState("");
   const [responsablePhone, setResponsablePhone] = useState("");
@@ -88,7 +90,14 @@ export default function Company() {
 
   useEffect(() => {
     if(status == 200){
-      toast.success('Connected to company')
+      toast({
+        title: "Connected to company",
+        description: `${user?.name} connected successfully`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       window.location.reload()
     }
   }, [status])
@@ -115,7 +124,14 @@ export default function Company() {
         })
         .then((response) => setStatus(response.status));
     } catch (err) {
-      toast.error("Code not found");
+      toast({
+        title: "Code not found",
+        description: `The code writen was not found. Check the spaces.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     }
   };
 

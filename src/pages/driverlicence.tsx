@@ -9,6 +9,7 @@ import {
   VStack,
   Text,
   Spinner,
+  useToast
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -21,7 +22,6 @@ import { api } from "../services/axios";
 import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
-import { toast } from "react-toastify";
 
 type UpdateDriverLicenceData = {
   register_number: string;
@@ -37,6 +37,8 @@ const createUserFormSchema = yup.object().shape({
 
 export default function DriverLicence() {
   const { user: userContext } = useContext(LoginContext);
+
+  const toast = useToast()
 
   const [status, setStatus] = useState(0);
 
@@ -69,7 +71,14 @@ export default function DriverLicence() {
 
 
   useEffect(() => {
-    status == 200 && toast.success('Driver licence updated')
+    status == 200 && toast({
+      title: "Driver licence updated",
+      description: `Driver licence updated successfully`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: 'top-right'
+    });
   }, [status]);
 
   const { user } = useContext(LoginContext);
@@ -98,7 +107,14 @@ export default function DriverLicence() {
         })
         .then((response) => setStatus(response.status));
     } catch (err) {
-      toast.error("Something went wrong");
+      toast({
+        title: "Something went wrong",
+        description: `The driver licence couldn't be updated.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     }
   };
 

@@ -98,7 +98,6 @@ export default function Schedule() {
       setSelectedSlots(updatedSlots)
     }else{
       setIsSameDay(false)
-      
     }
     
   }
@@ -178,14 +177,15 @@ export default function Schedule() {
         vehicle,
         speedway,
         userId: user.userId,
-        companyName: user.companyName
+        companyName: user.companyName,
+        companyRef: user.companyRef
       })
       .then((response) => setStatus(response.status))
       .catch((err) => {
         console.log(err);
         toast({
-          title: "Something went wrong",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was couldn't be canceled.`,
+          title: "Your company don't have enough credits.",
+          description: `Credits must be acquired if you want to schedule a test track.`,
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -206,7 +206,6 @@ export default function Schedule() {
 
         {page == 1? (
            <Box
-
            flex="1"
            borderRadius={8}
            bg="gray.800"
@@ -379,6 +378,7 @@ export default function Schedule() {
                   setSelectedSlots={setSelectedSlots}
                   setIsSlotLoading={setIsSlotLoading}
                   sameDay={isSameDay}
+                  testTrack={speedway}
                   />
                 )}
               
@@ -392,6 +392,7 @@ export default function Schedule() {
               <Button onClick={() => {
                 setPage(1)
                 setSelectedSlots([])
+                window.location.reload();
                 }} colorScheme="whiteAlpha">Back</Button>
                
                <Button colorScheme="blue" onClick={() => {

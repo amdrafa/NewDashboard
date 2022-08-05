@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from '../../services/fauna'
 import { query as q } from 'faunadb'
-import { useState } from "react";
 import { authenticated } from "./login";
 
 
@@ -39,6 +38,10 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
 
             const busySlots = []
 
+            const {testtrack} = request.query
+
+            console.log(testtrack)
+
             const {data} = await fauna.query<BusySlotsDataProps>(
                 q.Map(
                     q.Paginate(
@@ -49,7 +52,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             )
 
             data.forEach(slot => {
-                if(slot.data.status == 'canceled' || slot.data.status == 'rejected'){
+                if(slot.data.status == 'canceled' || slot.data.status == 'rejected' || slot.data.speedway !== testtrack){
                     return ;
                 }else{
                     slot.data.selectedSlots.map(selectedSlot => {

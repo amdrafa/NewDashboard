@@ -9,6 +9,7 @@ import {
   VStack,
   Text,
   Spinner,
+  useToast
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -21,7 +22,6 @@ import { api } from "../services/axios";
 import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
-import { toast } from "react-toastify";
 
 type CreateSpeedwayFormData = {
   name: string;
@@ -59,11 +59,20 @@ const createUserFormSchema = yup.object().shape({
 });
 
 export default function Settings() {
+
+  const toast = useToast()
   
   const [status, setStatus] = useState(0);
 
   useEffect(() => {
-    status == 200 && toast.success('Informations updated');
+    status == 200 && toast({
+      title: "Informations updated",
+      description: `Informations updated successfully.`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: 'top-right'
+    });
   }, [status]);
 
   const { user } = useContext(LoginContext);
@@ -97,7 +106,14 @@ export default function Settings() {
         })
         .then((response) => setStatus(response.status));
     } catch (err) {
-      toast.error("Current password not correct");
+      toast({
+        title: "Incorrect password",
+        description: `Current password not correct.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     }
   };
   

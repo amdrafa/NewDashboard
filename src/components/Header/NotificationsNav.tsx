@@ -18,11 +18,7 @@ import { MyPopoverTrigger } from "../PopOverTriggerComponent";
 
 export function NotificationsNav() {
 
-  const [hasDriverLicence, setHasDriverLicence] = useState(false)
-
   const {user} = useContext(LoginContext);
-
-  
 
   return (
     <>
@@ -38,7 +34,8 @@ export function NotificationsNav() {
         <Popover placement={"bottom-end"}>
           <MyPopoverTrigger>
             <Link>
-            <Icon as={BsFillCircleFill} mt='-4' fontSize="6" color={'red.500'} />
+            {(user?.companyRef == '' || !user?.driver_expiration || new Date(user?.driver_expiration) <= new Date()) && <Icon as={BsFillCircleFill} mt='-4' fontSize="6" color={'red.500'} /> }
+            
               <Icon as={RiNotificationLine} fontSize="20" />
             </Link>
           </MyPopoverTrigger>
