@@ -13,14 +13,14 @@ import { api } from "../../services/axios";
 type CreateAdmFormData = {
     name: string;
     email: string;
-    cpf: number;
+    cpf: string;
     role: string;
   }
   
   const createAdmFormSchema = yup.object().shape({
     name: yup.string().required(),  
     email: yup.string().required().email(),
-    cpf: yup.number().required().min(11, 'Minimum 11 letters.'),
+    cpf: yup.string().required().min(11, 'Minimum 11 letters.'),
     role: yup.string().required()
   })
 

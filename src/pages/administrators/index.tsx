@@ -152,7 +152,7 @@ export type DecodedToken = {
         
         setTotal(totalcount)
 
-  
+        console.log(ReturnedData)
         return ReturnedData;
       }
     );
@@ -211,7 +211,7 @@ export type DecodedToken = {
                   <Th px={["4", "4", "6"]} color="gray.300" width="">
                     <Text>Administrator</Text>
                   </Th>
-                  <Th>Created by</Th>
+                  <Th>CPF</Th>
                   <Th>Role</Th>
                   {isWideVersioon && <Th>Register date</Th>}
                 </Tr>
@@ -235,10 +235,11 @@ export type DecodedToken = {
                         <Text fontSize="sm" color="gray.300">
                         {adm.data.email}
                         </Text>
+
                       </Box>
                     </Td>
                     <Td>
-                      <Text>{adm.ref["@ref"].id}</Text>
+                      <Text>{adm.data.cpf}</Text>
                     </Td>
                     <Td>{adm.data.workRole}</Td>
                     {isWideVersioon && <Td>18 de maio, 2022</Td>}
@@ -284,34 +285,34 @@ export type DecodedToken = {
   }
 
 
-  export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-    const {auth} = parseCookies(ctx)
+  //   const {auth} = parseCookies(ctx)
   
-    const decodedUser = decode(auth as string) as DecodedToken;
+  //   const decodedUser = decode(auth as string) as DecodedToken;
   
   
-    const necessaryRoles = ['ADMINISTRATOR']
+  //   const necessaryRoles = ['ADMINISTRATOR']
     
-    if(necessaryRoles?.length > 0){
-      const hasAllRoles = necessaryRoles.some(role => {
-        return decodedUser.roles.includes(role)
-    });
+  //   if(necessaryRoles?.length > 0){
+  //     const hasAllRoles = necessaryRoles.some(role => {
+  //       return decodedUser.roles.includes(role)
+  //   });
   
   
-    if(!hasAllRoles){
-      return {
-        redirect: {
-          destination: '/home',
-          permanent: false
-        }
-      }
-    }
-    }
+  //   if(!hasAllRoles){
+  //     return {
+  //       redirect: {
+  //         destination: '/home',
+  //         permanent: false
+  //       }
+  //     }
+  //   }
+  //   }
   
-    return {
-      props: {}
-    }
-  }
+  //   return {
+  //     props: {}
+  //   }
+  // }
   
   

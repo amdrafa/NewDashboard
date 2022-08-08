@@ -221,8 +221,8 @@ export default function UserList() {
                   <Th px={["4", "4", "6"]} color="gray.300" width="">
                     <Text>User</Text>
                   </Th>
-                  <Th>Company</Th>
                   <Th>CPF</Th>
+                  <Th>Company</Th>
                   
                   {isWideVersioon && <Th>Driver licence</Th>}
                 </Tr>
@@ -253,8 +253,10 @@ export default function UserList() {
                         </Text>
                       </Box>
                     </Td>
-                    <Td>{user.data.companyName}</Td>
+                    
                     {isWideVersioon && <Td>{user.data.cpf}</Td>}
+
+                    <Td>{user.data.companyName ? (user.data.companyName) : (<Text color={'gray.300'}>Not registered</Text>)}</Td>
                     <Td>
 
                       {!user.data.register_number || user.data.register_number == '' ? (

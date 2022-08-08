@@ -1,79 +1,80 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { fauna } from '../../services/fauna'
-import { query as q } from 'faunadb'
+import { fauna } from "../../services/fauna";
+import { query as q } from "faunadb";
 import { useState } from "react";
 import { authenticated } from "./login";
+import { Console } from "console";
 
-
-
-interface UserProps{
+interface UserProps {
+  ref: string;
+  ts: string;
+  data: {
     name: string;
     email: string;
     companyRef: string;
+    roles: string[];
+  };
 }
 
-
 interface UserDataProps {
-    ref: string;
-    ts: string;
-    data: UserProps[]
-  }
+  ref: string;
+  ts: string;
+  data: UserProps[];
+}
 
-export default authenticated (async (request: NextApiRequest, response: NextApiResponse) => {
-    
-    if(request.method === 'GET'){
+export default authenticated(
+  async (request: NextApiRequest, response: NextApiResponse) => {
+    if (request.method === "GET") {
+      console.log("TEST GETTING ALL USERS");
 
+      try {
+        const { data } = await fauna.query<UserDataProps>(
+          q.Map(
+            q.Paginate(q.Match(q.Index("all_users"))),
+            q.Lambda((x) => q.Get(x))
+          )
+        );
 
-        console.log("TEST GETTING ALL USERS")
+        const necessaryRoles = ["USER"];
 
-        
-        
-        try{
+        let filteredData = [];
 
-            
+        data.forEach((user) => {
 
-            const {data} = await fauna.query<UserDataProps>(
-                q.Map(
-                    q.Paginate(
-                        q.Match(q.Index('all_users'))
-                    ),
-                    q.Lambda(x => q.Get(x))
-                )
-            )
+          const isUser = user.data.roles.includes("USER")
 
-            
+          if (isUser) {
+            filteredData.push(user);
+          }
+        });
 
-            let totalcount = data.length
+        let totalcount = filteredData.length;
 
-            let page = request.url.substr(22, 1)
-            const per_page = 6
-            
-            const slicedData = () => {
-                const pageStart = (Number(page) - 1)*(per_page)
-                const pageEnd = pageStart + per_page
-                const mySlicedData = data.slice(pageStart,pageEnd)
-                
-                return mySlicedData
-            }
-           
-            
-            const PaginateData = slicedData()
-            
-            
-            
-            return response.status(200).json({PaginateData, totalcount})
-        }catch(err){
-            console.log('error when getting all companies', err)
-            
-            return false
-        }
-        
+        const { page, limit } = request.query;
+        const per_page = Number(limit);
 
-    }else{
-        response.setHeader('Allow', 'GET')
-        
-        response.status(405).end('Method not allowed')
-        
+        console.log(page, per_page);
+
+        const slicedData = () => {
+          const pageStart = (Number(page) - 1) * per_page;
+          const pageEnd = pageStart + per_page;
+          const mySlicedData = filteredData.slice(pageStart, pageEnd);
+
+          return mySlicedData;
+        };
+
+        const PaginateData = slicedData();
+
+        return response.status(200).json({ PaginateData, totalcount });
+      } catch (err) {
+        console.log("error when getting all companies", err);
+
+        return false;
+      }
+    } else {
+      response.setHeader("Allow", "GET");
+
+      response.status(405).end("Method not allowed");
     }
-})
-    
+  }
+);
