@@ -188,7 +188,7 @@ export default function DriverLicence() {
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                <Link href="/userdashboard">
+                <Link href="/home">
                     <Button colorScheme="whiteAlpha">
                       Cancel
                     </Button>

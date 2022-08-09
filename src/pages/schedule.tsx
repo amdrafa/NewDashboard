@@ -150,9 +150,9 @@ export default function Schedule() {
     `SpeedwayList`,
     async () => {
       const response = await api.get(`getspeedwaylist`);
-      const { speedways } = response.data;
+      const { updatedSpeedways } = response.data;
 
-      return speedways;
+      return updatedSpeedways;
     }
   );
 
@@ -300,7 +300,7 @@ export default function Schedule() {
  
            <Flex mt="8" justify="flex-end">
              <HStack spacing="4">
-               <Link href="/dashboard">
+               <Link href="/home">
                  <Button colorScheme="whiteAlpha">Cancel</Button>
                </Link>
                <Button colorScheme="blue" onClick={() => {

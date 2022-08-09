@@ -148,7 +148,7 @@ export default function EditCompany({
       </Heading>
       <Button bg='red.500' _hover={{bg:'red.400'}} onClick={() => setIsModalOpen(true)}>
             <Icon mr={1.5} as={FiTrash2} />
-            Delete company
+            Disable company
           </Button>
       </Flex>
 

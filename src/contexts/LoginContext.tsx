@@ -1,8 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { api } from "../services/axios";
 import Router from "next/router";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useToast } from "@chakra-ui/react";
 import { parseCookies, destroyCookie } from "nookies";
 
 type User = {
@@ -65,6 +64,8 @@ export function LoginContextProvider({ children }: authProviderProps) {
   const [statusLogin, setStatusLogin] = useState(0);
   let isAuthenticated = !!user;
 
+  const toast = useToast()
+
   useEffect(() => {
     authChannel = new BroadcastChannel("auth");
 
@@ -113,6 +114,15 @@ export function LoginContextProvider({ children }: authProviderProps) {
     
     {
       if(statusLogin == 200){
+
+        toast({
+          title: "Logged in",
+          description: `You will be redirected to home page.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
   
         Router.push("/home");
 
@@ -130,7 +140,14 @@ export function LoginContextProvider({ children }: authProviderProps) {
       setStatusLogin(response.status);
     } catch (err) {
       console.log(err);
-      toast.error("E-mail or password incorrect.");
+      toast({
+        title: "E-mail or password incorrect",
+        description: `Try a valid e-mail and password.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
     }
   }
 
@@ -142,7 +159,14 @@ export function LoginContextProvider({ children }: authProviderProps) {
         .then((response) => console.log(setStatusRegister(response.status)));
     } catch (err) {
       setStatusRegister(err.response.status);
-      toast.error("This e-mail is already registered.");
+      toast({
+        title: "E-mail already registered",
+        description: `Try another e-mail. If the problem persists, contact the support`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
       console.log(err)
     }
   }
@@ -153,7 +177,6 @@ export function LoginContextProvider({ children }: authProviderProps) {
     <LoginContext.Provider
       value={{ createUser, loginAuth, user, isAuthenticated, signOut }}
     >
-      <ToastContainer theme="colored" />
       {children}
     </LoginContext.Provider>
   );

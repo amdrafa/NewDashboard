@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack, useToast } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../../components/Form/input";
 import { Header } from "../../components/Header";
@@ -7,9 +7,18 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup' 
 import { api } from "../../services/axios";
-import Router from "next/router";
-import { toast, ToastContainer } from "react-toastify";
-import { useEffect } from "react";
+import { decode } from "jsonwebtoken";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+
+export type DecodedToken = {
+    sub: string;
+    iat: number;
+    exp: number;
+    roles: string[];
+    name: string;
+  }
+
 
 type CreateSpeedwayFormData = {
     speedway: string;
@@ -26,6 +35,8 @@ type CreateSpeedwayFormData = {
 
 export default function CreateSpeedway(){
 
+    const toast = useToast()
+
     const { register, handleSubmit, formState, resetField } = useForm({
         resolver: yupResolver(createSpeedwayFormSchema)
     })
@@ -34,19 +45,31 @@ export default function CreateSpeedway(){
 
     const handleCreateSpeedway: SubmitHandler<CreateSpeedwayFormData> = async ({speedway, vehicles_limit, description }) => {
         
-        console.log(speedway, vehicles_limit, description)
-        
         await api.post('createspeedway', {data: speedway, vehicles_limit, description})
         .then(response => {
 
-            toast.success('Speedway created')
+            toast({
+                title: "Test track created",
+                description: `Test track was created successfully.`,
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
 
             resetField('speedway')
             resetField('vehicles_limit')
             resetField('description')
         })
         .catch(err => {
-            toast.error('Something went wrong')
+            toast({
+                title: "Something went wrong",
+                description: `An unknown error has occurred.`,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right'
+              });
         })
 
         
@@ -94,3 +117,34 @@ export default function CreateSpeedway(){
         </Box>
     );
 }
+
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+    const {auth} = parseCookies(ctx)
+  
+    const decodedUser = decode(auth as string) as DecodedToken;
+  
+    const necessaryRoles = ['ADMINISTRATOR']
+    
+    if(necessaryRoles?.length > 0){
+      const hasAllRoles = necessaryRoles.some(role => {
+        return decodedUser?.roles?.includes(role)
+    });
+  
+    if(!hasAllRoles){
+      console.log(hasAllRoles)
+      return {
+        redirect: {
+          destination: '/home',
+          permanent: false
+        }
+      }
+    }
+    }
+  
+    
+    return {
+      props: {}
+    }
+  }

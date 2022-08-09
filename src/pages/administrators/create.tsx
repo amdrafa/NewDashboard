@@ -9,6 +9,17 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useContext } from "react";
 import { LoginContext } from "../../contexts/LoginContext";
 import { api } from "../../services/axios";
+import { GetServerSideProps } from "next";
+import { decode } from "jsonwebtoken";
+import { parseCookies } from "nookies";
+
+export type DecodedToken = {
+    sub: string;
+    iat: number;
+    exp: number;
+    roles: string[];
+    name: string;
+  }
 
 type CreateAdmFormData = {
     name: string;
@@ -120,3 +131,33 @@ export default function CreateAdm(){
         </Box>
     );
 }
+
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+//     const {auth} = parseCookies(ctx)
+  
+//     const decodedUser = decode(auth as string) as DecodedToken;
+  
+//     const necessaryRoles = ['ADMINISTRATOR']
+    
+//     if(necessaryRoles?.length > 0){
+//       const hasAllRoles = necessaryRoles.some(role => {
+//         return decodedUser?.roles?.includes(role)
+//     });
+  
+//     if(!hasAllRoles){
+//       console.log(hasAllRoles)
+//       return {
+//         redirect: {
+//           destination: '/home',
+//           permanent: false
+//         }
+//       }
+//     }
+//     }
+  
+    
+//     return {
+//       props: {}
+//     }
+//   }

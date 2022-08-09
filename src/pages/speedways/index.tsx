@@ -150,7 +150,7 @@ export default function Speedwaylist() {
                   colorScheme="blue"
                   leftIcon={<Icon as={RiAddLine} fontSize="20" />}
                 >
-                  Add a new speedway
+                  Add a new test track
                 </Button>
               </Link>
             </Flex>
@@ -173,10 +173,10 @@ export default function Speedwaylist() {
                       </Th>
 
                       <Th px={["4", "4", "6"]} width="">
-                        <Text>Status</Text>
+                        <Text>Description</Text>
                       </Th>
 
-                      {isWideVersioon && <Th>Description</Th>}
+                      {isWideVersioon && <Th>Vehicles limit</Th>}
                       <Th w="8">Status</Th>
                     </Tr>
                   </Thead>
@@ -199,13 +199,16 @@ export default function Speedwaylist() {
                         <Td px={["4", "4", "6"]}>
                           <Text>{speed.data.speedway}</Text>
                         </Td>
+
+                        {isWideVersioon && <Td>{speed.data.description}</Td>}
+
                         <Td>
                           <Box>
-                            sadsaddsa
+                            {speed.data.vehicles_limit}
                             <Text fontSize="sm" color="gray.300"></Text>
                           </Box>
                         </Td>
-                        {isWideVersioon && <Td>{speed.data.description}</Td>}
+                        
 
                         <Td>
                           {speed.data.status == "active" ? (

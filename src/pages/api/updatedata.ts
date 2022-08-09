@@ -59,7 +59,7 @@ export default authenticated(
     if (request.method === "POST") {
       console.log("Updating user informations");
 
-      const { data: new_password, old_password, new_email, current_email, name: new_name, phone: new_phone, cpf: new_cpf } = request.body;
+      const { new_password, old_password, new_email, current_email, name: new_name, phone: new_phone, cpf: new_cpf } = request.body;
 
       console.log(new_password, old_password, new_email);
 
@@ -82,7 +82,7 @@ export default authenticated(
           if (!err && result) {
             
             console.log('passwords are the same')
-            hash(new_password, 10, async function (err, hash) {
+            hash(new_password? new_password : old_password, 10, async function (err, hash) {
               // Store hash in your password DB.
 
               const auth = request.headers.authorization;
@@ -113,13 +113,11 @@ export default authenticated(
               .status(200)
               .json({ message: "Informations updated." });
           }else{
-            console.log('aaaaa')
             return response.status(400).json({ message: "Incorrect password" });
           }
         });
     }catch(error){
-        console.log(error + 'didnt work')
-        response.status(400).json({message: 'didnt worked'});
+        response.status(400).json({message: 'didnt work'});
     }
     } else {
       response.setHeader("Allow", "POST");

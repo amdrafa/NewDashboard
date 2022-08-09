@@ -9,7 +9,8 @@ import {
   VStack,
   Text,
   Spinner,
-  useToast
+  useToast,
+  Checkbox
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -30,8 +31,8 @@ type CreateSpeedwayFormData = {
   cpf: number;
   old_password: string;
   old_password_confirmation: string;
-  new_password: string;
-  new_password_confirmation: string;
+  new_password?: string;
+  new_password_confirmation?: string;
 };
 
 const createUserFormSchema = yup.object().shape({
@@ -47,15 +48,14 @@ const createUserFormSchema = yup.object().shape({
       [null, yup.ref("old_password")],
       "The passwords need to be the same"
     ),
-  new_password: yup.string().required().min(6, "Minimum 6 letters."),
+  new_password: yup.string().notRequired(),
   new_password_confirmation: yup
-    .string()
-    .required()
-    .min(6, "Minimum 6 letters.")
-    .oneOf(
+    .string().notRequired().oneOf(
       [null, yup.ref("new_password")],
-      "The new passwords need to be the same"
+      "The passwords need to be the same"
     ),
+    
+    
 });
 
 export default function Settings() {
@@ -63,6 +63,8 @@ export default function Settings() {
   const toast = useToast()
   
   const [status, setStatus] = useState(0);
+
+  const [changePassword, setChangePassword] = useState(false)
 
   useEffect(() => {
     status == 200 && toast({
@@ -73,6 +75,8 @@ export default function Settings() {
       isClosable: true,
       position: 'top-right'
     });
+
+    setStatus(0)
   }, [status]);
 
   const { user } = useContext(LoginContext);
@@ -91,29 +95,71 @@ export default function Settings() {
     email,
     cpf
   }) => {
-    console.log(old_password, new_password);
-    // Router.push('/speedways')
-    try {
-      const response = await api
-        .post("updatedata", {
-          data: new_password,
-          old_password,
-          name,
-          phone, 
-          new_email: email,
-          current_email: user.email,
-          cpf
-        })
-        .then((response) => setStatus(response.status));
-    } catch (err) {
+
+    if(new_password?.length < 6 && changePassword){
       toast({
-        title: "Incorrect password",
-        description: `Current password not correct.`,
+        title: "New password needs at least 6 characters",
+        description: `Try a bigger password.`,
         status: "error",
         duration: 5000,
         isClosable: true,
         position: 'top-right'
       });
+    }
+
+    
+    if(changePassword){
+      try {
+        const response = await api
+          .post("updatedata", {
+            new_password,
+            old_password,
+            name,
+            phone, 
+            new_email: email,
+            current_email: user.email,
+            cpf
+          })
+          .then((response) => {
+            setStatus(response.status)
+            new Promise(resolve => setTimeout(() => {
+              window.location.reload()
+            }, 2000))
+            
+          });
+      } catch (err) {
+        toast({
+          title: "Incorrect password",
+          description: `Check your password and try again.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
+      }
+    }else{
+      try {
+        const response = await api
+          .post("updatedata", {
+            new_password: null,
+            old_password,
+            name,
+            phone, 
+            new_email: email,
+            current_email: user.email,
+            cpf
+          })
+          .then((response) => setStatus(response.status));
+      } catch (err) {
+        toast({
+          title: "Incorrect password",
+          description: `Check your password and try again.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
+      }
     }
   };
   
@@ -181,7 +227,16 @@ export default function Settings() {
                   />
                 </SimpleGrid>
 
-                <Divider my="4" borderColor="gray.700" />
+                <Divider mt="4" borderColor="gray.700" />
+
+                <Flex w={'100%'} justifyContent={'start'}>
+                  <Checkbox mr={2} onChange={(e) => {
+                    setChangePassword(e.target.checked)
+                  }} /> 
+                  <Text color={'gray.200'}>
+                    Change password?
+                  </Text>
+                </Flex>
 
                 <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                   <Input
@@ -200,7 +255,8 @@ export default function Settings() {
                   />
                 </SimpleGrid>
 
-                <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+                {changePassword && (
+                  <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                   <Box>
                     <Input
                       type={"password"}
@@ -222,11 +278,12 @@ export default function Settings() {
                     error={errors.new_password_confirmation}
                   />
                 </SimpleGrid>
+                )}
               </VStack>
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                  <Link href="userdashboard">
+                  <Link href="home">
                     <Button  colorScheme="whiteAlpha">
                       Cancel
                     </Button>

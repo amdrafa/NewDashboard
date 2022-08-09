@@ -10,6 +10,7 @@ import { HiOutlineHome } from "react-icons/hi";
 import { VscSettingsGear } from "react-icons/vsc";
 import { BsSpeedometer2 } from "react-icons/bs";
 import { BiBuilding } from "react-icons/bi";
+import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { NavLink } from "./NavLink";
 import { NavSection } from "./NavSection";
 import { MdOutlineBadge } from "react-icons/md";
@@ -60,7 +61,7 @@ export function SidebarNav() {
           <NavLink
             hasPermission={true}
             hrefs="/approvals"
-            icon={RiDashboardLine}
+            icon={AiOutlineAppstoreAdd}
           >
             Approvals
           </NavLink>

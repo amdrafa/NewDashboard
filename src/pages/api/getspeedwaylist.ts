@@ -7,10 +7,16 @@ import { authenticated } from "./login";
 
 
 interface speedwayProps{
-    speedway: string;
-    vehicles_limit: number;
-    description: string;
-    createdAt: string;
+    ref: string;
+    ts: string;
+    data: {
+        speedway: string;
+        vehicles_limit: number;
+        description: string;
+        status: string;
+        createdAt: string;
+    }
+    
 }
 
 
@@ -42,9 +48,17 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
                 )
             )
 
+            let updatedSpeedways = [];
+
+            speedways.forEach(speed => {
+                if(speed.data.status == "active"){
+                    updatedSpeedways.push(speed)
+                }
+            })
+
             
             
-            return response.status(200).json({speedways})
+            return response.status(200).json({updatedSpeedways})
         }catch(err){
             console.log('error when getting speedway list', err)
             

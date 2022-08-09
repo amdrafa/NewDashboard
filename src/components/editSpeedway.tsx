@@ -9,6 +9,7 @@ import {
   SimpleGrid,
   Text,
   VStack,
+  useToast
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import Link from "next/link";
@@ -20,7 +21,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
 import Router from "next/router";
-import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaLock, FaUnlockAlt } from "react-icons/fa";
@@ -52,6 +52,8 @@ export default function EditSpeedway({
     resolver: yupResolver(EditSpeedwayFormSchema),
   });
 
+  const toast = useToast()
+
   const { errors } = formState;
 
   const handleEditSpeedway: SubmitHandler<EditSpeedwayFormData> = async ({
@@ -67,10 +69,24 @@ export default function EditSpeedway({
         speedwayId,
       })
       .then((response) => {
-        toast.success("Speedway updated");
+        toast({
+          title: "Test track updated",
+          description: `The test track was updated successfully.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       })
       .catch((err) => {
-        toast.error("Company name already registered");
+        toast({
+          title: "Company name already exists",
+          description: `This name is already in use. Please try another one.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   };
 
@@ -86,13 +102,28 @@ export default function EditSpeedway({
         }
       )
       .then((response) => {
-        toast.success("Speedway disabled");
+        toast({
+          title: "Test track disabled",
+          description: `The test track was disabled successfully. Active it again if necessary.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         setIsModalOpen(false);
         setIsEditMode(false);
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `An unknown error has occurred
+          `,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   }
 
@@ -108,13 +139,28 @@ export default function EditSpeedway({
         }
       )
       .then((response) => {
-        toast.success("Speedway active again");
+        toast({
+          title: "Test track enabled",
+          description: `The test track was enabled successfully. Disable it again if necessary.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
         setIsEnableModalOpen(false);
         setIsEditMode(false);
         window.location.reload();
       })
       .catch((err) => {
-        toast.error("Something went wrong");
+        toast({
+          title: "Something went wrong",
+          description: `An unknown error has occurred
+          `,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right'
+        });
       });
   }
 
@@ -135,12 +181,12 @@ export default function EditSpeedway({
     >
       <Flex justify={"space-between"} alignItems="center">
         <Heading justifyContent={"space-between"} size="lg" fontWeight="normal">
-          Edit speedway
+          Edit test track
         </Heading>
         {speedway_status == "active" ? (
           <Button bg='red.500' onClick={() => setIsModalOpen(true)} _hover={{bg:'red.400'}}>
             <Icon mr={1.5} as={FaLock} />
-            Disable speedway
+            Disable test track
           </Button>
         ) : (
           <Button
@@ -150,7 +196,7 @@ export default function EditSpeedway({
             onClick={() => setIsEnableModalOpen(true)}
           >
             <Icon mr={1.5} as={FaUnlockAlt} />
-            Unblock speedway
+            Unblock test track
           </Button>
         )}
       </Flex>
@@ -161,7 +207,7 @@ export default function EditSpeedway({
         <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
           <Input
             name="speedway"
-            label="Speedway name"
+            label="Test track name"
             {...register("speedway")}
             error={errors.speedway}
             defaultValue={speedway}
@@ -228,7 +274,7 @@ export default function EditSpeedway({
             alignItems={"center"}
             mb={2}
           >
-            <Text fontSize={"2xl"}>Disable speedway</Text>
+            <Text fontSize={"2xl"}>Disable test track</Text>
             <Icon
               fontSize={20}
               as={IoMdClose}
@@ -242,11 +288,11 @@ export default function EditSpeedway({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to disable this speedway? All appointments
+              Do you really want to disable this test track? All appointments
               schedueled are going to be canceled.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              An e-mail will be sent informing that the speedway is temporarily
+              An e-mail will be sent informing that the test track is temporarily
               disabled.
             </Text>
           </Box>
@@ -294,7 +340,7 @@ export default function EditSpeedway({
             alignItems={"center"}
             mb={2}
           >
-            <Text fontSize={"2xl"}>Enable speedway</Text>
+            <Text fontSize={"2xl"}>Enable test track</Text>
             <Icon
               fontSize={20}
               as={IoMdClose}
@@ -308,11 +354,11 @@ export default function EditSpeedway({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to enable this speedway? From this moment,
-              everyone will be able to schedule an appointment at this speedway.
+              Do you really want to enable this test track? From this moment,
+              everyone will be able to schedule an appointment at this test track.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              Be sure the speedway is working properly before enabling the test
+              Be sure the test track is working properly before enabling the test
               track.
             </Text>
           </Box>

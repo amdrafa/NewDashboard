@@ -285,34 +285,34 @@ export type DecodedToken = {
   }
 
 
-  // export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-  //   const {auth} = parseCookies(ctx)
+    const {auth} = parseCookies(ctx)
   
-  //   const decodedUser = decode(auth as string) as DecodedToken;
+    const decodedUser = decode(auth as string) as DecodedToken;
   
   
-  //   const necessaryRoles = ['ADMINISTRATOR']
+    const necessaryRoles = ['ADMINISTRATOR']
     
-  //   if(necessaryRoles?.length > 0){
-  //     const hasAllRoles = necessaryRoles.some(role => {
-  //       return decodedUser.roles.includes(role)
-  //   });
+    if(necessaryRoles?.length > 0){
+      const hasAllRoles = necessaryRoles.some(role => {
+        return decodedUser?.roles?.includes(role)
+    });
   
   
-  //   if(!hasAllRoles){
-  //     return {
-  //       redirect: {
-  //         destination: '/home',
-  //         permanent: false
-  //       }
-  //     }
-  //   }
-  //   }
+    if(!hasAllRoles){
+      return {
+        redirect: {
+          destination: '/home',
+          permanent: false
+        }
+      }
+    }
+    }
   
-  //   return {
-  //     props: {}
-  //   }
-  // }
+    return {
+      props: {}
+    }
+  }
   
   

@@ -211,7 +211,7 @@ export default function Company() {
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                  <Link href="/userdashboard">
+                  <Link href="/home">
                     <Button colorScheme="whiteAlpha">Cancel</Button>
                   </Link>
                   <Button disabled colorScheme="blue">
@@ -254,7 +254,7 @@ export default function Company() {
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                  <Link href="/userdashboard">
+                  <Link href="/home">
                     <Button colorScheme="whiteAlpha">Cancel</Button>
                   </Link>
                   <Button

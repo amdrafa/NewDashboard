@@ -15,16 +15,17 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <NextAuthProvider session={pageProps.session}>
-        
+      <ChakraProvider theme={theme}>
         <LoginContextProvider>
         <CalendarContextProvider>
-          <ChakraProvider theme={theme}>
+          
             <SidebarDrawerProvider>
               <Component {...pageProps} />
             </SidebarDrawerProvider>
-          </ChakraProvider>
+          
           </CalendarContextProvider>
         </LoginContextProvider>
+        </ChakraProvider>
        
       </NextAuthProvider>
 
