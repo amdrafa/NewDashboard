@@ -1,10 +1,10 @@
-import { Flex, Button, Stack, Icon, Divider, Text } from "@chakra-ui/react";
+import { Flex, Button, Stack, Icon, Divider, Text, Box } from "@chakra-ui/react";
 import { Input } from "../components/Form/input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
 import { signIn as githubSignIn, useSession } from "next-auth/react";
 import Router from "next/router";
@@ -24,7 +24,6 @@ const SignInFormSchema = yup.object().shape({
 
 export default function Login() {
 
-
   const { loginAuth } = useContext(LoginContext);
 
   const { register, handleSubmit, formState } = useForm({
@@ -40,7 +39,9 @@ export default function Login() {
 
   return (
     <Flex w="100vw" h="100vh" alignItems="center" justifyContent="center">
-      <Flex
+      
+      
+        <Flex
         as="form"
         w="100%"
         maxW={360}
@@ -52,7 +53,7 @@ export default function Login() {
         
       >
         <Stack spacing={4}>
-          <Input
+        <Input
             type="email"
             name="email"
             label="E-mail"
@@ -80,15 +81,17 @@ export default function Login() {
         </Button>
 
         <Flex display="grid" alignItems="center" justifyContent="center" mt="8">
-          <Text>Aren't you registered?</Text>
-        </Flex>
-        <Flex display="grid" alignItems="center" justifyContent="center">
+          
           <Link href="/register" passHref>
             <Text color="blue.600" cursor="pointer"  _hover={{color: "blue.400"}}>Register now!</Text>
           </Link>
         </Flex>
+        <Flex display="grid" alignItems="center" justifyContent="center">
+        <Link href="/recovery" passHref>
+          <Text color="blue.600" cursor="pointer"  _hover={{color: "blue.400"}}>Forgot password?</Text>
+          </Link>
+        </Flex>
       </Flex>
-
       
     </Flex>
   );
