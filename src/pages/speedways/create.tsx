@@ -10,6 +10,7 @@ import { api } from "../../services/axios";
 import { decode } from "jsonwebtoken";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
     sub: string;
@@ -114,6 +115,11 @@ export default function CreateSpeedway(){
 
                 </Box>
             </Flex>
+
+            <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
         </Box>
     );
 }

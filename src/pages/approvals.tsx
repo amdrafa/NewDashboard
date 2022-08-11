@@ -4,12 +4,9 @@ import {
   SimpleGrid,
   Box,
   Text,
-  theme,
   Button,
-  Checkbox,
   Heading,
   Icon,
-  Link,
   Table,
   Tbody,
   Td,
@@ -19,22 +16,17 @@ import {
   useBreakpointValue,
   Divider,
   Spinner,
-  Input,
   HStack,
   useToast,
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
-import dynamic from "next/dynamic";
-import { SiOpenaigym } from "react-icons/si";
 import { Pagination } from "../components/Pagination";
-import { BiShapeSquare } from "react-icons/bi";
 import { api } from "../services/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { CgSandClock } from "react-icons/cg";
-import { GiConfirmed } from "react-icons/gi";
 import dayjs from "dayjs";
 import { FaExchangeAlt } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -44,6 +36,7 @@ import { FiX } from "react-icons/fi";
 import { GetServerSideProps } from "next";
 import { decode } from "jsonwebtoken";
 import { parseCookies } from "nookies";
+import {Footer} from '../components/footer'
 
 export type DecodedToken = {
   sub: string;
@@ -130,11 +123,14 @@ export default function Approvals() {
     data: dataBusySlots,
     isLoading: isLoadingBusylots,
     error: errorBusylots,
-  } = useQuery<busySlotsProps>(`busySlotsList`, async () => {
+    refetch
+  } = useQuery<busySlotsProps>(`busySlotsListApprovals${speedway}`, async () => {
     const response = await api.get(`getbusyslots?testtrack=${speedway}`);
 
+    console.log(response.data)
     return response.data;
   });
+
 
 
   async function handleCancelAppointment(id: number){
@@ -336,6 +332,7 @@ export default function Approvals() {
                   </Flex>
                 ) : total > 0 ? (
                   <>
+                  <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
@@ -406,6 +403,7 @@ export default function Approvals() {
                                 {appointment.data.selectedSlots.map((slot) => {
                                   return (
                                     <Text
+                                      key={slot}
                                       color={"gray.100"}
                                       fontWeight={"bold"}
                                       ml="2"
@@ -466,9 +464,10 @@ export default function Approvals() {
                       currentPage={page}
                       onPageChanges={setPage}
                     />
+                    </Flex>
                   </>
                 ) : (
-                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
                 <Box justifyContent="center" mb={8} >
                   <Flex justifyContent={'center'}>
                     <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
@@ -524,6 +523,8 @@ export default function Approvals() {
                   </Flex>
                 ) : totalAllAppointments > 0 ? (
                   <>
+                  
+                  <Flex  minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
@@ -684,9 +685,10 @@ export default function Approvals() {
                       currentPage={pageAllAppointments}
                       onPageChanges={setPageAllAppointments}
                     />
+                    </Flex>
                   </>
                 ) : (
-                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
                 <Box justifyContent="center" mb={8}>
                   <Flex justifyContent={'center'}>
                     <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
@@ -778,7 +780,7 @@ export default function Approvals() {
             <Divider orientation="horizontal" />
 
             <Box my={"4"}>
-              <Text
+              <Box
                 color={"gray.100"}
                 display={"flex"}
                 flexWrap="wrap"
@@ -807,7 +809,7 @@ export default function Approvals() {
                   {dayjs(selectedSlots[0]).format("DD/MM/YYYY")}{" "}
                 </Text>{" "}
                 !
-              </Text>
+              </Box>
               <Flex flexDir={"column"}>
                 <ApprovalTimeCard
                   slot={new Date(
@@ -1711,6 +1713,11 @@ export default function Approvals() {
             )}
           </SimpleGrid>
         </Modal>
+
+        <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
       </Box>
     </>
   );

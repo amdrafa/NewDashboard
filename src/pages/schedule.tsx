@@ -48,6 +48,7 @@ import dayjs from "dayjs";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
+import { Footer } from "../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -451,6 +452,13 @@ export default function Schedule() {
          </Box> 
          )}
       </Flex>
+
+      
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
+      
       
     </Box>
     

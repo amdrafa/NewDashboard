@@ -31,6 +31,7 @@ import ReactPaginate from 'react-paginate'
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import EditCompany from "../../components/editCompany";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -58,6 +59,7 @@ interface companyProps {
   phone: number;
   avaiableHours: number;
   companyId: string;
+  status?: string;
   createdAt?: string;
 }
 
@@ -171,6 +173,7 @@ export default function CompanyList() {
             </Flex>
           ) : (
             total > 0 ? (<>
+            <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
               <Table colorScheme="whiteAlpha">
                 <Thead>
                   <Tr>
@@ -185,7 +188,7 @@ export default function CompanyList() {
                     <Th>CNPJ</Th>
 
                     {isWideVersioon && <Th>Register date</Th>}
-                    <Th w="8">Created by</Th>
+                    <Th w="8">Status</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -223,7 +226,7 @@ export default function CompanyList() {
 
                       <Td w={'10rem'}>
                         <Text>
-                          Rafael Amaro
+                          {company.data.status}
                         </Text>
                       </Td>
                     </Tr>
@@ -235,7 +238,7 @@ export default function CompanyList() {
               currentPage={page}
               onPageChanges={setPage}
               />
-              
+              </Flex>
             </>) : (
               <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
               <Box justifyContent="center" mb={8}>
@@ -260,7 +263,11 @@ export default function CompanyList() {
         )}
       </Flex>
 
-      
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
+    
     </Box>   
   );
 }

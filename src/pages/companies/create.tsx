@@ -10,6 +10,7 @@ import { api } from "../../services/axios";
 import { GetServerSideProps } from "next";
 import { decode } from "jsonwebtoken";
 import { parseCookies } from "nookies";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
     sub: string;
@@ -127,7 +128,13 @@ export default function CreateCompany(){
 
 
                 </Box>
+
             </Flex>
+
+            <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
         </Box>
     );
 }

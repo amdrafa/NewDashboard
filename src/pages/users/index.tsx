@@ -31,6 +31,7 @@ import { EditUser } from "../../components/editUser";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -215,6 +216,7 @@ export default function UserList() {
             </Flex>
           ): (
               total > 0 ? (<>
+              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                 <Table colorScheme="whiteAlpha">
               <Thead>
                 <Tr>
@@ -287,6 +289,7 @@ export default function UserList() {
               currentPage={page}
               onPageChanges={setPage}
             />
+            </Flex>
                 </>) : (
                   <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
                   <Box justifyContent="center" mb={8}>
@@ -313,6 +316,11 @@ export default function UserList() {
         </Box>
         )}
         
+      </Flex>
+
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
       </Flex>
     </Box>
   );

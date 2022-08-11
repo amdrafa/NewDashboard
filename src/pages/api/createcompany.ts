@@ -48,7 +48,7 @@ export default authenticated (async (request: NextApiRequest, response: NextApiR
             await fauna.query(
                 q.Create(
                     q.Collection('companies'),
-                    { data: {company, cnpj, responsable_name, email, phone, avaiableHours: hours, companySecretKey, createdAt} }
+                    { data: {company, cnpj, responsable_name, email, phone, avaiableHours: hours, companySecretKey, createdAt, status: 'active'} }
                 )
             )
 

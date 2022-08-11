@@ -61,7 +61,7 @@ export default authenticated(
 
       const { new_password, old_password, new_email, current_email, name: new_name, phone: new_phone, cpf: new_cpf } = request.body;
 
-      console.log(new_password, old_password, new_email);
+      console.log(new_cpf);
 
       try{
         

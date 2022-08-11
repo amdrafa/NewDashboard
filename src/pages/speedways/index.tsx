@@ -27,6 +27,7 @@ import EditSpeedway from "../../components/editSpeedway";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -165,6 +166,7 @@ export default function Speedwaylist() {
               </Flex>
             ) : total > 0 ? (
               <>
+              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                 <Table colorScheme="whiteAlpha">
                   <Thead>
                     <Tr>
@@ -230,9 +232,10 @@ export default function Speedwaylist() {
                   currentPage={page}
                   onPageChanges={setPage}
                 />
+                </Flex>
               </>
             ) : (
-              <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
                   <Box justifyContent="center" mb={8}>
                     <Flex justifyContent={'center'}>
                     <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
@@ -252,6 +255,11 @@ export default function Speedwaylist() {
             )}
           </Box>
         )}
+      </Flex>
+
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
       </Flex>
     </Box>
   );

@@ -43,6 +43,7 @@ import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
 import { ApprovalTimeCard } from "../components/approvalTimeCard";
 import noAppointments from '../../public/noappointments.png'
+import { Footer } from "../components/footer";
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -106,7 +107,7 @@ export default function UserDashboard() {
     data: dataBusySlots,
     isLoading: isLoadingBusylots,
     error: errorBusylots,
-  } = useQuery<busySlotsProps>(`busySlotsList`, async () => {
+  } = useQuery<busySlotsProps>(`busySlotsListUserDashboard${speedway}`, async () => {
     const response = await api.get(`getbusyslots?testtrack=${speedway}`);
 
     return response.data;
@@ -217,6 +218,7 @@ export default function UserDashboard() {
               </Flex>
             ) : total > 0 ? (
               <>
+              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                 <Table colorScheme="whiteAlpha">
                   <Thead>
                     <Tr>
@@ -412,13 +414,14 @@ export default function UserDashboard() {
                   currentPage={page}
                   onPageChanges={setPage}
                 />
+                </Flex>
               </>
             ) : total == -1 ? (
               <Flex justify="center">
                 <Spinner mt="10" mb="80px" />
               </Flex>
             ) : (
-              <Flex w="100%" justifyContent="center" cursor={'not-allowed'} > 
+              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'} > 
                 <Box justifyContent="center" mb={8} display='flex' flexDirection={'column'}>
                   <Flex justifyContent={'center'}>
                     <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
@@ -933,6 +936,11 @@ export default function UserDashboard() {
             )}
           </SimpleGrid>
         </Modal>
+
+        <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
       </Box>
     </>
   );

@@ -8,7 +8,7 @@ import {
 import Link from "next/link";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
-import { CardCarousel } from "../components/carouselCard";
+import { Footer } from "../components/footer";
 import Carousel from 'nuka-carousel'
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
     <Box mt={-3}>
       <Header />
 
-      <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6" mb={"14"}>
+      <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
         <Box flex="1" height={"100%"} borderRadius={8} p="8">
@@ -105,6 +105,12 @@ export default function Home() {
           </Box>
         </Box>
       </Flex>
+
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
+      
     </Box>
   );
 }

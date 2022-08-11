@@ -23,12 +23,13 @@ import { api } from "../services/axios";
 import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
+import { Footer } from "../components/footer";
 
 type CreateSpeedwayFormData = {
   name: string;
   phone: number;
   email: string;
-  cpf: number;
+  cpf: string;
   old_password: string;
   old_password_confirmation: string;
   new_password?: string;
@@ -39,7 +40,7 @@ const createUserFormSchema = yup.object().shape({
   name: yup.string().required(),
   phone: yup.number().required(),
   email: yup.string().required(),
-  cpf: yup.number().required(),
+  cpf: yup.string().required(),
   old_password: yup.string().required(),
   old_password_confirmation: yup
     .string()
@@ -218,7 +219,7 @@ export default function Settings() {
                     type="email"
                   />
                   <Input
-                    defaultValue={user?.userId}
+                    defaultValue={user?.cpf}
                     type="number"
                     name="cpf"
                     label="CPF"
@@ -304,6 +305,11 @@ export default function Settings() {
             </Flex>
           )}
         </Box>
+      </Flex>
+
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
       </Flex>
     </Box>
   );

@@ -36,6 +36,7 @@ import EditAdministrator from "../../components/editAdministrator";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
+import { Footer } from "../../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -151,8 +152,6 @@ export type DecodedToken = {
         console.log(ReturnedData);
         
         setTotal(totalcount)
-
-        console.log(ReturnedData)
         return ReturnedData;
       }
     );
@@ -165,7 +164,7 @@ export type DecodedToken = {
   
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
-  
+          
           {isEditMode ? (
             <EditAdministrator 
             admId={admId}
@@ -194,6 +193,7 @@ export type DecodedToken = {
             </Link>
             </Flex>
   
+            
             {isLoading ? (
             <Flex justify="center">
               <Spinner mt="70px" mb="110px" />
@@ -205,6 +205,7 @@ export type DecodedToken = {
             ): (
               
               total > 0 ? (<>
+              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
                 <Table colorScheme="whiteAlpha">
               <Thead>
                 <Tr>
@@ -252,8 +253,9 @@ export type DecodedToken = {
               currentPage={page}
               onPageChanges={setPage}
             />
+            </Flex>
                 </>) : (
-                  <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
                   <Box justifyContent="center" mb={8}>
                     <Flex justifyContent={'center'}>
                       <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
@@ -279,7 +281,10 @@ export type DecodedToken = {
           )}
         </Flex>
 
-        
+        <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
+      </Flex>
       </Box>
     );
   }

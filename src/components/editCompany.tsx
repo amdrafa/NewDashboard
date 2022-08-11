@@ -105,12 +105,15 @@ export default function EditCompany({
       });
   };
 
-  function deleteCompany(id: string){
-    api.delete('deletecompany', {data: {id}})
+  async function deleteCompany(id: string){
+    await api
+      .put("disablecompany", {
+        id
+      })
     .then((response) => {
       toast({
-        title: "Company deleted",
-        description: `${company} was deleted successfully.`,
+        title: "Company disabled",
+        description: `${company} was disabled successfully.`,
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -121,7 +124,7 @@ export default function EditCompany({
     .catch((err) => {
       toast({
         title: "Something went wrong",
-        description: `${company} couldn't be deleted.`,
+        description: `${company} couldn't be disabled.`,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -257,7 +260,7 @@ export default function EditCompany({
             alignItems={"center"}
             mb={2}
           >
-            <Text fontSize={"2xl"}>Delete company</Text>
+            <Text fontSize={"2xl"}>Disable company</Text>
             <Icon
               fontSize={20}
               as={IoMdClose}
@@ -271,10 +274,10 @@ export default function EditCompany({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to delete this speedway? All users registered to this company will be deleted too.
+              Do you really want to disable this speedway? All users registered to this company are going to be disconnected from {company}.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              An e-mail will be sent to the responsable for the company informing it was deleted.
+              If you want to enable this company again, an e-mail will be sent to the responsable for the company informing the new secret key.
             </Text>
           </Box>
 
@@ -295,7 +298,7 @@ export default function EditCompany({
                 }}
                 colorScheme={"red"}
               >
-                Delete
+                Disable
               </Button>
             </HStack>
           </Flex>

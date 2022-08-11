@@ -22,6 +22,7 @@ import { api } from "../services/axios";
 import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
+import { Footer } from "../components/footer";
 
 type UpdateDriverLicenceData = {
   register_number: string;
@@ -209,6 +210,11 @@ export default function DriverLicence() {
             </Flex>
           )}
         </Box>
+      </Flex>
+
+      <Flex >
+        <Flex  w={{lg: '275px'}}></Flex>
+      <Footer />
       </Flex>
     </Box>
   );
