@@ -135,23 +135,23 @@ export function SidebarNav() {
     ) : (
       <Stack spacing="12" align="flex-start">
       <NavSection title="GENERAL">
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
 
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
 
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
 
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
       
        
       </NavSection>
 
       <NavSection title="CONFIGURATIONS">
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
         
-      <Image opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
         
       </NavSection>
     </Stack>

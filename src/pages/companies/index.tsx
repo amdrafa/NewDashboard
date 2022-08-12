@@ -230,7 +230,7 @@ export default function CompanyList() {
                       {isWideVersioon && <Td>{company.data.createdAt}</Td>}
 
                       <Td w={'10rem'}>
-                        <Text>
+                        
                         {company.data.status == "active" ? (
                             <Text fontWeight={"medium"} color={"blue.400"}>
                               Active
@@ -240,7 +240,7 @@ export default function CompanyList() {
                               Disabled
                             </Text>
                           )}
-                        </Text>
+                        
                       </Td>
                     </Tr>
                   ))}

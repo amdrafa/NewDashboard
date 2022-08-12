@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { hash } from "bcrypt";
-import { authenticated } from "./login";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
   if (request.method === "POST") {

@@ -258,7 +258,7 @@ export type DecodedToken = {
                   <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
                   <Box justifyContent="center" mb={8}>
                     <Flex justifyContent={'center'}>
-                      <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
+                      <Image alt="No appointments" opacity={0.4} src='images/noappointments.png' w={'200px'}/>
                     </Flex>
                     <Flex w="100%" justifyContent="center">
                       <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
