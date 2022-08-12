@@ -4,7 +4,7 @@ import { parseCookies } from 'nookies'
 let {auth} = parseCookies()
 
 export const api = axios.create({
-    baseURL: 'http://https://ctvi-test.vercel.app//api',
+    baseURL: 'http://ctvi-test.vercel.app//apiapi',
     headers: {
         authorization: (auth? auth : '')
     }
