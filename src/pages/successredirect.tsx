@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { MdSpeed } from "react-icons/md";
 
 
-export default function successredirect() {
+export default function SuccessRedirect() {
 
   const [isLoading, setIsLoading] = useState(true)
  

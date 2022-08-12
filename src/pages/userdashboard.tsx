@@ -287,6 +287,7 @@ export default function UserDashboard() {
                             {appointment.data.selectedSlots.map((slot) => {
                               return (
                                 <Text
+                                  key={slot}
                                   color={"gray.100"}
                                   fontWeight={"bold"}
                                   ml="2"
