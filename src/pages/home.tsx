@@ -19,7 +19,7 @@ export default function Home() {
       <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        <Box flex="1" height={"100%"} borderRadius={8} p="8" maxW={1000}>
+        <Box flex="1" height={"100%"} borderRadius={8} p="8" maxW={1100}>
           <Flex justifyContent={'space-between'}>
             <Box w={"60%"} >
               <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
@@ -72,7 +72,7 @@ export default function Home() {
               
             </Box>
 
-            <Box w={"100%"}>
+            <Box>
             <Image src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
