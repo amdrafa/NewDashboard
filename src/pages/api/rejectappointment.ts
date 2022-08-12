@@ -6,25 +6,20 @@ import { authenticated } from "./login";
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
-      const {
-        id,
-      } = request.body;
-
+      const { id } = request.body;
 
       try {
-
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("schedules"), id), {
-            data: {  
-                status: 'rejected'
+            data: {
+              status: "rejected",
             },
           })
         );
 
-
-        return response.status(200).json({ message: "Appointment deleted" });
+        return response.status(200).json({ message: "Appointment rejected" });
       } catch (err) {
-        console.log("Error when deleting appointment", err);
+        console.log("Error when rejecting appointment", err);
         return response.status(400).json({ message: "Something went wrong" });
       }
     } else {

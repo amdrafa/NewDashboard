@@ -6,21 +6,16 @@ import { authenticated } from "./login";
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
-      const {
-        id,
-      } = request.body;
-
+      const { id } = request.body;
 
       try {
-
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("schedules"), id), {
-            data: {  
-                status: 'canceled'
+            data: {
+              status: "canceled",
             },
           })
         );
-
 
         return response.status(200).json({ message: "Appointment canceled" });
       } catch (err) {

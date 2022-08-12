@@ -59,7 +59,7 @@ interface companyProps {
   phone: number;
   avaiableHours: number;
   companyId: string;
-  status?: string;
+  status: string;
   createdAt?: string;
 }
 
@@ -72,6 +72,7 @@ export default function CompanyList() {
   const [responsable_name, setResponsable_name] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState(0);
+  const [status, setStatus] = useState('');
   const [avaiableHours, setAvaiableHours] = useState(0);
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -83,8 +84,8 @@ export default function CompanyList() {
     email,
     phone,
     avaiableHours,
-    companyId
-
+    companyId,
+    status
   }): companyProps {
    
     
@@ -95,6 +96,7 @@ export default function CompanyList() {
     setPhone(phone)
     setAvaiableHours(avaiableHours)
     setCompanyId(companyId)
+    setStatus(status)
     
 
     setIsEditMode(true);
@@ -141,6 +143,7 @@ export default function CompanyList() {
           hours={avaiableHours}
           email={email}
           companyId={companyId}
+          status={status}
           setIsEditMode={setIsEditMode}
           />
         ) : (
@@ -202,7 +205,9 @@ export default function CompanyList() {
                         email: company.data.email,
                         phone: company.data.phone,
                         avaiableHours: company.data.avaiableHours,
-                        companyId: company.ref["@ref"].id
+                        companyId: company.ref["@ref"].id,
+                        status: company.data.status
+                        
                       })
                     }}
                     _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
@@ -226,7 +231,15 @@ export default function CompanyList() {
 
                       <Td w={'10rem'}>
                         <Text>
-                          {company.data.status}
+                        {company.data.status == "active" ? (
+                            <Text fontWeight={"medium"} color={"blue.400"}>
+                              Active
+                            </Text>
+                          ) : (
+                            <Text fontWeight={"medium"} color={"gray.300"} _hover={{fontWeight:'bold'}}>
+                              Disabled
+                            </Text>
+                          )}
                         </Text>
                       </Td>
                     </Tr>
@@ -240,7 +253,7 @@ export default function CompanyList() {
               />
               </Flex>
             </>) : (
-              <Flex w="100%" justifyContent="center" cursor={'not-allowed'}>
+              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
               <Box justifyContent="center" mb={8}>
                 <Flex justifyContent={'center'}>
                   <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>

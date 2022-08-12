@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaUnlockAlt } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
+import { AiOutlineDashboard } from "react-icons/ai";
 
 type EditCompanyFormData = {
   company: string;
@@ -33,6 +34,7 @@ type EditCompanyFormData = {
   phone: number;
   hours: number;
   companyId: string;
+  status: string;
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -54,6 +56,7 @@ export default function EditCompany({
   hours: propsHours,
   responsable_name,
   companyId,
+  status
 }: EditCompanyFormData) {
   const { register, handleSubmit, formState, resetField } = useForm({
     resolver: yupResolver(EditCompanyFormSchema),
@@ -63,6 +66,8 @@ export default function EditCompany({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isModalOpenActive, setIsModalOpenActive] = useState(false);
+
   const { errors } = formState;
 
   const handleEditCompany: SubmitHandler<EditCompanyFormData> = async ({
@@ -71,7 +76,7 @@ export default function EditCompany({
     responsable_name,
     email,
     phone,
-    hours
+    hours,
   }) => {
     await api
       .put("editcompany", {
@@ -133,6 +138,36 @@ export default function EditCompany({
     });
   }
 
+  async function activeCompany(id: string){
+    await api
+      .put("activecompany", {
+        id,
+        email,
+        responsable_name
+      })
+    .then((response) => {
+      toast({
+        title: "Company enabled",
+        description: `${company} was enabled successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+      window.location.reload()
+    })
+    .catch((err) => {
+      toast({
+        title: "Something went wrong",
+        description: `${company} couldn't be enabled.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    });
+  }
+
   
 
   return (
@@ -149,10 +184,17 @@ export default function EditCompany({
       <Heading size="lg" fontWeight="normal">
         Edit company
       </Heading>
-      <Button bg='red.500' _hover={{bg:'red.400'}} onClick={() => setIsModalOpen(true)}>
+          {status == 'active' ? (
+            <Button bg='red.500' _hover={{bg:'red.400'}} onClick={() => setIsModalOpen(true)}>
             <Icon mr={1.5} as={FiTrash2} />
             Disable company
           </Button>
+          ) : (
+            <Button bg='blue.500' _hover={{bg:'blue.400'}} onClick={() => setIsModalOpenActive(true)}>
+            <Icon mr={1.5} as={AiOutlineDashboard} />
+            Active company
+          </Button>
+          )}
       </Flex>
 
       <Divider my="6" borderColor="gray.700" />
@@ -274,7 +316,7 @@ export default function EditCompany({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to disable this speedway? All users registered to this company are going to be disconnected from {company}.
+              Do you really want to disable this company? All users registered to this company are going to be disconnected from {company}.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
               If you want to enable this company again, an e-mail will be sent to the responsable for the company informing the new secret key.
@@ -299,6 +341,71 @@ export default function EditCompany({
                 colorScheme={"red"}
               >
                 Disable
+              </Button>
+            </HStack>
+          </Flex>
+        </SimpleGrid>
+      </Modal>
+
+
+      <Modal
+        isOpen={isModalOpenActive}
+        onRequestClose={() => setIsModalOpenActive(false)}
+        overlayClassName="react-modal-overlay"
+        className="react-modal-delete-message"
+        ariaHideApp={false}
+      >
+        <SimpleGrid
+          flex="1"
+          gap="1"
+          minChildWidth="320px"
+          alignItems="flex-start"
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems={"center"}
+            mb={2}
+          >
+            <Text fontSize={"2xl"}>Active company</Text>
+            <Icon
+              fontSize={20}
+              as={IoMdClose}
+              onClick={() => {
+                setIsModalOpenActive(false);
+              }}
+              cursor={"pointer"}
+            />
+          </Box>
+          <Divider orientation="horizontal" />
+
+          <Box my={"4"}>
+            <Text mb={2} fontSize={"md"}>
+              Do you really want to active this company? All users registered to this company were disconnected.
+            </Text>
+            <Text color={"gray.300"} mb={2} fontSize={"md"}>
+              If you enable this company again, an e-mail will be sent to the responsable for the company informing the new secret key.
+            </Text>
+          </Box>
+
+          <Flex justify={"flex-end"}>
+            <HStack spacing={4}>
+              <Button
+                type="submit"
+                onClick={() => setIsModalOpenActive(false)}
+                colorScheme={"whiteAlpha"}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                type="submit"
+                onClick={() => {
+                  activeCompany(companyId)
+                }}
+                colorScheme={"blue"}
+              >
+                Active
               </Button>
             </HStack>
           </Flex>

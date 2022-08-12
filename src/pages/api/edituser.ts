@@ -14,29 +14,20 @@ export default authenticated(
         register_number,
         driver_category,
         expires_at,
-        userId
+        userId,
       } = request.body;
-
-      console.log(email,
-        name,
-        cpf,
-        phone,
-        register_number,
-        driver_category,
-        expires_at,
-        userId)
 
       try {
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("users"), userId), {
-            data: {  
-                email,
-                name,
-                cpf,
-                phone,
-                register_number,
-                driver_category,
-                expires_at
+            data: {
+              email,
+              name,
+              cpf,
+              phone,
+              register_number,
+              driver_category,
+              expires_at,
             },
           })
         );

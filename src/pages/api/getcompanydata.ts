@@ -33,14 +33,10 @@ type DataProps = {
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "GET") {
-
-
-      console.log("Getting company data");
-
       const companyRef = request.query["companyRef"];
 
-      if(!companyRef){
-        return response.status(200).json({ Message: "Waiting parameters" });
+      if (!companyRef) {
+        return response.status(400).json({ Message: "Waiting parameters" });
       }
 
       try {
@@ -48,15 +44,13 @@ export default authenticated(
           q.Get(q.Ref(q.Collection("companies"), companyRef))
         );
 
-        return response
-          .status(200)
-          .json({
-            responsable_name: companyData.data.responsable_name,
-            email: companyData.data.email,
-            company_name: companyData.data.responsable_name,
-            cnpj: companyData.data.cnpj,
-            phone: companyData.data.phone
-          });
+        return response.status(200).json({
+          responsable_name: companyData.data.responsable_name,
+          email: companyData.data.email,
+          company_name: companyData.data.responsable_name,
+          cnpj: companyData.data.cnpj,
+          phone: companyData.data.phone,
+        });
       } catch (err) {
         console.log("error when getting company data ");
         return response.status(400).json({ error: err });

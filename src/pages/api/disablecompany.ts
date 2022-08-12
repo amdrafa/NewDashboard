@@ -19,7 +19,7 @@ interface UserProps {
 interface UserDataProps {
   ref: {
     id: number;
-  }
+  };
   ts: string;
   data: UserProps[];
 }
@@ -27,18 +27,16 @@ interface UserDataProps {
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
-      const {
-        id,
-      } = request.body;
-
+      const { id } = request.body;
 
       try {
         const updatedData = await fauna.query(
-          q.Update(q.Ref(q.Collection("companies"), id), {data: {
-            status: 'disabled'
-          }})
+          q.Update(q.Ref(q.Collection("companies"), id), {
+            data: {
+              status: "disabled",
+            },
+          })
         );
-        
 
         const { data } = await fauna.query<UserDataProps>(
           q.Map(
@@ -47,21 +45,21 @@ export default authenticated(
           )
         );
 
-        const companyUsers = []
+        const companyUsers = [];
 
-        data.forEach(user => {
-          if(user.data.companyRef == id){
-             fauna.query(
-              q.Update(q.Ref(q.Collection("users"), user.ref.id), {data: {
-                companyRef: '',
-                companyName: '',
-                permissions: [""]
-              }})
+        data.forEach((user) => {
+          if (user.data.companyRef == id) {
+            fauna.query(
+              q.Update(q.Ref(q.Collection("users"), user.ref.id), {
+                data: {
+                  companyRef: "",
+                  companyName: "",
+                  permissions: [""],
+                },
+              })
             );
-
           }
-        })
-
+        });
 
         return response.status(200).json({ message: "Company disabled" });
       } catch (err) {

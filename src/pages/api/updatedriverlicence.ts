@@ -6,14 +6,12 @@ import { decode } from "jsonwebtoken";
 import { authenticated } from "./login";
 import { compare, hash } from "bcrypt";
 
-
 export type DecodedToken = {
   sub: string;
   iat: number;
   exp: number;
   userId: string;
 };
-
 
 interface DataProps {
   ref: {
@@ -39,18 +37,13 @@ interface UserDataProps {
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
-        
-      console.log("Updating driver licence informations");
-
       const {
         register_number,
         driver_category,
         expires_at,
         email: current_email,
-        userId
+        userId,
       } = request.body;
-
-      console.log(register_number, driver_category, expires_at, current_email);
 
       try {
         const userData: DataProps = await fauna.query(
@@ -65,25 +58,29 @@ export default authenticated(
           )
         );
 
-
         const updatedData: UserDataProps = await fauna.query(
-            q.If(
-              q.Not(
-                q.Exists(
-                  q.Match(q.Index("user_by_email"), q.Casefold(current_email))
-                )
-              ),
-              q.Abort(`E-mail is not registered.`),
-              q.Update(q.Ref(q.Collection("users"), userId), {
-                data: {register_number: register_number, driver_category: driver_category, expires_at: expires_at},
-              })
-            )
-          );
+          q.If(
+            q.Not(
+              q.Exists(
+                q.Match(q.Index("user_by_email"), q.Casefold(current_email))
+              )
+            ),
+            q.Abort(`E-mail is not registered.`),
+            q.Update(q.Ref(q.Collection("users"), userId), {
+              data: {
+                register_number: register_number,
+                driver_category: driver_category,
+                expires_at: expires_at,
+              },
+            })
+          )
+        );
 
-        return response.status(200).json({ message: "Driver licence updated." });
+        return response
+          .status(200)
+          .json({ message: "Driver licence updated." });
       } catch (error) {
-        console.log(error + "Driver licence not working");
-        response.status(400).json({ message: "Driver licence not working" });
+        response.status(400).json({ message: "Driver licence couldn't be updated" });
       }
     } else {
       response.setHeader("Allow", "POST");

@@ -13,12 +13,6 @@ export default authenticated(
         speedwayId,
       } = request.body;
 
-      console.log(
-        "heyyyy, I am at createSpeedway api" + speedway,
-        vehicles_limit,
-        description
-      );
-
       try {
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("speedways"), speedwayId), {
@@ -26,9 +20,9 @@ export default authenticated(
           })
         );
 
-        return response.status(200).json({ message: "Speedway updated" });
+        return response.status(200).json({ message: "Test track updated" });
       } catch (err) {
-        console.log("Error when editing speedway", err);
+        console.log("Error when editing test track", err);
         return response.status(400).json({ message: "Something went wrong" });
       }
     } else {

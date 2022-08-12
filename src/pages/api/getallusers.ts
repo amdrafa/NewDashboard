@@ -25,8 +25,6 @@ interface UserDataProps {
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "GET") {
-      console.log("TEST GETTING ALL USERS");
-
       try {
         const { data } = await fauna.query<UserDataProps>(
           q.Map(
@@ -40,8 +38,7 @@ export default authenticated(
         let filteredData = [];
 
         data.forEach((user) => {
-
-          const isUser = user.data.roles.includes("USER")
+          const isUser = user.data.roles.includes("USER");
 
           if (isUser) {
             filteredData.push(user);
@@ -52,8 +49,6 @@ export default authenticated(
 
         const { page, limit } = request.query;
         const per_page = Number(limit);
-
-        console.log(page, per_page);
 
         const slicedData = () => {
           const pageStart = (Number(page) - 1) * per_page;
@@ -67,7 +62,7 @@ export default authenticated(
 
         return response.status(200).json({ PaginateData, totalcount });
       } catch (err) {
-        console.log("error when getting all companies", err);
+        console.log("Error when getting all users", err);
 
         return false;
       }

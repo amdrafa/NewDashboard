@@ -3,7 +3,7 @@ import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { compare } from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
-import cookie from 'cookie';
+import cookie from "cookie";
 
 interface DataProps {
   ref: {
@@ -20,7 +20,7 @@ interface UserDataProps {
   createdAt: string;
   companyRef: string;
   roles: string[];
-  permissions: string[]
+  permissions: string[];
 }
 
 export const authenticated =
@@ -42,8 +42,6 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
   if (request.method === "POST") {
     const { data: email, password } = request.body;
 
-    console.log("Login starting...", email, password);
-
     try {
       const userData: DataProps = await fauna.query(
         q.If(
@@ -60,29 +58,34 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
             name: userData.data.name,
             roles: userData.data.roles,
             permissions: userData.data.permissions,
-            userId: userData.ref.id
+            userId: userData.ref.id,
           };
 
           const jwt = sign(claims, "supersecretkey", { expiresIn: "1h" });
 
-          response.setHeader('Set-Cookie', cookie.serialize('auth', jwt, {
+          response.setHeader(
+            "Set-Cookie",
+            cookie.serialize("auth", jwt, {
               httpOnly: false,
-              secure: process.env.NODE_ENV !== 'development',
-              sameSite: 'strict',
+              secure: process.env.NODE_ENV !== "development",
+              sameSite: "strict",
               maxAge: 3600,
-              path: '/'
-          }))
+              path: "/",
+            })
+          );
 
           // Setar cookies atualizados quando a permissão é adicionada, pois isso só é feito no momento de login
-          
-          return response.status(200).json({ message: "Welcome, correct password" });
+
+          return response
+            .status(200)
+            .json({ message: "Welcome, correct password" });
         } else {
           return response.status(400).json({ message: "Incorrect password" });
         }
       });
     } catch (err) {
       console.log("error, login", err);
-      return response.status(400).json({err});
+      return response.status(400).json({ err });
     }
   } else {
     response.setHeader("Allow", "POST");

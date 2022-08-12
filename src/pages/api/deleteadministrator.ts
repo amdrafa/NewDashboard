@@ -6,21 +6,12 @@ import { authenticated } from "./login";
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "DELETE") {
-      const {
-        id,
-      } = request.body;
-
+      const { id } = request.body;
 
       try {
         const updatedData = await fauna.query(
           q.Delete(q.Ref(q.Collection("users"), id))
         );
-
-        // const deleteUsers = await fauna.query(
-        //     q.Delete(
-        //         q.Match(q.Index("user_by_companyRef"), id)
-        //     )
-        // )
 
         return response.status(200).json({ message: "Administrator deleted" });
       } catch (err) {

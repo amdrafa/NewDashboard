@@ -3,7 +3,7 @@ import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { authenticated } from "./login";
 import { decode, sign } from "jsonwebtoken";
-import cookie from 'cookie';
+import cookie from "cookie";
 
 type DecodedToken = {
   sub: string;
@@ -13,30 +13,26 @@ type DecodedToken = {
   iat: number;
   exp: number;
   userId: string;
-  
 };
 
 type DataProps = {
   ref: {
     id: string;
-  }
+  };
   data: {
-    company:string;
-  }
+    company: string;
+  };
 };
 
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
-      const { secret_key, userId, email } = request.body;
       
+      const { secret_key, userId, email } = request.body;
 
       try {
-
-        
         const auth = request.headers.authorization;
         const decoded = decode(auth as string) as DecodedToken;
-
 
         const company = await fauna.query<DataProps>(
           q.If(
@@ -47,10 +43,13 @@ export default authenticated(
           )
         );
 
-
         await fauna.query(
           q.Update(q.Ref(q.Collection("users"), userId), {
-            data: { companyRef: company.ref.id, companyName: company.data.company, permissions: ["SCHEDULE"] },
+            data: {
+              companyRef: company.ref.id,
+              companyName: company.data.company,
+              permissions: ["SCHEDULE"],
+            },
           })
         );
 
@@ -59,26 +58,28 @@ export default authenticated(
           name: decoded.name,
           roles: decoded.roles,
           permissions: ["SCHEDULE"],
-          userId: decoded.userId
-          
+          userId: decoded.userId,
         };
-
-
 
         const jwt = sign(claims, "supersecretkey", { expiresIn: "1h" });
 
-        response.setHeader('Set-Cookie', cookie.serialize('auth', jwt, {
+        response.setHeader(
+          "Set-Cookie",
+          cookie.serialize("auth", jwt, {
             httpOnly: false,
-            secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV !== "development",
+            sameSite: "strict",
             maxAge: 3600,
-            path: '/'
-        }))
+            path: "/",
+          })
+        );
 
         return response.status(200).json({ message: "User company updated" });
       } catch (err) {
         console.log("error when connecting user to company", err);
-        return response.status(400).json({ message: "User company not updated" });
+        return response
+          .status(400)
+          .json({ message: "User company not updated" });
       }
     } else {
       response.setHeader("Allow", "POST");

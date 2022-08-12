@@ -1,4 +1,4 @@
-import { Flex, Icon, IconButton, useBreakpointValue } from '@chakra-ui/react'
+import { Flex, Icon, IconButton, Link, useBreakpointValue } from '@chakra-ui/react'
 import { RiMenuLine } from 'react-icons/ri';
 import { useSidebarDrawer } from '../../contexts/SidebarDrawerContext';
 import { Logo } from './Logo';
@@ -43,7 +43,9 @@ export function Header(){
               </IconButton>
           )}  
 
-          <Logo />
+          <Link _hover={{textDecoration: 'none'}} href='/home'>
+            <Logo />
+          </Link>
 
             {isWideVersion && <SearchBox />}
 
