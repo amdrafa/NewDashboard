@@ -72,7 +72,7 @@ export default function Home() {
               
             </Box>
 
-            <Box w={"100%"}>
+            <Box w={"50%"}>
             <Image src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
