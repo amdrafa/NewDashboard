@@ -111,6 +111,7 @@ export function SidebarNav() {
           >
             Test tracks
           </NavLink>
+          
         </Can>
       </NavSection>
 
@@ -125,6 +126,15 @@ export function SidebarNav() {
         >
           Driver Licence
         </NavLink>
+        <Can roles={["ADMINISTRATOR"]}>
+        <NavLink
+          hasPermission={true}
+          hrefs="/reports"
+          icon={RiGitMergeLine}
+        >
+          Reports
+        </NavLink>
+        </Can>
         <Can roles={["USER"]}>
           <NavLink hasPermission={true} hrefs="/company" icon={BiBuilding}>
             Company

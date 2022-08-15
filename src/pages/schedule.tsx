@@ -158,10 +158,6 @@ export default function Schedule() {
   );
 
 
-  function handleOpenModal() {
-    setIsModalOpen(true);
-  }
-
   function handleCloseModal() {
     setIsModalOpen(false);
   }
