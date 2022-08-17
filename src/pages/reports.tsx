@@ -20,7 +20,7 @@ import {
   SimpleGrid,
   Input,
   Select,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import { GetServerSideProps } from "next";
@@ -39,6 +39,27 @@ import { decode } from "jsonwebtoken";
 import EditCompany from "../components/editCompany";
 import { Footer } from "../components/footer";
 import { IoMdClose } from "react-icons/io";
+import * as FileSaver from "file-saver";
+import * as XLSX from "xlsx";
+import dayjs from "dayjs";
+
+interface AppointmentProps {
+  ref: string;
+  ts: number;
+  data: {
+    selectedSlots: string[];
+    speedway: string;
+    vehicle: string;
+    userId: string;
+    status: string;
+    companyName: string;
+  };
+}
+
+interface AppointmentDataProps {
+  filteredData: AppointmentProps[]
+}
+
 
 export type DecodedToken = {
   sub: string;
@@ -71,8 +92,7 @@ interface companyProps {
 }
 
 export default function Reports() {
-
-  const toast = useToast()
+  const toast = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,6 +104,9 @@ export default function Reports() {
   const [phone, setPhone] = useState(0);
   const [status, setStatus] = useState("");
   const [avaiableHours, setAvaiableHours] = useState(0);
+
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
 
   function handleGenerateReport({
     company,
@@ -110,15 +133,25 @@ export default function Reports() {
   }
 
   const handleGenerateReportStep2 = async () => {
-    await api
-      .post("generatereport", {
-        cnpj,
+    if (selectedYear == "" || selectedMonth == "") {
+      toast({
+        title: "Select a period",
+        description: `You need to choose the report month and year.`,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      return;
+    }
+
+    const data = await api
+      .post<AppointmentDataProps>("generatereport", {
         company,
-        responsable_name,
-        email,
-        phone,
-        avaiableHours,
-        companyId
+        companyId,
+        selectedMonth,
+        selectedYear,
       })
       .then((response) => {
         toast({
@@ -127,8 +160,65 @@ export default function Reports() {
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
+
+        setSelectedMonth("");
+        setSelectedYear("");
+        setIsModalOpen(false);
+
+
+        const wb = XLSX.utils?.book_new();
+
+        wb.Props = {
+          Title: "Report",
+          Subject: "Company Report",
+          Author: "CTVI Development",
+          CreatedDate: new Date(),
+        };
+
+        wb.SheetNames.push(`${company}-report`);
+
+        const appointmentsLenght = response.data.filteredData.length
+
+        const columns = ["Company", "Vehicle", "Test track", "User ID", "Slots", "Date"];
+
+        
+
+        var rows = [];
+
+        
+          
+        
+
+        const mydata = [
+          columns,
+        ];
+
+        for (var i = 0; i < appointmentsLenght; ++i) {
+          rows[i] = []
+          
+          response.data.filteredData.forEach(item => {
+            rows[i].push(item.data.companyName)
+            rows[i].push(item.data.vehicle)
+            rows[i].push(item.data.speedway)
+            rows[i].push(item.data.userId)
+            rows[i].push(item.data.selectedSlots[0])
+            rows[i].push(item.data.selectedSlots[0])
+          });
+
+
+
+          mydata.push(rows[i])
+      }
+
+        // `[${appointment.data.companyName}, ${appointment.data.vehicle}, ${appointment.data.speedway}, ${appointment.data.userId}, ${dayjs(appointment.data.selectedSlots[0]).format('hh').toString()} + 'h', ${dayjs(appointment.data.selectedSlots[0]).format('DD/MM/YYYY').toString()}],`
+        
+        const ws = XLSX.utils.aoa_to_sheet(mydata);
+
+        wb.Sheets[`${company}-report`] = ws;
+
+        XLSX.writeFile(wb, `${company}-report/${dayjs(new Date()).format('MM-YYYY')}.xlsx`, {bookType: 'xlsx', type: 'binary'})
       })
       .catch((err) => {
         toast({
@@ -137,7 +227,7 @@ export default function Reports() {
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
   };
@@ -358,7 +448,7 @@ export default function Reports() {
       >
         <SimpleGrid
           flex="1"
-          pb='2'
+          pb="2"
           gap="1"
           minChildWidth="320px"
           alignItems="flex-start"
@@ -372,7 +462,8 @@ export default function Reports() {
             <Box>
               <Text fontSize={"2xl"}>{company} - Report</Text>
               <Text color={"gray.300"} my={2} fontSize={"md"}>
-                An excel file will be generated containing all slots that the company used during the month. 
+                An excel file will be generated containing all slots that the
+                company used during the month.
               </Text>
             </Box>
             <Icon
@@ -392,16 +483,17 @@ export default function Reports() {
             </Text>
 
             <Select
-              //  onChange={(e) => setSpeedway(e.target.value)}
+              onChange={(e) => {
+                setSelectedYear(e.target.value);
+              }}
               placeholder="Select option"
               color="gray.300"
               bg="gray.900"
               border="none"
               height="45px"
             >
-              <option value={"aaaaaaaa"}>2022</option>
-              <option value={"aaaaaaaa"}>2023</option>
-              <option value={"aaaaaaaa"}>2024</option>
+              <option value={"2022"}>2022</option>
+              <option value={"2023"}>2023</option>
             </Select>
 
             <Text w="100%" fontSize="20">
@@ -409,25 +501,27 @@ export default function Reports() {
             </Text>
 
             <Select
-              //  onChange={(e) => setSpeedway(e.target.value)}
+              onChange={(e) => {
+                setSelectedMonth(e.target.value);
+              }}
               placeholder="Select option"
               color="gray.300"
               bg="gray.900"
               border="none"
               height="45px"
             >
-              <option value={"aaaaaaaa"}>January</option>
-              <option value={"aaaaaaaa"}>February</option>
-              <option value={"aaaaaaaa"}>March</option>
-              <option value={"aaaaaaaa"}>April</option>
-              <option value={"aaaaaaaa"}>May</option>
-              <option value={"aaaaaaaa"}>June</option>
-              <option value={"aaaaaaaa"}>July</option>
-              <option value={"aaaaaaaa"}>August</option>
-              <option value={"aaaaaaaa"}>September</option>
-              <option value={"aaaaaaaa"}>October</option>
-              <option value={"aaaaaaaa"}>November</option>
-              <option value={"aaaaaaaa"}>December</option>
+              <option value={"Jan"}>January</option>
+              <option value={"Feb"}>February</option>
+              <option value={"Mar"}>March</option>
+              <option value={"Apr"}>April</option>
+              <option value={"May"}>May</option>
+              <option value={"Jun"}>June</option>
+              <option value={"Jul"}>July</option>
+              <option value={"Aug"}>August</option>
+              <option value={"Set"}>September</option>
+              <option value={"Oct"}>October</option>
+              <option value={"Nov"}>November</option>
+              <option value={"Dec"}>December</option>
             </Select>
           </SimpleGrid>
 
@@ -441,9 +535,13 @@ export default function Reports() {
                 Cancel
               </Button>
 
-              <Button type="submit" colorScheme={"blue"} onClick={() => {
-                handleGenerateReportStep2()
-              }}>
+              <Button
+                type="submit"
+                colorScheme={"blue"}
+                onClick={() => {
+                  handleGenerateReportStep2();
+                }}
+              >
                 Generate
               </Button>
             </HStack>
