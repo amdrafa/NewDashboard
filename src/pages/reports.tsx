@@ -57,9 +57,8 @@ interface AppointmentProps {
 }
 
 interface AppointmentDataProps {
-  filteredData: AppointmentProps[]
+  filteredData: AppointmentProps[];
 }
-
 
 export type DecodedToken = {
   sub: string;
@@ -167,7 +166,6 @@ export default function Reports() {
         setSelectedYear("");
         setIsModalOpen(false);
 
-
         const wb = XLSX.utils?.book_new();
 
         wb.Props = {
@@ -179,51 +177,67 @@ export default function Reports() {
 
         wb.SheetNames.push(`${company}-report`);
 
-        const appointmentsLenght = response.data.filteredData.length
+        const appointmentsLenght = response.data.filteredData.length;
 
-        const columns = ["Company", "Vehicle", "Test track", "User ID", "Slots", "Date"];
-
-        
+        const columns = [
+          "Company",
+          "Vehicle",
+          "Test track",
+          "User ID",
+          "Slots",
+          "Total slots",
+          "Date",
+        ];
 
         var rows = [];
 
-        
-          
-        
+        const sheetData = [columns];
 
-        const mydata = [
-          columns,
-        ];
+        let i = 0;
 
-        for (var i = 0; i < appointmentsLenght; ++i) {
-          rows[i] = []
-          
-          response.data.filteredData.forEach(item => {
-            rows[i].push(item.data.companyName)
-            rows[i].push(item.data.vehicle)
-            rows[i].push(item.data.speedway)
-            rows[i].push(item.data.userId)
-            rows[i].push(item.data.selectedSlots[0])
-            rows[i].push(item.data.selectedSlots[0])
-          });
+        response.data.filteredData.forEach((item) => {
+          rows[i] = [];
+          let currentSlots = "";
 
+          rows[i].push(item.data.companyName);
+          rows[i].push(item.data.vehicle);
+          rows[i].push(item.data.speedway);
+          rows[i].push(item.data.userId);
+          {
+            item.data.selectedSlots.forEach((slot) => {
+              currentSlots =
+                currentSlots +
+                " " +
+                dayjs(slot).format("HH:mm") +
+                " to " +
+                (Number(dayjs(slot).format("HH")) + 1).toString() +
+                ":00" +
+                ", ";
+            });
+          }
+          rows[i].push(currentSlots);
+          rows[i].push(item.data.selectedSlots.length);
+          rows[i].push(dayjs(item.data.selectedSlots[0]).format("DD-MM-YYYY"));
 
+          sheetData.push(rows[i]);
 
-          mydata.push(rows[i])
-      }
+          i++;
+        });
 
-        // `[${appointment.data.companyName}, ${appointment.data.vehicle}, ${appointment.data.speedway}, ${appointment.data.userId}, ${dayjs(appointment.data.selectedSlots[0]).format('hh').toString()} + 'h', ${dayjs(appointment.data.selectedSlots[0]).format('DD/MM/YYYY').toString()}],`
-        
-        const ws = XLSX.utils.aoa_to_sheet(mydata);
+        const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
         wb.Sheets[`${company}-report`] = ws;
 
-        XLSX.writeFile(wb, `${company}-report/${dayjs(new Date()).format('MM-YYYY')}.xlsx`, {bookType: 'xlsx', type: 'binary'})
+        XLSX.writeFile(
+          wb,
+          `${company}-report/${dayjs(new Date()).format("MM-YYYY")}.xlsx`,
+          { bookType: "xlsx", type: "binary" }
+        );
       })
       .catch((err) => {
         toast({
-          title: "Something went wrong",
-          description: `${company} report couldn't be downloaded.`,
+          title: "Appointments not found",
+          description: `${company} didn't schedule any appointment in ${dayjs(selectedMonth).format('MMM')}, ${dayjs(selectedYear).format('YYYY')}`,
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -492,8 +506,8 @@ export default function Reports() {
               border="none"
               height="45px"
             >
-              <option value={"2022"}>2022</option>
-              <option value={"2023"}>2023</option>
+              <option value={"2022-12-17T03:24:00"}>2022</option>
+              <option value={"2023-12-17T03:24:00"}>2023</option>
             </Select>
 
             <Text w="100%" fontSize="20">
@@ -510,18 +524,18 @@ export default function Reports() {
               border="none"
               height="45px"
             >
-              <option value={"Jan"}>January</option>
-              <option value={"Feb"}>February</option>
-              <option value={"Mar"}>March</option>
-              <option value={"Apr"}>April</option>
-              <option value={"May"}>May</option>
-              <option value={"Jun"}>June</option>
-              <option value={"Jul"}>July</option>
-              <option value={"Aug"}>August</option>
-              <option value={"Set"}>September</option>
-              <option value={"Oct"}>October</option>
-              <option value={"Nov"}>November</option>
-              <option value={"Dec"}>December</option>
+              <option value={"2022-01-17T03:24:00"}>January</option>
+              <option value={"2022-02-17T03:24:00"}>February</option>
+              <option value={"2022-03-17T03:24:00"}>March</option>
+              <option value={"2022-04-17T03:24:00"}>April</option>
+              <option value={"2022-05-17T03:24:00"}>May</option>
+              <option value={"2022-06-17T03:24:00"}>June</option>
+              <option value={"2022-07-17T03:24:00"}>July</option>
+              <option value={"2022-08-17T03:24:00"}>August</option>
+              <option value={"2022-09-17T03:24:00"}>September</option>
+              <option value={"2022-10-17T03:24:00"}>October</option>
+              <option value={"2022-11-17T03:24:00"}>November</option>
+              <option value={"2022-12-17T03:24:00"}>December</option>
             </Select>
           </SimpleGrid>
 
