@@ -42,6 +42,7 @@ export default authenticated(
         );
 
         data.forEach((appointment) => {
+
           if (
             appointment.data.companyName == company &&
             dayjs(selectedMonth).format("MM") == dayjs(appointment.data.selectedSlots[0]).format("MM") &&

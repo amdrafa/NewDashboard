@@ -92,6 +92,10 @@ interface companyProps {
 
 export default function Reports() {
   const toast = useToast();
+  
+  const [filteredData, setFilteredData] = useState([])
+
+  const [searchCompanyValue, setSearchCompanyValue] = useState('')
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -146,7 +150,7 @@ export default function Reports() {
     }
 
     const data = await api
-      .post<AppointmentDataProps>("generatereport", {
+      .post<AppointmentDataProps>(`generatereport?search=${searchCompanyValue}`, {
         company,
         companyId,
         selectedMonth,
@@ -246,6 +250,25 @@ export default function Reports() {
       });
   };
 
+  function handleSearchCompany(event:React.ChangeEvent<HTMLInputElement>){
+
+    
+    setSearchCompanyValue(event.target.value)
+    
+    if(event.target.value == ''){
+      setSearchCompanyValue('')
+
+      return
+    }
+
+    setFilteredData(data.filter((company) => {
+      return company.data.company.toLowerCase().trim().includes(searchCompanyValue.toLowerCase().trim())
+    }))
+    
+  }
+
+ 
+
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,
@@ -261,7 +284,7 @@ export default function Reports() {
     `companylist${page}`,
     async () => {
       const response = await api.get(
-        `getallcompanies?page=${page}&limit=${limit}`
+        `getallcompanies?page=${page}&limit=${limit}&search=${searchCompanyValue}`
       );
       const { PaginateData: ReturnedData, totalcount } = response.data;
 
@@ -270,6 +293,7 @@ export default function Reports() {
       return ReturnedData;
     }
   );
+
 
   return (
     <Box mt={-3}>
@@ -304,6 +328,7 @@ export default function Reports() {
                 mr="4"
                 placeholder="Search a company"
                 _placeholder={{ color: "gray.400" }}
+                onChange={handleSearchCompany}
               />
               <Icon as={RiSearchLine} fontSize="20" />
             </Flex>
@@ -341,7 +366,67 @@ export default function Reports() {
                       <Th w="8">Status</Th>
                     </Tr>
                   </Thead>
-                  <Tbody>
+                  {searchCompanyValue.length > 0 ? (
+                    <Tbody>
+                    {filteredData.map((company) => (
+                      <Tr
+                        onClick={() => {
+                          handleGenerateReport({
+                            company: company.data.company,
+                            cnpj: company.data.cnpj,
+                            responsable_name: company.data.responsable_name,
+                            email: company.data.email,
+                            phone: company.data.phone,
+                            avaiableHours: company.data.avaiableHours,
+                            companyId: company.ref["@ref"].id,
+                            status: company.data.status,
+                          });
+                        }}
+                        _hover={{
+                          bg: "gray.900",
+                          color: "gray.300",
+                          transition: "0.2s",
+                          cursor: "pointer",
+                        }}
+                        key={company.data.cnpj}
+                      >
+                        <Td px={["4", "4", "6"]}>
+                          <Text>{company.data.company}</Text>
+                        </Td>
+                        <Td>
+                          <Box>
+                            <Text fontWeight="bold">
+                              {company.data.responsable_name}
+                            </Text>
+                            <Text fontSize="sm" color="gray.300">
+                              {company.data.email}
+                            </Text>
+                          </Box>
+                        </Td>
+                        {isWideVersioon && <Td>{company.data.cnpj}</Td>}
+
+                        {isWideVersioon && <Td>{company.data.createdAt}</Td>}
+
+                        <Td w={"10rem"}>
+                          {company.data.status == "active" ? (
+                            <Text fontWeight={"medium"} color={"blue.400"}>
+                              Active
+                            </Text>
+                          ) : (
+                            <Text
+                              fontWeight={"medium"}
+                              color={"gray.300"}
+                              _hover={{ fontWeight: "bold" }}
+                            >
+                              Disabled
+                            </Text>
+                          )}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                  ) : (
+                    <Tbody>
                     {data.map((company) => (
                       <Tr
                         onClick={() => {
@@ -399,12 +484,21 @@ export default function Reports() {
                       </Tr>
                     ))}
                   </Tbody>
+                  )}
                 </Table>
-                <Pagination
+                {searchCompanyValue.length > 0 ? (
+                  <Pagination
+                  totalCountOfRegisters={filteredData.length}
+                  currentPage={page}
+                  onPageChanges={setPage}
+                />
+                ) : (
+                  <Pagination
                   totalCountOfRegisters={total}
                   currentPage={page}
                   onPageChanges={setPage}
                 />
+                )}
               </Flex>
             </>
           ) : (

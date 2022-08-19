@@ -66,6 +66,7 @@ interface companyProps {
 
 export default function CompanyList() {
 
+
   const [companyId, setCompanyId] = useState("");
   const [company, setCompany] = useState('');
   const [cnpj, setCnpj] = useState('false');
@@ -118,7 +119,7 @@ export default function CompanyList() {
   
 
   const { data, isLoading, error } = useQuery<companyDataProps[]>(`companylist${page}`, async () => {
-    const response = await api.get(`getallcompanies?page=${page}&limit=${limit}`)
+    const response = await api.get(`getallcompanies?page=${page}&limit=${limit}&search=${''}`)
     const {PaginateData: ReturnedData, totalcount} = response.data;
 
     setTotal(totalcount)

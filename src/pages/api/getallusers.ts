@@ -26,6 +26,9 @@ export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "GET") {
       try {
+
+        const { page, limit } = request.query;
+
         const { data } = await fauna.query<UserDataProps>(
           q.Map(
             q.Paginate(q.Match(q.Index("all_users"))),
@@ -37,17 +40,23 @@ export default authenticated(
 
         let filteredData = [];
 
+
         data.forEach((user) => {
           const isUser = user.data.roles.includes("USER");
 
-          if (isUser) {
-            filteredData.push(user);
-          }
+          
+            if (isUser) {
+              filteredData.push(user);
+            }
+          
+
         });
+
+
 
         let totalcount = filteredData.length;
 
-        const { page, limit } = request.query;
+        
         const per_page = Number(limit);
 
         const slicedData = () => {

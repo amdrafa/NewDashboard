@@ -19,7 +19,7 @@ export default function Home() {
       <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        <Box display={'flex'} flexDir='column' flex="1" height={"100%"} borderRadius={8} p="8" maxW={1100} justifyContent='center'>
+        <Box display={'flex'} flexDir='column' flex="1" height={"100%"} borderRadius={8} p="8" justifyContent='center'>
           <Flex justifyContent={'space-between'}>
             <Box w={"60%"} >
               <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
@@ -72,8 +72,8 @@ export default function Home() {
               
             </Box>
 
-            <Box w={'80%'}>
-            <Image src="images/about-hero-right1.png"/>
+            <Box>
+            <Image w={'750px'} src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
 

@@ -18,7 +18,7 @@ import {
   Image
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { FiTrash } from "react-icons/fi";
 import { Header } from "../../components/Header";
@@ -83,6 +83,8 @@ export default function UserList() {
     lg: true,
   });
 
+  const [filteredData, setFilteredData] = useState([])
+
   const [name, setName] = useState('')
   const [cpf, setCpf] = useState(0)
   const [phone, setPhone] = useState(0)
@@ -104,9 +106,7 @@ export default function UserList() {
 
   const [total, setTotal] = useState(1);
 
-  const [users, setUsers] = useState<UserDataProps[]>([]);
-
-  const [needsLessHeight, setNeedsLessHeight] = useState('');
+  const [searchUsersValue, setSearchUsersValue] = useState('');
 
 
   function handleEditUser({
@@ -139,20 +139,34 @@ export default function UserList() {
   }
 
 
-  const { data, isLoading, error } = useQuery<UserDataProps[]>(
+  const { data, isLoading, error, refetch } = useQuery<UserDataProps[]>(
     `userlist${page}`,
     async () => {
       const response = await api.get(`getallusers?page=${page}&limit=${limit}`);
       const { PaginateData: ReturnedData, totalcount } = response.data;
      
-      
-     
-
       setTotal(totalcount);
 
       return ReturnedData;
     }
   );
+
+  function handleSearchUsers(event:React.ChangeEvent<HTMLInputElement>){
+
+    
+    setSearchUsersValue(event.target.value)
+    
+    if(event.target.value == ''){
+      setSearchUsersValue('')
+
+      return
+    }
+
+    setFilteredData(data.filter((user) => {
+      return user.data.name.toLowerCase().includes(searchUsersValue.toLowerCase())
+    }))
+    
+  }
 
   
   return (
@@ -201,6 +215,7 @@ export default function UserList() {
                 mr="4"
                 placeholder="Search for a user"
                 _placeholder={{ color: "gray.400" }}
+                onChange={handleSearchUsers}
               />
               <Icon as={RiSearchLine} fontSize="20" />
             </Flex>
@@ -229,8 +244,9 @@ export default function UserList() {
                   {isWideVersioon && <Th>Driver licence</Th>}
                 </Tr>
               </Thead>
-              <Tbody>
-                {data.map((user) => (
+              {searchUsersValue.length > 0 ? (
+                <Tbody>
+                {filteredData.map((user) => (
                     <Tr 
                     onClick={() => {
                       handleEditUser({
@@ -283,12 +299,75 @@ export default function UserList() {
                   </Tr>
                 ))}
               </Tbody>
+              ) : (
+                <Tbody>
+                {data.map((user) => (
+                    <Tr 
+                    onClick={() => {
+                      handleEditUser({
+                        companyName: user.data.companyName,
+                        cpf: user.data.cpf,
+                        name: user.data.name,
+                        email: user.data.email,
+                        phone: user.data.phone,
+                        userId: user.ref["@ref"].id,
+                        driver_category: user.data.driver_category,
+                        expires_at: user.data.expires_at,
+                        register_number: user.data.register_number
+                      })
+                    }}
+                    _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
+                    key={user.ts}>
+                    <Td px={["4", "4", "6"]}>
+                      <Box>
+                        <Text fontWeight="bold">{user.data.name}</Text>
+                        <Text fontSize="sm" color="gray.300">
+                        {user.data.email}
+                        </Text>
+                      </Box>
+                    </Td>
+                    
+                    {isWideVersioon && <Td>{user.data.cpf}</Td>}
+
+                    <Td>{user.data.companyName ? (user.data.companyName) : (<Text color={'gray.300'}>Not registered</Text>)}</Td>
+                    <Td>
+
+                      {!user.data.register_number || user.data.register_number == '' ? (
+                        <Text color={'gray.300'}>Not registered</Text>
+                      ) : (
+                        <Box>
+                        <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
+                        <Text fontSize="sm" color="gray.300">
+                          {dayjs(user.data.expires_at).format('DD/MM/YYYY') > dayjs().format('DD/MM/YYYY') ? (
+                            <Text color={'red.400'}>Expired</Text>
+                          ) : (
+                            <Text color={'blue.500'}>{`Expires at: ${dayjs(user.data.expires_at).format('DD/MM/YYYY')}`}</Text>
+                            
+                          )}
+                          
+                        </Text>
+                      </Box>
+                      )}
+
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+              )}
             </Table>
-            <Pagination
+            {searchUsersValue.length > 0 ? (
+              <Pagination
+              totalCountOfRegisters={filteredData.length}
+              currentPage={page}
+              onPageChanges={setPage}
+            />
+            ) : (
+              <Pagination
               totalCountOfRegisters={total}
               currentPage={page}
               onPageChanges={setPage}
             />
+            )}
             </Flex>
                 </>) : (
                   <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
