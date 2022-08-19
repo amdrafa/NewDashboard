@@ -140,7 +140,7 @@ export function SearchBox() {
 
               {filteredData.map((testtrack) => {
                 return (
-                  <Box>
+                  <Box key={testtrack.ts}>
                     
                       <Flex
                         borderTop={"1px"}
