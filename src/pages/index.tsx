@@ -11,6 +11,7 @@ import Router from "next/router";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import { Logo } from "../components/Header/Logo";
 
 type SignInFormData = {
   email: string;
@@ -41,6 +42,13 @@ export default function Login() {
     <Flex w="100vw" h="100vh" alignItems="center" justifyContent="center">
       
       
+      
+      <Box>
+      
+
+      <Flex cursor={'pointer'} mb={'6'} flex='1' justify={'center'} _hover={{color: 'gray.200'}}>
+          <Logo />
+        </Flex>
         <Flex
         as="form"
         w="100%"
@@ -92,7 +100,9 @@ export default function Login() {
           </Link>
         </Flex>
       </Flex>
+
       
+      </Box>
     </Flex>
   );
 }

@@ -16,6 +16,7 @@ export default function Home() {
 
   const isWideVersioon = useBreakpointValue({
     base: false,
+    md: false,
     lg: true,
   });
   
@@ -27,15 +28,15 @@ export default function Home() {
         <Sidebar />
 
         
-          <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'}>
-            <Box mr={10}>
-              <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
+          <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} >
+            <Box mr={16} display='flex' flexDir={'column'} w='400px'>
+              <Text fontSize={"5xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
 
               <Text
                 mt={-9}
-                fontSize={"6xl"}
+                fontSize={"5xl"}
                 color="gray.100"
                 fontWeight="semibold"
               >
@@ -43,8 +44,8 @@ export default function Home() {
               </Text>
 
               <Text
-                mt={-9}
-                fontSize={"6xl"}
+                mt={-8}
+                fontSize={"5xl"}
                 color="green.600"
                 fontWeight="bold"
               >
@@ -80,7 +81,7 @@ export default function Home() {
             </Box>
 
             <Box mt={isWideVersioon? '' : '20'}>
-            <Image src="images/about-hero-right1.png"/>
+            <Image w={'600px'} src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
 
