@@ -3,16 +3,39 @@ import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { authenticated } from "./login";
 
+interface companyProps {
+  ref: string;
+  ts:number;
+  data: {
+    avaiableHours: number;
+  }
+}
+
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
-      const { id } = request.body;
+      const { id, selectedSlots, companyRef } = request.body;
 
       try {
+
+        const companyData = await fauna.query<companyProps>(
+          q.Get(q.Ref(q.Collection("companies"), companyRef))
+        );
+
+
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("schedules"), id), {
             data: {
               status: "canceled",
+              // avaiableHours: companyData.data.avaiableHours + selectedSlots
+            },
+          })
+        );
+
+        const updatedCompany = await fauna.query(
+          q.Update(q.Ref(q.Collection("companies"), companyRef), {
+            data: {
+              avaiableHours: companyData.data.avaiableHours + selectedSlots
             },
           })
         );

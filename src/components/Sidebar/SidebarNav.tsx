@@ -17,10 +17,6 @@ import { MdOutlineBadge } from "react-icons/md";
 import { Can } from "../can";
 import { LoginContext } from "../../contexts/LoginContext";
 import { useContext, useEffect } from "react";
-import { GetServerSideProps } from "next";
-import { parseCookies } from "nookies";
-import { decode } from "jsonwebtoken";
-import loading from '../../../public/loading.png'
 
 export type DecodedToken = {
   sub: string;
@@ -32,26 +28,23 @@ export type DecodedToken = {
 };
 
 export function SidebarNav() {
-
   const { user } = useContext(LoginContext);
 
   let hasSchedulePermission = false;
 
-  const necessaryPermissions = ["SCHEDULE"]
+  const necessaryPermissions = ["SCHEDULE"];
 
   useEffect(() => {
     const waitAuthenticationLoad = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      if(user) {
-          hasSchedulePermission = true
+      if (user) {
+        hasSchedulePermission = true;
       }
     };
   }, [user]);
-  
 
-  return (
-    (user)? (
-      <Stack spacing="12" align="flex-start">
+  return user ? (
+    <Stack spacing="12" align="flex-start">
       <NavSection title="GENERAL">
         <NavLink hasPermission={true} hrefs="/home" icon={HiOutlineHome}>
           Home
@@ -75,19 +68,21 @@ export function SidebarNav() {
           Dashboard
         </NavLink>
 
-        {user ? 
-          user.permissions?.some(permission => permission == "SCHEDULE") ? (
+        {user ? (
+          user.permissions?.some((permission) => permission == "SCHEDULE") ? (
             <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
-            Schedule 
-          </NavLink>
+              Schedule
+            </NavLink>
           ) : (
-            <Flex cursor={'not-allowed'} alignItems='center'>
-              <Icon as={RiTimeLine} fontSize="20" color={'gray.600'}/>
-                <Text ml="4" fontWeight="semibold" color={'gray.600'}>Schedule</Text>
+            <Flex cursor={"not-allowed"} alignItems="center">
+              <Icon as={RiTimeLine} fontSize="20" color={"gray.600"} />
+              <Text ml="4" fontWeight="semibold" color={"gray.600"}>
+                Schedule
+              </Text>
             </Flex>
           )
-         : (
-          'Loading'
+        ) : (
+          "Loading"
         )}
 
         <Can roles={["ADMINISTRATOR"]}>
@@ -111,7 +106,6 @@ export function SidebarNav() {
           >
             Test tracks
           </NavLink>
-          
         </Can>
       </NavSection>
 
@@ -127,13 +121,9 @@ export function SidebarNav() {
           Driver Licence
         </NavLink>
         <Can roles={["ADMINISTRATOR"]}>
-        <NavLink
-          hasPermission={true}
-          hrefs="/reports"
-          icon={RiGitMergeLine}
-        >
-          Reports
-        </NavLink>
+          <NavLink hasPermission={true} hrefs="/reports" icon={RiGitMergeLine}>
+            Reports
+          </NavLink>
         </Can>
         <Can roles={["USER"]}>
           <NavLink hasPermission={true} hrefs="/company" icon={BiBuilding}>
@@ -142,30 +132,73 @@ export function SidebarNav() {
         </Can>
       </NavSection>
     </Stack>
-    ) : (
-      <Stack spacing="12" align="flex-start">
+  ) : (
+    <Stack spacing="12" align="flex-start">
       <NavSection title="GENERAL">
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
 
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
 
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
 
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-      
-       
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
       </NavSection>
 
       <NavSection title="CONFIGURATIONS">
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-        
-      <Image alt="loading" opacity={0.1} w={'110px'} h='20px' src='images/loading.png'/>
-        
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
+
+        <Image
+          alt="loading"
+          opacity={0.1}
+          w={"110px"}
+          h="20px"
+          src="images/loading.png"
+        />
       </NavSection>
     </Stack>
-
-    )
   );
 }

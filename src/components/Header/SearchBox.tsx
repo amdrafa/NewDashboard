@@ -162,7 +162,7 @@ export function SearchBox() {
                           </Text>
                           <Box>
                             <Text pr={1.5} fontSize={14} color={"gray.300"}>
-                              Responsable: {testtrack.data.description}
+                              {testtrack.data.description}
                             </Text>
                             
                           </Box>

@@ -9,7 +9,7 @@ import {
   VStack,
   Text,
   Spinner,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -39,47 +39,59 @@ const createUserFormSchema = yup.object().shape({
 export default function DriverLicence() {
   const { user: userContext } = useContext(LoginContext);
 
-  const toast = useToast()
+  const toast = useToast();
 
   const [status, setStatus] = useState(0);
 
-  const [defaultRegister_number, setDefaultRegister_number] = useState('');
-  const [defaultDriver_category, setDefaultDriver_category] = useState('');
-  const [defaultExpires_at, setDefaultExpires_at] = useState('');
+  const [defaultRegister_number, setDefaultRegister_number] = useState("");
+  const [defaultDriver_category, setDefaultDriver_category] = useState("");
+  const [defaultExpires_at, setDefaultExpires_at] = useState("");
 
   useEffect(() => {
-    
-    const response = api.get<UpdateDriverLicenceData>('mydriverlicence')
-    .then(response => {
+    const response = api
+      .get<UpdateDriverLicenceData>("mydriverlicence")
+      .then((response) => {
+        const day =
+          new Date(response.data.expires_at).getDate().toString().slice(0, 2)
+            .length > 1
+            ? new Date(response.data.expires_at)
+                .getDate()
+                .toString()
+                .slice(0, 2)
+            : "0" +
+              new Date(response.data.expires_at)
+                .getDate()
+                .toString()
+                .slice(0, 2);
 
-      const day = new Date(response.data.expires_at).getDate().toString().slice(0,2).length > 1 ? (new Date(response.data.expires_at).getDate().toString().slice(0,2)) : ('0' + new Date(response.data.expires_at).getDate().toString().slice(0,2))
+        setDefaultRegister_number(response.data.register_number);
+        setDefaultDriver_category(response.data.driver_category);
 
-      setDefaultRegister_number(response.data.register_number)
-      setDefaultDriver_category(response.data.driver_category)
-      setDefaultExpires_at((new Date(response.data.expires_at).getFullYear().toString()) + "-" + ("0" + (new Date(response.data.expires_at).getMonth() + 1)).slice(-2) + "-" + day)
-      
-      console.log(("0" + (new Date().getMonth() + 1)).slice(-2))
-      
-     console.log((new Date(response.data.expires_at).getFullYear().toString()) + "-" + ("0" + (new Date(response.data.expires_at).getMonth() + 1)).slice(-2) + "-" + (new Date(response.data.expires_at).getDate().toString().slice(0,2)))
-      
-      console.log('0' + new Date(response.data.expires_at).getDate().toString().slice(0,2))
-      
-    })
-    .catch(error => console.log(error))
-
-      
-  }, [])
-
+        if (response?.data?.expires_at) {
+          setDefaultExpires_at(
+            new Date(response.data.expires_at).getFullYear().toString() +
+              "-" +
+              ("0" + (new Date(response.data.expires_at).getMonth() + 1)).slice(
+                -2
+              ) +
+              "-" +
+              day
+          );
+        }        
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   useEffect(() => {
-    status == 200 && toast({
-      title: "Driver licence updated",
-      description: `Driver licence updated successfully`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: 'top-right'
-    });
+    status == 200 &&
+      toast({
+        title: "Driver licence updated",
+        description: `Driver licence updated successfully`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
   }, [status]);
 
   const { user } = useContext(LoginContext);
@@ -90,11 +102,9 @@ export default function DriverLicence() {
 
   const { errors } = formState;
 
-  const handleUpdateDriverLicence: SubmitHandler<UpdateDriverLicenceData> = async ({
-    register_number,
-    driver_category,
-    expires_at,
-  }) => {
+  const handleUpdateDriverLicence: SubmitHandler<
+    UpdateDriverLicenceData
+  > = async ({ register_number, driver_category, expires_at }) => {
     console.log();
     // Router.push('/speedways')
     try {
@@ -114,7 +124,7 @@ export default function DriverLicence() {
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: 'top-right'
+        position: "top-right",
       });
     }
   };
@@ -142,12 +152,12 @@ export default function DriverLicence() {
 
           <Divider my="6" borderColor="gray.700" />
 
-          {(user) ? (
+          {user ? (
             <>
               <VStack spacing="8">
                 <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
                   <Input
-                  defaultValue={defaultRegister_number}
+                    defaultValue={defaultRegister_number}
                     name="register_number"
                     label="Register number"
                     type={"number"}
@@ -159,7 +169,7 @@ export default function DriverLicence() {
                 <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
                   <Box>
                     <Input
-                    defaultValue={defaultDriver_category}
+                      defaultValue={defaultDriver_category}
                       name="driver_category"
                       label="License"
                       {...register("driver_category")}
@@ -189,10 +199,8 @@ export default function DriverLicence() {
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                <Link href="/home">
-                    <Button colorScheme="whiteAlpha">
-                      Cancel
-                    </Button>
+                  <Link href="/home">
+                    <Button colorScheme="whiteAlpha">Cancel</Button>
                   </Link>
                   <Button
                     isLoading={formState.isSubmitting}
@@ -212,9 +220,9 @@ export default function DriverLicence() {
         </Box>
       </Flex>
 
-      <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
+      <Flex>
+        <Flex w={{ lg: "275px" }}></Flex>
+        <Footer />
       </Flex>
     </Box>
   );

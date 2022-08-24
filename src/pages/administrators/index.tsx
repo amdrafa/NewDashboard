@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Checkbox,
     Flex,
     Heading,
     Icon,
@@ -13,25 +12,18 @@ import {
     Tr,
     Text,
     useBreakpointValue,
-    Input,
     Spinner,
-    Divider,
-    HStack,
-    SimpleGrid,
     Image,
     useToast
   } from "@chakra-ui/react";
-  import Modal from "react-modal";
   import Link from "next/link";
-  import {useState, useEffect } from "react";
-  import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
-  import { FiTrash } from "react-icons/fi";
+  import {useState } from "react";
+  import { RiAddLine } from "react-icons/ri";
   import { Header } from "../../components/Header";
   import { Pagination } from "../../components/Pagination";
   import { Sidebar } from "../../components/Sidebar";
   import { api } from "../../services/axios";
   import { useQuery } from "react-query";
-import { IoMdClose } from "react-icons/io";
 import EditAdministrator from "../../components/editAdministrator";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";

@@ -61,6 +61,7 @@ interface appointmentProps {
   selectedSlots: string[];
   companyName: string;
   status: string;
+  companyRef: string;
 }
 
 interface busySlotsProps {
@@ -74,6 +75,7 @@ interface appointmentFunctionProps {
   companyName: string;
   appointmentId: number;
   status: string;
+  companyRef: string;
 }
 
 export default function UserDashboard() {
@@ -96,6 +98,8 @@ export default function UserDashboard() {
   const [selectedSlots, setSelectedSlots] = useState(["20/02/2022"]);
 
   const [companyName, setCompanyName] = useState("");
+
+  const [companyRef, setCompanyRef] = useState("");
 
   const [page, setPage] = useState(1);
 
@@ -135,6 +139,7 @@ export default function UserDashboard() {
     vehicle,
     appointmentId,
     status,
+    companyRef
   }: appointmentFunctionProps) {
     setCompanyName(companyName);
     setSelectedSlots(selectedSlots);
@@ -142,6 +147,7 @@ export default function UserDashboard() {
     setVehicle(vehicle);
     setAppointmentId(appointmentId);
     setAppointmentStatus(status);
+    setCompanyRef(companyRef)
 
     setIsModalOpen(true);
     return;
@@ -151,6 +157,8 @@ export default function UserDashboard() {
     await api
       .put("cancelappointment", {
         id,
+        companyRef,
+        selectedSlots: selectedSlots.length
       })
       .then((response) => {
         toast({
@@ -167,7 +175,7 @@ export default function UserDashboard() {
         toast({
           title: "Something went wrong",
           description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} couldn't be canceled.`,
-          status: "success",
+          status: "error",
           duration: 5000,
           isClosable: true,
           position: 'top-right'
@@ -257,6 +265,7 @@ export default function UserDashboard() {
                             speedway: appointment.data.speedway,
                             status: appointment.data.status,
                             vehicle: appointment.data.vehicle,
+                            companyRef: appointment.data.companyRef
                           });
                         }}
                       >

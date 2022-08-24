@@ -17,8 +17,6 @@ export function SidebarDrawerProvider({children}: SidebarDrawerProviderProps){
 
     const disclosure = useDisclosure()
 
-    console.log(asPath)
-
     useEffect(() => {
         disclosure.onClose()
     }, [asPath])

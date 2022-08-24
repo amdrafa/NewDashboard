@@ -3,7 +3,8 @@ import {
   Button,
   Flex,
   Text,
-  Image
+  Image,
+  useBreakpointValue
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Header } from "../components/Header";
@@ -12,6 +13,12 @@ import { Footer } from "../components/footer";
 import Carousel from 'nuka-carousel'
 
 export default function Home() {
+
+  const isWideVersioon = useBreakpointValue({
+    base: false,
+    lg: true,
+  });
+  
   return (
     <Box mt={-3}>
       <Header />
@@ -19,9 +26,9 @@ export default function Home() {
       <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        <Box  maxWidth={1200} height={"100%"} borderRadius={8} p="8" justifyContent='center' mx={'auto'}>
-          <Flex justifyContent={'space-between'} mx='auto'>
-            <Box>
+        
+          <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'}>
+            <Box mr={10}>
               <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
@@ -72,12 +79,12 @@ export default function Home() {
               
             </Box>
 
-            <Box>
+            <Box mt={isWideVersioon? '' : '20'}>
             <Image src="images/about-hero-right1.png"/>
             </Box>
           </Flex>
 
-          <Box w={'100%'} py={12} bg={'gray.800'} px='4' rounded={'lg'} mt='10'> 
+{/*            
           <Carousel  autoplay={true} enableKeyboardControls wrapAround={true}
     slidesToShow={3} cellSpacing={16}>
           <Box w={'100%'} display='flex' flexDir={'column'} justifyContent={'center'} alignItems='center' pb='8'>
@@ -100,10 +107,10 @@ export default function Home() {
           <Image height={'260px'} src="https://posvenda.pt/wp-content/uploads/2015/10/contidrom.jpg"/>
           <Text mt={4} color='gray.100' fontWeight={'bold'} fontSize={26} >Comfort Lane</Text>
           </Box>
-          </Carousel>
+          </Carousel> */}
             
-          </Box>
-        </Box>
+          
+        
       </Flex>
 
       <Flex >

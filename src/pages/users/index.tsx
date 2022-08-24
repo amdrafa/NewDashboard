@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  Checkbox,
   Flex,
   Heading,
   Icon,
@@ -15,12 +13,10 @@ import {
   useBreakpointValue,
   Input,
   Spinner,
-  Image
+  Image,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
-import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
-import { FiTrash } from "react-icons/fi";
+import { useState } from "react";
+import { RiSearchLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
@@ -40,7 +36,7 @@ export type DecodedToken = {
   roles: string[];
   permissions: string[];
   name: string;
-}
+};
 
 interface UserDataProps {
   data: UserProps;
@@ -61,7 +57,6 @@ interface UserProps {
   expires_at: string;
   cpf: number;
   driver_category: string;
-  
 }
 
 interface UserFunctionProps {
@@ -76,27 +71,24 @@ interface UserFunctionProps {
   userId: string;
 }
 
-
 export default function UserList() {
   const isWideVersioon = useBreakpointValue({
     base: false,
     lg: true,
   });
 
-  const [filteredData, setFilteredData] = useState([])
+  const [filteredData, setFilteredData] = useState([]);
 
-  const [name, setName] = useState('')
-  const [cpf, setCpf] = useState(0)
-  const [phone, setPhone] = useState(0)
-  const [email, setEmail] = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [userId, setUserId] = useState('')
+  const [name, setName] = useState("");
+  const [cpf, setCpf] = useState(0);
+  const [phone, setPhone] = useState(0);
+  const [email, setEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [userId, setUserId] = useState("");
 
-  const [registerNumber, setRegisterNumber] = useState('')
-  const [expires_at, setExpires_at] = useState('')
-  const [driver_category, setDriver_category] = useState('')
-  
-
+  const [registerNumber, setRegisterNumber] = useState("");
+  const [expires_at, setExpires_at] = useState("");
+  const [driver_category, setDriver_category] = useState("");
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -106,8 +98,7 @@ export default function UserList() {
 
   const [total, setTotal] = useState(1);
 
-  const [searchUsersValue, setSearchUsersValue] = useState('');
-
+  const [searchUsersValue, setSearchUsersValue] = useState("");
 
   function handleEditUser({
     name,
@@ -120,55 +111,51 @@ export default function UserList() {
     driver_category,
     userId,
   }): UserFunctionProps {
-   
-    
-    setName(name)
-    setEmail(email)
-    setCpf(cpf)
-    setCompanyName(companyName)
-    setPhone(phone)
-    setRegisterNumber(register_number)
-    setExpires_at(expires_at)
-    setDriver_category(driver_category)
-    setUserId(userId)
-      
+    setName(name);
+    setEmail(email);
+    setCpf(cpf);
+    setCompanyName(companyName);
+    setPhone(phone);
+    setRegisterNumber(register_number);
+    setExpires_at(expires_at);
+    setDriver_category(driver_category);
+    setUserId(userId);
 
     setIsEditMode(true);
 
     return;
   }
 
-
   const { data, isLoading, error, refetch } = useQuery<UserDataProps[]>(
     `userlist${page}`,
     async () => {
       const response = await api.get(`getallusers?page=${page}&limit=${limit}`);
       const { PaginateData: ReturnedData, totalcount } = response.data;
-     
+
       setTotal(totalcount);
 
       return ReturnedData;
     }
   );
 
-  function handleSearchUsers(event:React.ChangeEvent<HTMLInputElement>){
+  function handleSearchUsers(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchUsersValue(event.target.value);
 
-    
-    setSearchUsersValue(event.target.value)
-    
-    if(event.target.value == ''){
-      setSearchUsersValue('')
+    if (event.target.value == "") {
+      setSearchUsersValue("");
 
-      return
+      return;
     }
 
-    setFilteredData(data.filter((user) => {
-      return user.data.name.toLowerCase().includes(searchUsersValue.toLowerCase())
-    }))
-    
+    setFilteredData(
+      data.filter((user) => {
+        return user.data.name
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase());
+      })
+    );
   }
 
-  
   return (
     <Box mt={-3}>
       <Header />
@@ -177,260 +164,313 @@ export default function UserList() {
         <Sidebar />
 
         {isEditMode ? (
-          <EditUser 
-          userId={userId}
-          name={name}
-          cpf={cpf}
-          email={email}
-          phone={phone}
-          driver_category={driver_category}
-          expires_at={expires_at}
-          register_number={registerNumber}
-          setIsEditMode={setIsEditMode}
+          <EditUser
+            userId={userId}
+            name={name}
+            cpf={cpf}
+            email={email}
+            phone={phone}
+            driver_category={driver_category}
+            expires_at={expires_at}
+            register_number={registerNumber}
+            setIsEditMode={setIsEditMode}
           />
         ) : (
-          <Box flex="1" borderRadius={8} bg="gray.800" height="100%" p="8" mt={5}>
-          <Flex mb="8" justify="space-between" align="center">
-            <Heading size="lg" fontWeight="normal">
-              Users list
-            </Heading>
+          <Box
+            flex="1"
+            borderRadius={8}
+            bg="gray.800"
+            height="100%"
+            p="8"
+            mt={5}
+          >
+            <Flex mb="8" justify="space-between" align="center">
+              <Heading size="lg" fontWeight="normal">
+                Users list
+              </Heading>
 
-            <Flex
-              as="label"
-              flex="1"
-              py="2"
-              px="8"
-              ml="6"
-              maxWidth={230}
-              alignSelf="center"
-              color="gray.200"
-              position="relative"
-              bg="gray.900"
-              borderRadius="full"
-            >
-              <Input
-                color="gray.50"
-                variant="unstyled"
-                px="4"
-                mr="4"
-                placeholder="Search for a user"
-                _placeholder={{ color: "gray.400" }}
-                onChange={handleSearchUsers}
-              />
-              <Icon as={RiSearchLine} fontSize="20" />
+              <Flex
+                as="label"
+                flex="1"
+                py="2"
+                px="8"
+                ml="6"
+                maxWidth={230}
+                alignSelf="center"
+                color="gray.200"
+                position="relative"
+                bg="gray.900"
+                borderRadius="full"
+              >
+                <Input
+                  color="gray.50"
+                  variant="unstyled"
+                  px="4"
+                  mr="4"
+                  placeholder="Search for a user"
+                  _placeholder={{ color: "gray.400" }}
+                  onChange={handleSearchUsers}
+                />
+                <Icon as={RiSearchLine} fontSize="20" />
+              </Flex>
             </Flex>
-          </Flex>
 
-          {isLoading ? (
-          <Flex justify="center">
-            <Spinner mt="70px" mb="110px" />
-          </Flex>
-          ): error ? (
-            <Flex justify="center">
-              <Text>The requisition failed</Text>
-            </Flex>
-          ): (
-              total > 0 ? (<>
-              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
-                <Table colorScheme="whiteAlpha">
-              <Thead>
-                <Tr>
-                  <Th px={["4", "4", "6"]} color="gray.300" width="">
-                    <Text>User</Text>
-                  </Th>
-                  <Th>CPF</Th>
-                  <Th>Company</Th>
-                  
-                  {isWideVersioon && <Th>Driver licence</Th>}
-                </Tr>
-              </Thead>
-              {searchUsersValue.length > 0 ? (
-                <Tbody>
-                {filteredData.map((user) => (
-                    <Tr 
-                    onClick={() => {
-                      handleEditUser({
-                        companyName: user.data.companyName,
-                        cpf: user.data.cpf,
-                        name: user.data.name,
-                        email: user.data.email,
-                        phone: user.data.phone,
-                        userId: user.ref["@ref"].id,
-                        driver_category: user.data.driver_category,
-                        expires_at: user.data.expires_at,
-                        register_number: user.data.register_number
-                      })
-                    }}
-                    _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
-                    key={user.ts}>
-                    <Td px={["4", "4", "6"]}>
-                      <Box>
-                        <Text fontWeight="bold">{user.data.name}</Text>
-                        <Text fontSize="sm" color="gray.300">
-                        {user.data.email}
-                        </Text>
-                      </Box>
-                    </Td>
-                    
-                    {isWideVersioon && <Td>{user.data.cpf}</Td>}
+            {isLoading ? (
+              <Flex justify="center">
+                <Spinner mt="70px" mb="110px" />
+              </Flex>
+            ) : error ? (
+              <Flex justify="center">
+                <Text>The requisition failed</Text>
+              </Flex>
+            ) : total > 0 ? (
+              <>
+                <Flex
+                  minHeight={"400px"}
+                  flexDir={"column"}
+                  justifyContent="space-between"
+                >
+                  <Table colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>User</Text>
+                        </Th>
+                        <Th>CPF</Th>
+                        <Th>Company</Th>
 
-                    <Td>{user.data.companyName ? (user.data.companyName) : (<Text color={'gray.300'}>Not registered</Text>)}</Td>
-                    <Td>
+                        {isWideVersioon && <Th>Driver licence</Th>}
+                      </Tr>
+                    </Thead>
+                    {searchUsersValue.length > 0 ? (
+                      <Tbody>
+                        {filteredData.map((user) => (
+                          <Tr
+                            onClick={() => {
+                              handleEditUser({
+                                companyName: user.data.companyName,
+                                cpf: user.data.cpf,
+                                name: user.data.name,
+                                email: user.data.email,
+                                phone: user.data.phone,
+                                userId: user.ref["@ref"].id,
+                                driver_category: user.data.driver_category,
+                                expires_at: user.data.expires_at
+                                  ? user.data.expires_at
+                                  : "",
+                                register_number: user.data.register_number,
+                              });
+                            }}
+                            _hover={{
+                              bg: "gray.900",
+                              color: "gray.300",
+                              transition: "0.2s",
+                              cursor: "pointer",
+                            }}
+                            key={user.ts}
+                          >
+                            <Td px={["4", "4", "6"]}>
+                              <Box>
+                                <Text fontWeight="bold">{user.data.name}</Text>
+                                <Text fontSize="sm" color="gray.300">
+                                  {user.data.email}
+                                </Text>
+                              </Box>
+                            </Td>
 
-                      {!user.data.register_number || user.data.register_number == '' ? (
-                        <Text color={'gray.300'}>Not registered</Text>
-                      ) : (
-                        <Box>
-                        <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
-                        <Text fontSize="sm" color="gray.300">
-                          {dayjs(user.data.expires_at).format('DD/MM/YYYY') > dayjs().format('DD/MM/YYYY') ? (
-                            <Text color={'red.400'}>Expired</Text>
-                          ) : (
-                            <Text color={'blue.500'}>{`Expires at: ${dayjs(user.data.expires_at).format('DD/MM/YYYY')}`}</Text>
-                            
-                            
-                          )}
-                          
-                        </Text>
-                      </Box>
-                      )}
+                            {isWideVersioon && <Td>{user.data.cpf}</Td>}
 
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-              ) : (
-                <Tbody>
-                {data.map((user) => (
-                    <Tr 
-                    onClick={() => {
-                      handleEditUser({
-                        companyName: user.data.companyName,
-                        cpf: user.data.cpf,
-                        name: user.data.name,
-                        email: user.data.email,
-                        phone: user.data.phone,
-                        userId: user.ref["@ref"].id,
-                        driver_category: user.data.driver_category,
-                        expires_at: user.data.expires_at,
-                        register_number: user.data.register_number
-                      })
-                    }}
-                    _hover={{bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer'}}
-                    key={user.ts}>
-                    <Td px={["4", "4", "6"]}>
-                      <Box>
-                        <Text fontWeight="bold">{user.data.name}</Text>
-                        <Text fontSize="sm" color="gray.300">
-                        {user.data.email}
-                        </Text>
-                      </Box>
-                    </Td>
-                    
-                    {isWideVersioon && <Td>{user.data.cpf}</Td>}
+                            <Td>
+                              {user.data.companyName ? (
+                                user.data.companyName
+                              ) : (
+                                <Text color={"gray.300"}>Not registered</Text>
+                              )}
+                            </Td>
+                            <Td>
+                              {!user.data.register_number ||
+                              user.data.register_number == "" ? (
+                                <Text color={"gray.300"}>Not registered</Text>
+                              ) : (
+                                <Box>
+                                  <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
+                                  <Text fontSize="sm" color="gray.300">
+                                    {dayjs(user.data.expires_at).format(
+                                      "DD/MM/YYYY"
+                                    ) > dayjs().format("DD/MM/YYYY") ? (
+                                      <Text color={"red.400"}>Expired</Text>
+                                    ) : (
+                                      <Text
+                                        color={"blue.500"}
+                                      >{`Expires at: ${dayjs(
+                                        user.data.expires_at
+                                      ).format("DD/MM/YYYY")}`}</Text>
+                                    )}
+                                  </Text>
+                                </Box>
+                              )}
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    ) : (
+                      <Tbody>
+                        {data.map((user) => (
+                          <Tr
+                            onClick={() => {
+                              handleEditUser({
+                                companyName: user.data.companyName,
+                                cpf: user.data.cpf,
+                                name: user.data.name,
+                                email: user.data.email,
+                                phone: user.data.phone,
+                                userId: user.ref["@ref"].id,
+                                driver_category: user.data.driver_category,
+                                expires_at: user.data.expires_at,
+                                register_number: user.data.register_number,
+                              });
+                            }}
+                            _hover={{
+                              bg: "gray.900",
+                              color: "gray.300",
+                              transition: "0.2s",
+                              cursor: "pointer",
+                            }}
+                            key={user.ts}
+                          >
+                            <Td px={["4", "4", "6"]}>
+                              <Box>
+                                <Text fontWeight="bold">{user.data.name}</Text>
+                                <Text fontSize="sm" color="gray.300">
+                                  {user.data.email}
+                                </Text>
+                              </Box>
+                            </Td>
 
-                    <Td>{user.data.companyName ? (user.data.companyName) : (<Text color={'gray.300'}>Not registered</Text>)}</Td>
-                    <Td>
+                            {isWideVersioon && <Td>{user.data.cpf}</Td>}
 
-                      {!user.data.register_number || user.data.register_number == '' ? (
-                        <Text color={'gray.300'}>Not registered</Text>
-                      ) : (
-                        <Box>
-                        <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
-                        <Text fontSize="sm" color="gray.300">
-                          {dayjs(user.data.expires_at).format('DD/MM/YYYY') > dayjs().format('DD/MM/YYYY') ? (
-                            <Text color={'red.400'}>Expired</Text>
-                          ) : (
-                            <Text color={'blue.500'}>{`Expires at: ${dayjs(user.data.expires_at).format('DD/MM/YYYY')}`}</Text>
-                            
-                          )}
-                          
-                        </Text>
-                      </Box>
-                      )}
-
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-              )}
-            </Table>
-            {searchUsersValue.length > 0 ? (
-              <Pagination
-              totalCountOfRegisters={filteredData.length}
-              currentPage={page}
-              onPageChanges={setPage}
-            />
-            ) : (
-              <Pagination
-              totalCountOfRegisters={total}
-              currentPage={page}
-              onPageChanges={setPage}
-            />
-            )}
-            </Flex>
-                </>) : (
-                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
-                  <Box justifyContent="center" mb={8}>
-                    <Flex justifyContent={'center'}>
-                      <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">
-                      <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
-                        There is not any user registered.
-                      </Text>
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">
-                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
-                        Wait someone register in the platform.
-                      </Text>
-                    </Flex>
-                  </Box>
+                            <Td>
+                              {user.data.companyName ? (
+                                user.data.companyName
+                              ) : (
+                                <Text color={"gray.300"}>Not registered</Text>
+                              )}
+                            </Td>
+                            <Td>
+                              {!user.data.register_number ||
+                              user.data.register_number == "" ? (
+                                <Text color={"gray.300"}>Not registered</Text>
+                              ) : (
+                                <Box>
+                                  <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
+                                  <Text fontSize="sm" color="gray.300">
+                                    {dayjs(user.data.expires_at).format(
+                                      "DD/MM/YYYY"
+                                    ) < dayjs().format("DD/MM/YYYY") ? (
+                                      <Text color={"red.400"}>Expired</Text>
+                                    ) : (
+                                      <Text
+                                        color={"blue.500"}
+                                      >{`Expires at: ${dayjs(
+                                        user.data.expires_at
+                                      ).format("DD/MM/YYYY")}`}</Text>
+                                    )}
+                                  </Text>
+                                </Box>
+                              )}
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    )}
+                  </Table>
+                  {searchUsersValue.length > 0 ? (
+                    <Pagination
+                      totalCountOfRegisters={filteredData.length}
+                      currentPage={page}
+                      onPageChanges={setPage}
+                    />
+                  ) : (
+                    <Pagination
+                      totalCountOfRegisters={total}
+                      currentPage={page}
+                      onPageChanges={setPage}
+                    />
+                  )}
                 </Flex>
-                )
-            
-          )} 
-          
-          
-        </Box>
+              </>
+            ) : (
+              <Flex
+                w="100%"
+                alignItems={"center"}
+                justifyContent="center"
+                minH={"400px"}
+                cursor={"not-allowed"}
+              >
+                <Box justifyContent="center" mb={8}>
+                  <Flex justifyContent={"center"}>
+                    <Image
+                      opacity={0.4}
+                      src="images/noappointments.png"
+                      w={"200px"}
+                    />
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text
+                      fontSize={24}
+                      fontWeight="bold"
+                      color={"blackAlpha.400"}
+                    >
+                      There is not any user registered.
+                    </Text>
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text
+                      fontSize={18}
+                      color={"blackAlpha.400"}
+                      fontWeight="semibold"
+                    >
+                      Wait someone register in the platform.
+                    </Text>
+                  </Flex>
+                </Box>
+              </Flex>
+            )}
+          </Box>
         )}
-        
       </Flex>
 
-      <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
+      <Flex>
+        <Flex w={{ lg: "275px" }}></Flex>
+        <Footer />
       </Flex>
     </Box>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
-  const {auth} = parseCookies(ctx)
+  const { auth } = parseCookies(ctx);
 
   const decodedUser = decode(auth as string) as DecodedToken;
 
+  const necessaryRoles = ["ADMINISTRATOR"];
 
-  const necessaryRoles = ['ADMINISTRATOR']
-  
-  if(necessaryRoles?.length > 0){
-    const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser?.roles?.includes(role)
-  });
+  if (necessaryRoles?.length > 0) {
+    const hasAllRoles = necessaryRoles.some((role) => {
+      return decodedUser?.roles?.includes(role);
+    });
 
-
-  if(!hasAllRoles){
-    return {
-      redirect: {
-        destination: '/home',
-        permanent: false
-      }
+    if (!hasAllRoles) {
+      return {
+        redirect: {
+          destination: "/home",
+          permanent: false,
+        },
+      };
     }
-  }
   }
 
   return {
-    props: {}
-  }
-}
+    props: {},
+  };
+};

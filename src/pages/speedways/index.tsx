@@ -13,7 +13,7 @@ import {
   Text,
   useBreakpointValue,
   Spinner,
-  Image
+  Image,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -36,7 +36,7 @@ export type DecodedToken = {
   roles: string[];
   permissions: string[];
   name: string;
-}
+};
 
 interface speedwayDataProps {
   data: speedwayProps;
@@ -71,7 +71,7 @@ export default function Speedwaylist() {
     createdAt,
     description,
     speedwayId,
-    status
+    status,
   }): speedwayProps {
     setSpeedway(speedway);
     setVehiclesLimit(vehicles_limit);
@@ -110,8 +110,6 @@ export default function Speedwaylist() {
       return ReturnedData;
     }
   );
-
-  console.log(data);
 
   return (
     <Box mt={-3}>
@@ -166,133 +164,158 @@ export default function Speedwaylist() {
               </Flex>
             ) : total > 0 ? (
               <>
-              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
-                <Table colorScheme="whiteAlpha">
-                  <Thead>
-                    <Tr>
-                      <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Test track</Text>
-                      </Th>
+                <Flex
+                  minHeight={"400px"}
+                  flexDir={"column"}
+                  justifyContent="space-between"
+                >
+                  <Table colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>Test track</Text>
+                        </Th>
 
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Description</Text>
-                      </Th>
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Description</Text>
+                        </Th>
 
-                      {isWideVersioon && <Th>Vehicles limit</Th>}
-                      <Th w="8">Status</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data.map((speed) => (
-                      <Tr
-                        onClick={() => {
-                          handleEditSpeedway({
-                            speedway: speed.data.speedway,
-                            createdAt: speed.data.createdAt,
-                            description: speed.data.description,
-                            vehicles_limit: speed.data.vehicles_limit,
-                            speedwayId: speed.ref["@ref"].id,
-                            status: speed.data.status,
-                          });
-                        }}
-                        key={speed.ts}
-                        _hover={{ color: "gray.200", cursor: "pointer", bg:'gray.900', transition: '0.2s' }}
-                      >
-                        <Td px={["4", "4", "6"]}>
-                          <Text>{speed.data.speedway}</Text>
-                        </Td>
-
-                        {isWideVersioon && <Td>{speed.data.description}</Td>}
-
-                        <Td>
-                          <Box>
-                            {speed.data.vehicles_limit}
-                            <Text fontSize="sm" color="gray.300"></Text>
-                          </Box>
-                        </Td>
-                        
-
-                        <Td>
-                          {speed.data.status == "active" ? (
-                            <Text fontWeight={"medium"} color={"blue.400"}>
-                              Active
-                            </Text>
-                          ) : (
-                            <Text fontWeight={"medium"} color={"gray.300"} _hover={{fontWeight:'bold'}}>
-                              Disabled
-                            </Text>
-                          )}
-                        </Td>
+                        {isWideVersioon && <Th>Vehicles limit</Th>}
+                        <Th w="8">Status</Th>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-                <Pagination
-                  totalCountOfRegisters={total}
-                  currentPage={page}
-                  onPageChanges={setPage}
-                />
+                    </Thead>
+                    <Tbody>
+                      {data.map((speed) => (
+                        <Tr
+                          onClick={() => {
+                            handleEditSpeedway({
+                              speedway: speed.data.speedway,
+                              createdAt: speed.data.createdAt,
+                              description: speed.data.description,
+                              vehicles_limit: speed.data.vehicles_limit,
+                              speedwayId: speed.ref["@ref"].id,
+                              status: speed.data.status,
+                            });
+                          }}
+                          key={speed.ts}
+                          _hover={{
+                            color: "gray.200",
+                            cursor: "pointer",
+                            bg: "gray.900",
+                            transition: "0.2s",
+                          }}
+                        >
+                          <Td px={["4", "4", "6"]}>
+                            <Text>{speed.data.speedway}</Text>
+                          </Td>
+
+                          {isWideVersioon && <Td>{speed.data.description}</Td>}
+
+                          <Td>
+                            <Box>
+                              {speed.data.vehicles_limit}
+                              <Text fontSize="sm" color="gray.300"></Text>
+                            </Box>
+                          </Td>
+
+                          <Td>
+                            {speed.data.status == "active" ? (
+                              <Text fontWeight={"medium"} color={"blue.400"}>
+                                Active
+                              </Text>
+                            ) : (
+                              <Text
+                                fontWeight={"medium"}
+                                color={"gray.300"}
+                                _hover={{ fontWeight: "bold" }}
+                              >
+                                Disabled
+                              </Text>
+                            )}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                  <Pagination
+                    totalCountOfRegisters={total}
+                    currentPage={page}
+                    onPageChanges={setPage}
+                  />
                 </Flex>
               </>
             ) : (
-              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
-                  <Box justifyContent="center" mb={8}>
-                    <Flex justifyContent={'center'}>
-                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">
-                      <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
-                        There is not any speedway registered.
-                      </Text>
-                    </Flex>
-                    <Flex w="100%" justifyContent="center">
-                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
-                        Create a speedway and wait the users schedule it.
-                      </Text>
-                    </Flex>
-                  </Box>
-                </Flex>
+              <Flex
+                w="100%"
+                alignItems={"center"}
+                justifyContent="center"
+                minH={"400px"}
+                cursor={"not-allowed"}
+              >
+                <Box justifyContent="center" mb={8}>
+                  <Flex justifyContent={"center"}>
+                    <Image
+                      opacity={0.4}
+                      src="images/noappointments.png"
+                      w={"200px"}
+                    />
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text
+                      fontSize={24}
+                      fontWeight="bold"
+                      color={"blackAlpha.400"}
+                    >
+                      There is not any speedway registered.
+                    </Text>
+                  </Flex>
+                  <Flex w="100%" justifyContent="center">
+                    <Text
+                      fontSize={18}
+                      color={"blackAlpha.400"}
+                      fontWeight="semibold"
+                    >
+                      Create a speedway and wait the users schedule it.
+                    </Text>
+                  </Flex>
+                </Box>
+              </Flex>
             )}
           </Box>
         )}
       </Flex>
 
-      <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
+      <Flex>
+        <Flex w={{ lg: "275px" }}></Flex>
+        <Footer />
       </Flex>
     </Box>
   );
 }
 
-
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
-  const {auth} = parseCookies(ctx)
+  const { auth } = parseCookies(ctx);
 
   const decodedUser = decode(auth as string) as DecodedToken;
 
+  const necessaryRoles = ["ADMINISTRATOR"];
 
-  const necessaryRoles = ['ADMINISTRATOR']
-  
-  if(necessaryRoles?.length > 0){
-    const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser?.roles?.includes(role)
-  });
+  if (necessaryRoles?.length > 0) {
+    const hasAllRoles = necessaryRoles.some((role) => {
+      return decodedUser?.roles?.includes(role);
+    });
 
-
-  if(!hasAllRoles){
-    return {
-      redirect: {
-        destination: '/home',
-        permanent: false
-      }
+    if (!hasAllRoles) {
+      return {
+        redirect: {
+          destination: "/home",
+          permanent: false,
+        },
+      };
     }
-  }
   }
 
   return {
-    props: {}
-  }
-}
+    props: {},
+  };
+};

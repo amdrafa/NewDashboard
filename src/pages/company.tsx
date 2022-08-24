@@ -9,7 +9,7 @@ import {
   VStack,
   Text,
   Spinner,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -19,10 +19,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
-import Router from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
-import { useQuery } from "react-query";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
@@ -35,7 +33,7 @@ export type DecodedToken = {
   roles: string[];
   permissions: string[];
   name: string;
-}
+};
 
 type UpdateUserCompany = {
   secret_key: string;
@@ -58,7 +56,7 @@ export default function Company() {
 
   const [status, setStatus] = useState(0);
 
-  const toast = useToast()
+  const toast = useToast();
 
   const [responsableName, setResponsableName] = useState("");
   const [responsableEmail, setResponsableEmail] = useState("");
@@ -68,42 +66,36 @@ export default function Company() {
   const [cnpj, setCnpj] = useState("");
 
   useEffect(() => {
-    
-      if ((company == "") && !(user?.companyRef == "")) {
-        api
-          .get<CompanyDataProps>(
-            `getcompanydata?companyRef=${user?.companyRef}`
-          )
-          .then((response) => {
-            console.log(response);
-            setCompany(response.data.company_name);
-            setCnpj(response.data.cnpj);
+    if (company == "" && !(user?.companyRef == "")) {
+      api
+        .get<CompanyDataProps>(`getcompanydata?companyRef=${user?.companyRef}`)
+        .then((response) => {
+          console.log(response);
+          setCompany(response.data.company_name);
+          setCnpj(response.data.cnpj);
 
-            setResponsableName(response.data.responsable_name);
-            setResponsableEmail(response.data.email);
-            setResponsablePhone(response.data.phone)
-          });
-      }
-    
+          setResponsableName(response.data.responsable_name);
+          setResponsableEmail(response.data.email);
+          setResponsablePhone(response.data.phone);
+        });
+    }
 
     // use user._id
   }, [user]);
 
   useEffect(() => {
-    if(status == 200){
+    if (status == 200) {
       toast({
         title: "Connected to company",
         description: `${user?.name} connected successfully`,
         status: "success",
         duration: 5000,
         isClosable: true,
-        position: 'top-right'
+        position: "top-right",
       });
-      window.location.reload()
+      window.location.reload();
     }
-  }, [status])
-
-  
+  }, [status]);
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(createUserFormSchema),
@@ -131,7 +123,7 @@ export default function Company() {
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: 'top-right'
+        position: "top-right",
       });
     }
   };
@@ -272,40 +264,37 @@ export default function Company() {
         </Box>
       </Flex>
 
-      <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
+      <Flex>
+        <Flex w={{ lg: "275px" }}></Flex>
+        <Footer />
       </Flex>
     </Box>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
-  const {auth} = parseCookies(ctx)
+  const { auth } = parseCookies(ctx);
 
   const decodedUser = decode(auth as string) as DecodedToken;
 
+  const necessaryRoles = ["USER"];
 
-  const necessaryRoles = ['USER']
-  
-  if(necessaryRoles?.length > 0){
-    const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser.roles.includes(role)
-  });
+  if (necessaryRoles?.length > 0) {
+    const hasAllRoles = necessaryRoles.some((role) => {
+      return decodedUser.roles.includes(role);
+    });
 
-
-  if(!hasAllRoles){
-    return {
-      redirect: {
-        destination: '/home',
-        permanent: false
-      }
+    if (!hasAllRoles) {
+      return {
+        redirect: {
+          destination: "/home",
+          permanent: false,
+        },
+      };
     }
-  }
   }
 
   return {
-    props: {}
-  }
-}
+    props: {},
+  };
+};

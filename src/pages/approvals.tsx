@@ -36,7 +36,7 @@ import { FiX } from "react-icons/fi";
 import { GetServerSideProps } from "next";
 import { decode } from "jsonwebtoken";
 import { parseCookies } from "nookies";
-import {Footer} from '../components/footer'
+import { Footer } from "../components/footer";
 
 export type DecodedToken = {
   sub: string;
@@ -45,7 +45,7 @@ export type DecodedToken = {
   roles: string[];
   permissions: string[];
   name: string;
-}
+};
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -62,14 +62,16 @@ interface appointmentProps {
   vehicle: string;
   selectedSlots: string[];
   companyName: string;
+  companyRef: string;
   status: string;
 }
 
-interface appointmentFunctionProps { 
+interface appointmentFunctionProps {
   speedway: string;
   vehicle: string;
   selectedSlots: string[];
   companyName: string;
+  companyRef: string;
   appointmentId: number;
   status: string;
 }
@@ -84,7 +86,7 @@ export default function Approvals() {
     lg: true,
   });
 
-  const toast = useToast()
+  const toast = useToast();
 
   const [isConfirmMessageOpen, setIsConfirmMessageOpen] = useState(false);
 
@@ -100,6 +102,8 @@ export default function Approvals() {
 
   const [companyName, setCompanyName] = useState("");
 
+  const [companyRef, setCompanyRef] = useState("");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isModalOpenAllAppointments, setIsModalOpenAllAppointments] =
@@ -111,41 +115,45 @@ export default function Approvals() {
 
   const [limit, setLimit] = useState(6);
 
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(1);
 
   const [pageAllAppointments, setPageAllAppointments] = useState(1);
 
   const [limitAllAppointments, setLimitAllAppointments] = useState(6);
 
-  const [totalAllAppointments, setTotalAllAppointments] = useState(0);
+  const [totalAllAppointments, setTotalAllAppointments] = useState(1);
 
   const {
     data: dataBusySlots,
     isLoading: isLoadingBusylots,
     error: errorBusylots,
-    refetch
-  } = useQuery<busySlotsProps>(`busySlotsListApprovals${speedway}`, async () => {
-    const response = await api.get(`getbusyslots?testtrack=${speedway}`);
+    refetch,
+  } = useQuery<busySlotsProps>(
+    `busySlotsListApprovals${speedway}`,
+    async () => {
+      const response = await api.get(`getbusyslots?testtrack=${speedway}`);
 
-    console.log(response.data)
-    return response.data;
-  });
+      return response.data;
+    }
+  );
 
-
-
-  async function handleCancelAppointment(id: number){
+  async function handleCancelAppointment(id: number) {
     await api
       .put("cancelappointment", {
         id,
+        selectedSlots: selectedSlots.length,
+        companyRef,
       })
       .then((response) => {
         toast({
           title: "Appointment canceled",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was canceled.`,
+          description: `Appointment at ${dayjs(selectedSlots[0]).format(
+            "DD/MM/YYYY"
+          )} was canceled.`,
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
         window.location.reload();
       })
@@ -155,34 +163,41 @@ export default function Approvals() {
           description: "An error ocurred when deleting the appointment.",
           status: "error",
           duration: 5000,
-          isClosable: true
+          isClosable: true,
         });
       });
   }
 
-
   function handleAppointmentReject(id: number) {
     api
-      .put("rejectappointment", {id})
+      .put("rejectappointment", {
+        id,
+        companyRef,
+        selectedSlots: selectedSlots.length,
+      })
       .then((response) => {
         toast({
           title: "Appointment rejected",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was rejected.`,
+          description: `Appointment at ${dayjs(selectedSlots[0]).format(
+            "DD/MM/YYYY"
+          )} was rejected.`,
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
         window.location.reload();
       })
       .catch((err) => {
         toast({
           title: "Something went wrong",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} couldn't be canceled.`,
+          description: `Appointment at ${dayjs(selectedSlots[0]).format(
+            "DD/MM/YYYY"
+          )} couldn't be canceled.`,
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
 
@@ -196,6 +211,7 @@ export default function Approvals() {
     vehicle,
     appointmentId,
     status,
+    companyRef,
   }: appointmentFunctionProps) {
     setCompanyName(companyName);
     setSelectedSlots(selectedSlots);
@@ -203,6 +219,7 @@ export default function Approvals() {
     setVehicle(vehicle);
     setAppointmentId(appointmentId);
     setAppointmentStatus(status);
+    setCompanyRef(companyRef);
 
     setIsModalOpen(true);
     return;
@@ -215,6 +232,7 @@ export default function Approvals() {
     vehicle,
     appointmentId,
     status,
+    companyRef,
   }: appointmentFunctionProps) {
     setCompanyName(companyName);
     setSelectedSlots(selectedSlots);
@@ -222,6 +240,7 @@ export default function Approvals() {
     setVehicle(vehicle);
     setAppointmentId(appointmentId);
     setAppointmentStatus(status);
+    setCompanyRef(companyRef);
 
     setIsModalOpenAllAppointments(true);
     return;
@@ -235,22 +254,26 @@ export default function Approvals() {
       .then((response) => {
         toast({
           title: "Appointment approved",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was approved.`,
+          description: `Appointment at ${dayjs(selectedSlots[0]).format(
+            "DD/MM/YYYY"
+          )} was approved.`,
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
         window.location.reload();
       })
       .catch((err) => {
         toast({
           title: "Something went wrong",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was couldn't be canceled.`,
+          description: `Appointment at ${dayjs(selectedSlots[0]).format(
+            "DD/MM/YYYY"
+          )} was couldn't be canceled.`,
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
   }
@@ -294,45 +317,49 @@ export default function Approvals() {
 
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
-          
-            {isApprovalsOpen ? (
-              <Box
-                flex="1"
-                borderRadius={8}
-                bg="gray.800"
-                p="8"
-                mt={5}
-                height='100%'
-              >
-                <Flex mb="8" justify="space-between" align="center">
-                  <Heading size="lg" fontWeight="normal">
-                    Approvals
-                  </Heading>
 
-                  <Button
-                    size="sm"
-                    fontSize="sm"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
-                    onClick={() => {
-                      setIsApprovalsOpen(false);
-                    }}
-                  >
-                    Switch to all appointments
-                  </Button>
+          {isApprovalsOpen ? (
+            <Box
+              flex="1"
+              borderRadius={8}
+              bg="gray.800"
+              p="8"
+              mt={5}
+              height="100%"
+            >
+              <Flex mb="8" justify="space-between" align="center">
+                <Heading size="lg" fontWeight="normal">
+                  Approvals
+                </Heading>
+
+                <Button
+                  size="sm"
+                  fontSize="sm"
+                  colorScheme="blue"
+                  leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
+                  onClick={() => {
+                    setIsApprovalsOpen(false);
+                  }}
+                >
+                  Switch to all appointments
+                </Button>
+              </Flex>
+
+              {isLoading ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
                 </Flex>
-
-                {isLoading ? (
-                  <Flex justify="center">
-                    <Spinner mt="10" mb="80px" />
-                  </Flex>
-                ) : error ? (
-                  <Flex justify="center">
-                    <Text>The requisition failed</Text>
-                  </Flex>
-                ) : total > 0 ? (
-                  <>
-                  <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+              ) : error ? (
+                <Flex justify="center">
+                  <Text>The requisition failed</Text>
+                </Flex>
+              ) : total > 0 ? (
+                <>
+                  <Flex
+                    minHeight={"400px"}
+                    flexDir={"column"}
+                    justifyContent="space-between"
+                  >
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
@@ -371,19 +398,20 @@ export default function Approvals() {
                                 vehicle: appointment.data.vehicle,
                                 appointmentId: appointment.ref["@ref"].id,
                                 status: appointment.data.status,
+                                companyRef: appointment.data.companyRef,
                               });
                             }}
                           >
                             <Td>
-                            <Box>
-                            <Text fontWeight="bold">
-                              {appointment.data.speedway}
-                            </Text>
-                            <Text color={'gray.300'}>
-                              {appointment.data.vehicle}
-                            </Text>
-                            </Box>
-                          </Td>
+                              <Box>
+                                <Text fontWeight="bold">
+                                  {appointment.data.speedway}
+                                </Text>
+                                <Text color={"gray.300"}>
+                                  {appointment.data.vehicle}
+                                </Text>
+                              </Box>
+                            </Td>
                             <Td>
                               <Text>{appointment.data.companyName}</Text>
                             </Td>
@@ -464,67 +492,88 @@ export default function Approvals() {
                       currentPage={page}
                       onPageChanges={setPage}
                     />
+                  </Flex>
+                </>
+              ) : (
+                <Flex
+                  w="100%"
+                  alignItems={"center"}
+                  justifyContent="center"
+                  minH={"400px"}
+                  cursor={"not-allowed"}
+                >
+                  <Box justifyContent="center" mb={8}>
+                    <Flex justifyContent={"center"}>
+                      <Image
+                        opacity={0.4}
+                        src="images/noappointments.png"
+                        w={"200px"}
+                      />
                     </Flex>
-                  </>
-                ) : (
-                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
-                <Box justifyContent="center" mb={8} >
-                  <Flex justifyContent={'center'}>
-                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
-                      There are no appointments to approve.
-                    </Text>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
-                      Wait someone schedule a new appointment.
-                    </Text>
-                  </Flex>
-                </Box>
-              </Flex>
-                )}
-              </Box>
-            ) : (
-              <Box
-                flex="1"
-                borderRadius={8}
-                bg="gray.800"
-                height={'100%'}
-                p="8"
-                mt={5}
-              >
-                <Flex mb="8" justify="space-between" align="center">
-                  <Heading size="lg" fontWeight="normal">
-                    All appointments
-                  </Heading>
-
-                  <Button
-                    size="sm"
-                    fontSize="sm"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
-                    onClick={() => {
-                      setIsApprovalsOpen(true);
-                    }}
-                  >
-                    Switch to approvals
-                  </Button>
+                    <Flex w="100%" justifyContent="center">
+                      <Text
+                        fontSize={24}
+                        fontWeight="bold"
+                        color={"blackAlpha.400"}
+                      >
+                        There are no appointments to approve.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text
+                        fontSize={18}
+                        color={"blackAlpha.400"}
+                        fontWeight="semibold"
+                      >
+                        Wait someone schedule a new appointment.
+                      </Text>
+                    </Flex>
+                  </Box>
                 </Flex>
+              )}
+            </Box>
+          ) : (
+            <Box
+              flex="1"
+              borderRadius={8}
+              bg="gray.800"
+              height={"100%"}
+              p="8"
+              mt={5}
+            >
+              <Flex mb="8" justify="space-between" align="center">
+                <Heading size="lg" fontWeight="normal">
+                  All appointments
+                </Heading>
 
-                {isLoadingAllAppointments ? (
-                  <Flex justify="center">
-                    <Spinner mt="10" mb="80px" />
-                  </Flex>
-                ) : errorAllAppointments ? (
-                  <Flex justify="center">
-                    <Text>The requisition failed</Text>
-                  </Flex>
-                ) : totalAllAppointments > 0 ? (
-                  <>
-                  
-                  <Flex  minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                <Button
+                  size="sm"
+                  fontSize="sm"
+                  colorScheme="blue"
+                  leftIcon={<Icon as={FaExchangeAlt} fontSize="18" />}
+                  onClick={() => {
+                    setIsApprovalsOpen(true);
+                  }}
+                >
+                  Switch to approvals
+                </Button>
+              </Flex>
+
+              {isLoadingAllAppointments ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
+                </Flex>
+              ) : errorAllAppointments ? (
+                <Flex justify="center">
+                  <Text>The requisition failed</Text>
+                </Flex>
+              ) : totalAllAppointments > 0 ? (
+                <>
+                  <Flex
+                    minHeight={"400px"}
+                    flexDir={"column"}
+                    justifyContent="space-between"
+                  >
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
@@ -556,6 +605,7 @@ export default function Approvals() {
                                 vehicle: appointment.data.vehicle,
                                 appointmentId: appointment.ref["@ref"].id,
                                 status: appointment.data.status,
+                                companyRef: appointment.data.companyRef,
                               });
                             }}
                             key={appointment.ts}
@@ -567,15 +617,15 @@ export default function Approvals() {
                             }}
                           >
                             <Td>
-                            <Box>
-                            <Text fontWeight="bold">
-                              {appointment.data.speedway}
-                            </Text>
-                            <Text color={'gray.300'}>
-                              {appointment.data.vehicle}
-                            </Text>
-                            </Box>
-                          </Td>
+                              <Box>
+                                <Text fontWeight="bold">
+                                  {appointment.data.speedway}
+                                </Text>
+                                <Text color={"gray.300"}>
+                                  {appointment.data.vehicle}
+                                </Text>
+                              </Box>
+                            </Td>
                             <Td>
                               <Text>{appointment.data.companyName}</Text>
                             </Td>
@@ -588,20 +638,21 @@ export default function Approvals() {
                             </Td>
                             <Td>
                               <Flex
-                              wrap="wrap"
-                              alignSelf={"center"}
-                              alignItems={"center"}>
+                                wrap="wrap"
+                                alignSelf={"center"}
+                                alignItems={"center"}
+                              >
                                 {appointment.data.selectedSlots.map((slot) => {
                                   return (
                                     <Text
-                                    key={slot}
-                                    color={"gray.100"}
-                                    fontWeight={"bold"}
-                                    ml="2"
-                                    my="1"
-                                    p={2}
-                                    rounded="lg"
-                                    bg={"blue.600"}
+                                      key={slot}
+                                      color={"gray.100"}
+                                      fontWeight={"bold"}
+                                      ml="2"
+                                      my="1"
+                                      p={2}
+                                      rounded="lg"
+                                      bg={"blue.600"}
                                     >
                                       {dayjs(slot).format("H")}:00 to{" "}
                                       {Number(dayjs(slot).format("H")) + 1}:00
@@ -623,9 +674,8 @@ export default function Approvals() {
                                   </Text>
                                   <Icon as={BsCheckLg} color="whatsapp.400" />
                                 </Flex>
-                              ) : (
-                                appointment.data.status == "rejected"? (
-                                  <Flex alignItems={"center"}>
+                              ) : appointment.data.status == "rejected" ? (
+                                <Flex alignItems={"center"}>
                                   <Text
                                     mr={1}
                                     fontWeight={"bold"}
@@ -640,8 +690,8 @@ export default function Approvals() {
                                     color="red.500"
                                   />
                                 </Flex>
-                                ) : (
-                                  <Flex alignItems={"center"}>
+                              ) : (
+                                <Flex alignItems={"center"}>
                                   <Text
                                     mr={1}
                                     fontWeight={"bold"}
@@ -656,7 +706,6 @@ export default function Approvals() {
                                     color="red.800"
                                   />
                                 </Flex>
-                                )
                               )}
                             </Td>
 
@@ -686,37 +735,54 @@ export default function Approvals() {
                       currentPage={pageAllAppointments}
                       onPageChanges={setPageAllAppointments}
                     />
+                  </Flex>
+                </>
+              ) : (
+                <Flex
+                  w="100%"
+                  alignItems={"center"}
+                  justifyContent="center"
+                  minH={"400px"}
+                  cursor={"not-allowed"}
+                >
+                  <Box justifyContent="center" mb={8}>
+                    <Flex justifyContent={"center"}>
+                      <Image
+                        opacity={0.4}
+                        src="images/noappointments.png"
+                        w={"200px"}
+                      />
                     </Flex>
-                  </>
-                ) : (
-                  <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>
-                <Box justifyContent="center" mb={8}>
-                  <Flex justifyContent={'center'}>
-                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
-                      There are not new appointments.
-                    </Text>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
-                      Wait someone to schedule an appointment.
-                    </Text>
-                  </Flex>
-                </Box>
-              </Flex>
-                )}
-              </Box>
-            )}
-          
+                    <Flex w="100%" justifyContent="center">
+                      <Text
+                        fontSize={24}
+                        fontWeight="bold"
+                        color={"blackAlpha.400"}
+                      >
+                        There are not new appointments.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text
+                        fontSize={18}
+                        color={"blackAlpha.400"}
+                        fontWeight="semibold"
+                      >
+                        Wait someone to schedule an appointment.
+                      </Text>
+                    </Flex>
+                  </Box>
+                </Flex>
+              )}
+            </Box>
+          )}
         </Flex>
 
         <Modal
           isOpen={isModalOpen}
           onRequestClose={() => {
-            setIsModalOpen(false)
-            setIsConfirmMessageOpen(false)
+            setIsModalOpen(false);
+            setIsConfirmMessageOpen(false);
           }}
           overlayClassName="react-modal-overlay"
           className="react-modal-delete-message"
@@ -1190,9 +1256,8 @@ export default function Approvals() {
         <Modal
           isOpen={isModalOpenAllAppointments}
           onRequestClose={() => {
-            setIsConfirmMessageOpen(false)
-            setIsModalOpenAllAppointments(false)
-
+            setIsConfirmMessageOpen(false);
+            setIsModalOpenAllAppointments(false);
           }}
           overlayClassName="react-modal-overlay"
           className="react-modal-delete-message"
@@ -1251,7 +1316,7 @@ export default function Approvals() {
                 fontSize={20}
                 as={IoMdClose}
                 onClick={() => {
-                  setIsConfirmMessageOpen(false)
+                  setIsConfirmMessageOpen(false);
                   setIsModalOpenAllAppointments(false);
                 }}
                 cursor={"pointer"}
@@ -1664,92 +1729,89 @@ export default function Approvals() {
             {appointmentStatus == "canceled" ||
             appointmentStatus == "rejected" ? (
               <Button
-                    type="submit"
-                    ml={2}
-                    w={'20'}
-                    onClick={() => {
-                      setIsConfirmMessageOpen(false);
-                      setIsModalOpenAllAppointments(false);
-                    }}
-                    colorScheme={"whiteAlpha"}
-                  >
-                    Back
-                  </Button>
+                type="submit"
+                ml={2}
+                w={"20"}
+                onClick={() => {
+                  setIsConfirmMessageOpen(false);
+                  setIsModalOpenAllAppointments(false);
+                }}
+                colorScheme={"whiteAlpha"}
+              >
+                Back
+              </Button>
             ) : (
               <Flex justify={"space-between"}>
-                
+                <Button
+                  type="submit"
+                  ml={2}
+                  onClick={() => {
+                    setIsConfirmMessageOpen(false);
+                    setIsModalOpenAllAppointments(false);
+                  }}
+                  colorScheme={"whiteAlpha"}
+                >
+                  Back
+                </Button>
+
+                {isConfirmMessageOpen ? (
                   <Button
                     type="submit"
-                    ml={2}
                     onClick={() => {
-                      setIsConfirmMessageOpen(false);
-                      setIsModalOpenAllAppointments(false);
+                      handleCancelAppointment(appointmentId);
                     }}
-                    colorScheme={"whiteAlpha"}
+                    colorScheme={"red"}
                   >
-                    Back
+                    Yes, I want to cancel
                   </Button>
-
-                  {isConfirmMessageOpen ? (
-                    <Button
-                      type="submit"
-                      onClick={() => {
-                        handleCancelAppointment(appointmentId)
-                      }}
-                      colorScheme={"red"}
-                    >
-                      Yes, I want to cancel
-                    </Button>
-                  ) : <Button
-                  type="submit"
-                  onClick={() => {
-                    setIsConfirmMessageOpen(true);
-                  }}
-                  colorScheme={"red"}
-                >
-                  Cancel appointment
-                </Button>}
-                
+                ) : (
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      setIsConfirmMessageOpen(true);
+                    }}
+                    colorScheme={"red"}
+                  >
+                    Cancel appointment
+                  </Button>
+                )}
               </Flex>
             )}
           </SimpleGrid>
         </Modal>
 
-        <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
-      </Flex>
+        <Flex>
+          <Flex w={{ lg: "275px" }}></Flex>
+          <Footer />
+        </Flex>
       </Box>
     </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
-  const {auth} = parseCookies(ctx)
+  const { auth } = parseCookies(ctx);
 
   const decodedUser = decode(auth as string) as DecodedToken;
 
+  const necessaryRoles = ["ADMINISTRATOR"];
 
-  const necessaryRoles = ['ADMINISTRATOR']
-  
-  if(necessaryRoles?.length > 0){
-    const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser?.roles?.includes(role)
-  });
+  if (necessaryRoles?.length > 0) {
+    const hasAllRoles = necessaryRoles.some((role) => {
+      return decodedUser?.roles?.includes(role);
+    });
 
-
-  if(!hasAllRoles){
-    return {
-      redirect: {
-        destination: '/userdashboard',
-        permanent: false
-      }
+    if (!hasAllRoles) {
+      return {
+        redirect: {
+          destination: "/userdashboard",
+          permanent: false,
+        },
+      };
     }
-  }
   }
 
   return {
-    props: {}
-  }
-}
+    props: {},
+  };
+};

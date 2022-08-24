@@ -1,9 +1,5 @@
 import { Text } from "@chakra-ui/react";
 import dayjs from "dayjs";
-import { useQuery } from "react-query";
-import { api } from "../services/axios";
-
-
 
   interface ApprovalProps {
     slot: string;

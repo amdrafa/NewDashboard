@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   Heading,
   Icon,
@@ -16,18 +15,15 @@ import {
   Spinner,
   Image
 } from "@chakra-ui/react";
-import { query as q } from "faunadb";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { RiAddLine, RiPencilLine } from "react-icons/ri";
+import { useState } from "react";
+import { RiAddLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/axios";
-import { fauna } from "../../services/fauna";
 import { useQuery } from "react-query";
-import ReactPaginate from 'react-paginate'
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import EditCompany from "../../components/editCompany";
@@ -226,7 +222,7 @@ export default function CompanyList() {
                           </Text>
                         </Box>
                       </Td>
-                      {isWideVersioon && <Td>{company.data.cnpj}</Td>}
+                      <Td>{company.data.cnpj}</Td>
 
                       {isWideVersioon && <Td>{company.data.createdAt}</Td>}
 

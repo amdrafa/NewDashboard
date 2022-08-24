@@ -156,7 +156,7 @@ export function LoginContextProvider({ children }: authProviderProps) {
       //setUser({email, name: 'rafael'})
       await api
         .post("createuser", { data: email, password, name, cpf, phone, register_number, driver_category, expires_at})
-        .then((response) => console.log(setStatusRegister(response.status)));
+        .then((response) => setStatusRegister(response.status));
     } catch (err) {
       setStatusRegister(err.response.status);
       toast({

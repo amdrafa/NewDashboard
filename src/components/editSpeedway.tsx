@@ -9,7 +9,7 @@ import {
   SimpleGrid,
   Text,
   VStack,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import Link from "next/link";
@@ -52,7 +52,11 @@ export default function EditSpeedway({
     resolver: yupResolver(EditSpeedwayFormSchema),
   });
 
-  const toast = useToast()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
+
+  const toast = useToast();
 
   const { errors } = formState;
 
@@ -75,7 +79,7 @@ export default function EditSpeedway({
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       })
       .catch((err) => {
@@ -85,7 +89,7 @@ export default function EditSpeedway({
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
   };
@@ -108,7 +112,7 @@ export default function EditSpeedway({
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
         setIsModalOpen(false);
         setIsEditMode(false);
@@ -122,7 +126,7 @@ export default function EditSpeedway({
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
   }
@@ -145,7 +149,7 @@ export default function EditSpeedway({
           status: "success",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
         setIsEnableModalOpen(false);
         setIsEditMode(false);
@@ -159,14 +163,10 @@ export default function EditSpeedway({
           status: "error",
           duration: 5000,
           isClosable: true,
-          position: 'top-right'
+          position: "top-right",
         });
       });
   }
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
 
   return (
     <Box
@@ -184,7 +184,11 @@ export default function EditSpeedway({
           Edit test track
         </Heading>
         {speedway_status == "active" ? (
-          <Button bg='red.500' onClick={() => setIsModalOpen(true)} _hover={{bg:'red.400'}}>
+          <Button
+            bg="red.500"
+            onClick={() => setIsModalOpen(true)}
+            _hover={{ bg: "red.400" }}
+          >
             <Icon mr={1.5} as={FaLock} />
             Disable test track
           </Button>
@@ -292,8 +296,8 @@ export default function EditSpeedway({
               schedueled are going to be canceled.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              An e-mail will be sent informing that the test track is temporarily
-              disabled.
+              An e-mail will be sent informing that the test track is
+              temporarily disabled.
             </Text>
           </Box>
 
@@ -355,11 +359,12 @@ export default function EditSpeedway({
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
               Do you really want to enable this test track? From this moment,
-              everyone will be able to schedule an appointment at this test track.
+              everyone will be able to schedule an appointment at this test
+              track.
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              Be sure the test track is working properly before enabling the test
-              track.
+              Be sure the test track is working properly before enabling the
+              test track.
             </Text>
           </Box>
 
