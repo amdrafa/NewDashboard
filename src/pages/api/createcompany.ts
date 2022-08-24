@@ -3,9 +3,9 @@ import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import mail from "@sendgrid/mail";
 import secretKey from "secret-key";
-import { authenticated } from "./login";
+import { authenticated, isAdministrator } from "./login";
 
-export default authenticated(
+export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
       mail.setApiKey(process.env.SENDGRID_API_KEY);

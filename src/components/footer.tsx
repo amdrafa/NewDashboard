@@ -30,7 +30,7 @@ export function Footer() {
       bg={'gray.800'}
       rounded='3xl'
       color={'gray.400'}
-      mt='24'
+      mt='20'
       
       >
       <Container as={Stack} maxW={'1200px'} py={10}>

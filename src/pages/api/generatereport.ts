@@ -3,7 +3,7 @@ import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { useState } from "react";
 import { decode } from "jsonwebtoken";
-import { authenticated } from "./login";
+import { authenticated, isAdministrator } from "./login";
 import * as path from "path";
 import dayjs from "dayjs";
 
@@ -26,7 +26,7 @@ interface BusySlotsDataProps {
   data: BusySlotsProps[];
 }
 
-export default authenticated(
+export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
       const { company, companyId, selectedMonth, selectedYear } = request.body;

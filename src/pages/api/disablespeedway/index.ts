@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../../services/fauna";
 import { query as q } from "faunadb";
-import { authenticated } from "../login";
+import { authenticated, isAdministrator } from "../login";
 
-export default authenticated(
+export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
       const { id } = request.query;

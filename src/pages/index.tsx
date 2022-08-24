@@ -46,9 +46,7 @@ export default function Login() {
       <Box>
       
 
-      <Flex cursor={'pointer'} mb={'6'} flex='1' justify={'center'} _hover={{color: 'gray.200'}}>
-          <Logo />
-        </Flex>
+     
         <Flex
         as="form"
         w="100%"
@@ -88,17 +86,32 @@ export default function Login() {
           Enter
         </Button>
 
-        <Flex display="grid" alignItems="center" justifyContent="center" mt="8">
+        <Flex justifyContent={'space-between'} w='100%'>
+            
+       </Flex>
+
+        <Flex alignItems="center" justifyContent="center" mt="8">
           
+        <Flex cursor={'pointer'} flex='1' justify={'center'} _hover={{color: 'gray.200'}}>
+          <Logo
+          width=""
+          />
+        </Flex>
+          
+          <Box>
           <Link href="/register" passHref>
-            <Text color="blue.600" cursor="pointer"  _hover={{color: "blue.400"}}>Register now!</Text>
+            <Text color="gray.200" cursor="pointer" fontSize={14}  _hover={{color: "blue.400"}}>Register now!</Text>
           </Link>
-        </Flex>
-        <Flex display="grid" alignItems="center" justifyContent="center">
+        
+        
         <Link href="/recovery" passHref>
-          <Text color="blue.600" cursor="pointer"  _hover={{color: "blue.400"}}>Forgot password?</Text>
+          <Text color="gray.200" cursor="pointer" fontSize={14}  _hover={{color: "blue.400"}}>Forgot password?</Text>
           </Link>
+          </Box>
+        
         </Flex>
+
+        
       </Flex>
 
       

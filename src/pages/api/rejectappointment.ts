@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
-import { authenticated } from "./login";
+import { authenticated, isAdministrator } from "./login";
 
 interface companyProps {
   ref: string;
@@ -11,7 +11,7 @@ interface companyProps {
   }
 }
 
-export default authenticated(
+export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
       const { id, companyRef, selectedSlots } = request.body;

@@ -2,7 +2,7 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { compare } from "bcrypt";
-import { sign, verify } from "jsonwebtoken";
+import { decode, sign, verify } from "jsonwebtoken";
 import cookie from "cookie";
 
 interface DataProps {
@@ -12,6 +12,14 @@ interface DataProps {
   ts: number;
   data: UserDataProps;
 }
+
+export type DecodedToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+  roles: string[];
+  name: string;
+};
 
 interface UserDataProps {
   name: string;
@@ -30,6 +38,39 @@ export const authenticated =
       "supersecretkey",
       async function (err, decoded) {
         if (!err && decoded) {
+          return await fn(req, res);
+        }
+        res.status(401).json({ message: "Sorry, you are not authenticated." });
+      }
+    );
+  };
+
+export const isAdministrator =
+  (fn: NextApiHandler) => async (req: NextApiRequest, res: NextApiResponse) => {
+    verify(
+      req.headers.authorization!,
+      "supersecretkey",
+      async function (err, decoded) {
+
+        const auth = req.headers.authorization;
+
+        const decodedUser = decode(auth as string) as DecodedToken;
+
+        if (!err && decoded) {
+          const necessaryRoles = ["ADMINISTRATOR"];
+
+          if (necessaryRoles?.length > 0) {
+            const hasAllRoles = necessaryRoles.some((role) => {
+              return decodedUser?.roles?.includes(role);
+            });
+
+            if (!hasAllRoles) {
+              return res
+                .status(401)
+                .json({ message: "Sorry, you are not authenticated." });
+            }
+          }
+
           return await fn(req, res);
         }
 
