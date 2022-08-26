@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { authenticated } from "./login";
+import mail from "@sendgrid/mail";
+import dayjs from "dayjs";
 
 type CompanyProps = {
   ref: {
@@ -24,11 +26,15 @@ interface bodyProps {
   userId: number;
   companyName: string;
   companyRef: string;
+  userName: string;
+  userEmail: string;
 }
 
 export default authenticated(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "POST") {
+      mail.setApiKey(process.env.SENDGRID_API_KEY);
+
       const {
         selectedSlots,
         speedway,
@@ -36,6 +42,8 @@ export default authenticated(
         userId,
         companyName,
         companyRef,
+        userEmail,
+        userName
       }: bodyProps = request.body;
 
       try {
@@ -71,6 +79,32 @@ export default authenticated(
             },
           })
         );
+
+        let emailSlots = "|";
+
+        selectedSlots.forEach((slot) => {
+          const data = `${dayjs(slot).format("H")}:00 to ${
+            Number(dayjs(slot).format("H")) + 1
+          }:00`;
+
+          emailSlots = emailSlots + ` ${data} |`;
+        });
+
+        const message = `Hello, dear ${userName} <br> <br> <br> Your appointment on ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} is confirmed! Selected slots:  <br> <br> ${emailSlots}  <br> <br> <br> We hope you enjoy the tests. Good luck!`;
+  
+  
+          const companyResponsableEmail = companyData.data.email
+  
+          const emailData = {
+            to: userEmail,
+            cc: companyResponsableEmail,
+            from: "services@rafael.network",
+            subject: "Appointment confirmed.",
+            text: message,
+            html: message.replace(/\r\n/g, "<br>"),
+          };
+  
+          mail.send(emailData);
 
         return response.status(200).json({ Message: "Appointment scheduled" });
       } catch (err) {

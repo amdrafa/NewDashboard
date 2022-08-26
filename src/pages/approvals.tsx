@@ -64,6 +64,7 @@ interface appointmentProps {
   companyName: string;
   companyRef: string;
   status: string;
+  userId: string;
 }
 
 interface appointmentFunctionProps {
@@ -73,6 +74,7 @@ interface appointmentFunctionProps {
   companyName: string;
   companyRef: string;
   appointmentId: number;
+  userId: string
   status: string;
 }
 
@@ -103,6 +105,8 @@ export default function Approvals() {
   const [companyName, setCompanyName] = useState("");
 
   const [companyRef, setCompanyRef] = useState("");
+
+  const [userIdSchedule, setUserIdSchedule] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -143,6 +147,8 @@ export default function Approvals() {
         id,
         selectedSlots: selectedSlots.length,
         companyRef,
+        userId: userIdSchedule,
+        selectedSlotsData: selectedSlots
       })
       .then((response) => {
         toast({
@@ -233,6 +239,7 @@ export default function Approvals() {
     appointmentId,
     status,
     companyRef,
+    userId
   }: appointmentFunctionProps) {
     setCompanyName(companyName);
     setSelectedSlots(selectedSlots);
@@ -241,6 +248,7 @@ export default function Approvals() {
     setAppointmentId(appointmentId);
     setAppointmentStatus(status);
     setCompanyRef(companyRef);
+    setUserIdSchedule(userId);
 
     setIsModalOpenAllAppointments(true);
     return;
@@ -399,6 +407,7 @@ export default function Approvals() {
                                 appointmentId: appointment.ref["@ref"].id,
                                 status: appointment.data.status,
                                 companyRef: appointment.data.companyRef,
+                                userId: appointment.data.userId
                               });
                             }}
                           >
@@ -606,6 +615,7 @@ export default function Approvals() {
                                 appointmentId: appointment.ref["@ref"].id,
                                 status: appointment.data.status,
                                 companyRef: appointment.data.companyRef,
+                                userId: appointment.data.userId
                               });
                             }}
                             key={appointment.ts}

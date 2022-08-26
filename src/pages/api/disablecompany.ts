@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
 import { authenticated, isAdministrator } from "./login";
+import mail from "@sendgrid/mail";
 
 interface UserProps {
   ref: {
@@ -27,7 +28,9 @@ interface UserDataProps {
 export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
-      const { id } = request.body;
+      const { id, email, responsable_name } = request.body;
+
+      mail.setApiKey(process.env.SENDGRID_API_KEY);
 
       try {
         const updatedData = await fauna.query(
@@ -60,6 +63,18 @@ export default isAdministrator(
             );
           }
         });
+
+        const message = `Hello, dear ${responsable_name} <br> <br> <br> Your company was disabled. If it an error please contact us. <br> <br> <br> We hope to see you soon testing your vehicles. Good luck!`;
+  
+          const emailData = {
+            to: email,
+            from: "services@rafael.network",
+            subject: "Company disabled.",
+            text: message,
+            html: message.replace(/\r\n/g, "<br>"),
+          };
+  
+          mail.send(emailData);
 
         return response.status(200).json({ message: "Company disabled" });
       } catch (err) {

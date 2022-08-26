@@ -29,6 +29,8 @@ interface UserDataProps {
 export default isAdministrator(
   async (request: NextApiRequest, response: NextApiResponse) => {
     if (request.method === "PUT") {
+
+      mail.setApiKey(process.env.SENDGRID_API_KEY);
       
       const { id, email, responsable_name } = request.body;
 
@@ -36,19 +38,20 @@ export default isAdministrator(
         String(id).substring(0, 6)
       );
 
-      mail.setApiKey(process.env.SENDGRID_API_KEY);
+      
+      try {
 
-      const message = `Hello, dear ${responsable_name} <br> <br> <br> Secret key: ${companySecretKey} <br> <br> <br> Now, you are the only one who have access to this secret key, and you must foward only to the employes that need schedule the speedways. <br> <br> 1º Step: The employee has to sign in.  <br> <br> 2º Step: Paste the generated secret key which only you know inside the platform. <br> <br> 3º Step: Schedule the speedway. <br> <br> <br> Congrats, good luck!`;
+        const message = `Hello, dear ${responsable_name} <br> <br> <br> Your new secret key is: <br> <br> ${companySecretKey} <br> <br> Your company is active again. Remember to forward this e-mail for those who will schedule the future appointments. <br> <br> <br> We hope to see you soon testing your vehicles. Good luck!`;
 
       const emailData = {
         to: email,
         from: "services@rafael.network",
-        subject: "Authorization",
+        subject: "New secret key",
         text: message,
         html: message.replace(/\r\n/g, "<br>"),
       };
 
-      try {
+
         const updatedData = await fauna.query(
           q.Update(q.Ref(q.Collection("companies"), id), {
             data: {

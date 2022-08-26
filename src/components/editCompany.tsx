@@ -113,7 +113,9 @@ export default function EditCompany({
   async function deleteCompany(id: string){
     await api
       .put("disablecompany", {
-        id
+        id,
+        email,
+        responsable_name
       })
     .then((response) => {
       toast({

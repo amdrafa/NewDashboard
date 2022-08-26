@@ -174,6 +174,8 @@ export default function Schedule() {
         vehicle,
         speedway,
         userId: user.userId,
+        userEmail: user.email,
+        userName: user.name,
         companyName: user.companyName,
         companyRef: user.companyRef
       })
