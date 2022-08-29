@@ -331,8 +331,9 @@ export default function Schedule() {
            mt={5}
            height='100%'
            w={isWideVersioon ? '' : '100%'}
+           minW='400px'
          >
-           <Flex justifyContent={"space-between"} align="center" minW={'1180'}>
+           <Flex justifyContent={"space-between"} align="center">
             <Flex>
             <Heading mr={4} size="lg" fontWeight="normal">
                Schedule
@@ -350,7 +351,8 @@ export default function Schedule() {
  
            <Divider my="6" borderColor="gray.700" />
  
-           <Box sx={
+           <Box 
+           sx={
             { "&::-webkit-scrollbar": {
                 width: "4px",
                 
