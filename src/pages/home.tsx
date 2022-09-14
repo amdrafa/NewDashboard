@@ -4,7 +4,8 @@ import {
   Flex,
   Text,
   Image,
-  useBreakpointValue
+  useBreakpointValue,
+  Heading
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Header } from "../components/Header";
@@ -27,16 +28,18 @@ export default function Home() {
       <Flex w="100%" mt="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        
-          <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} >
+        <Box flex="1" borderRadius={8} bg="gray.800" height='100%'  p="8" mt={8}>
+          
+
+            <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} >
             <Box mr={16} display='flex' flexDir={'column'} w='400px'>
-              <Text fontSize={"5xl"} color="gray.100" fontWeight="semibold">
+              <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
 
               <Text
                 mt={-9}
-                fontSize={"5xl"}
+                fontSize={"6xl"}
                 color="gray.100"
                 fontWeight="semibold"
               >
@@ -45,7 +48,7 @@ export default function Home() {
 
               <Text
                 mt={-8}
-                fontSize={"5xl"}
+                fontSize={"6xl"}
                 color="green.600"
                 fontWeight="bold"
               >
@@ -81,9 +84,16 @@ export default function Home() {
             </Box>
 
             <Box mt={isWideVersioon? '' : '20'}>
-            <Image w={'600px'} src="images/about-hero-right1.png"/>
+            <Image alt="main image" w={'700px'} src="images/about-hero-right1.png"/>
             </Box>
+
+            
           </Flex>
+
+            </Box>
+
+        
+          
 
 {/*            
           <Carousel  autoplay={true} enableKeyboardControls wrapAround={true}
