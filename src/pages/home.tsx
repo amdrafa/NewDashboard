@@ -33,13 +33,13 @@ export default function Home() {
 
             <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} >
             <Box mr={16} display='flex' flexDir={'column'} w='400px'>
-              <Text fontSize={"6xl"} color="gray.100" fontWeight="semibold">
+              <Text fontSize={"5xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
 
               <Text
                 mt={-9}
-                fontSize={"6xl"}
+                fontSize={"5xl"}
                 color="gray.100"
                 fontWeight="semibold"
               >
@@ -48,7 +48,7 @@ export default function Home() {
 
               <Text
                 mt={-8}
-                fontSize={"6xl"}
+                fontSize={"5xl"}
                 color="green.600"
                 fontWeight="bold"
               >
@@ -84,7 +84,7 @@ export default function Home() {
             </Box>
 
             <Box mt={isWideVersioon? '' : '20'}>
-            <Image alt="main image" w={'700px'} src="images/about-hero-right1.png"/>
+            <Image alt="main image" w={'600px'} src="images/about-hero-right1.png"/>
             </Box>
 
             
