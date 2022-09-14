@@ -31,8 +31,8 @@ export default function Home() {
         <Box flex="1" borderRadius={8} bg="gray.800" height='100%'  p="8" mt={8}>
           
 
-            <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} >
-            <Box mr={16} display='flex' flexDir={'column'} w='400px'>
+            <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon? 'flex' : 'inline'} px={6} pb={14} >
+            <Box mr={16} display='flex' flexDir={'column'} w='400px' mt={4}>
               <Text fontSize={"5xl"} color="gray.100" fontWeight="semibold">
                 Ready for
               </Text>
@@ -49,7 +49,7 @@ export default function Home() {
               <Text
                 mt={-8}
                 fontSize={"5xl"}
-                color="green.600"
+                color="red.600"
                 fontWeight="bold"
               >
                 TEST TRACK
@@ -66,7 +66,7 @@ export default function Home() {
 
               <Text
                 fontSize={"xl"}
-                color="green.400"
+                color="green.300"
                 fontWeight="normal"
                 mt={-2}
               >
@@ -75,7 +75,7 @@ export default function Home() {
               </Box>
               
               <Link href={'/schedule'}>
-              <Button ml={1.5} mt={8} colorScheme={'green'} w={'64'} h='12' rounded={'full'}>
+              <Button ml={1.5} mt={12} colorScheme={'green'} w={'64'} h='12' rounded={'full'}>
                     SCHEDULE NOW
                 </Button>
               </Link>
@@ -84,7 +84,7 @@ export default function Home() {
             </Box>
 
             <Box mt={isWideVersioon? '' : '20'}>
-            <Image alt="main image" w={'600px'} src="images/about-hero-right1.png"/>
+            <Image alt="main image" w={'500px'} src="images/pista.png"/>
             </Box>
 
             
