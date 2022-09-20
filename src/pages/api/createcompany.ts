@@ -56,7 +56,7 @@ export default isAdministrator(
 
         mail.send(emailData);
 
-        return response.status(200).json({ message: "Company created" });
+        return response.status(201).json({ message: "Company created" });
       } catch (err) {
         console.log("error when creating company", err);
         return response.status(400).json({ message: "Something went wrong" });

@@ -51,7 +51,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
           )
         );
 
-        return response.status(200).json({message: "User created"});
+        return response.status(201).json({message: "User created"});
       } catch (err) {
         console.log("Error when adding user to database", err);
         return response.status(400).json({err});

@@ -27,7 +27,7 @@ export default isAdministrator(
           })
         );
 
-        return response.status(200).json({ message: "Test track created" });
+        return response.status(201).json({ message: "Test track created" });
       } catch (err) {
         console.log("error when creating test track", err);
         return response.status(400).json({ message: "Something went wrong" });

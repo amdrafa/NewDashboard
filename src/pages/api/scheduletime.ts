@@ -106,7 +106,7 @@ export default authenticated(
   
           mail.send(emailData);
 
-        return response.status(200).json({ Message: "Appointment scheduled" });
+        return response.status(201).json({ Message: "Appointment scheduled" });
       } catch (err) {
         console.log("Error when creating appointment", err);
         return response.status(400).json({ err });

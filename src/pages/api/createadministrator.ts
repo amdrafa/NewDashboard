@@ -62,7 +62,7 @@ export default isAdministrator(
 
             mail.send(emailData);
 
-            return response.status(200).json({ message: "Adm registered" });
+            return response.status(201).json({ message: "Adm registered" });
           } catch (err) {
             console.log("error when adding adm to database", err);
             return response.status(400).json({ err });
