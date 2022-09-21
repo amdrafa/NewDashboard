@@ -66,7 +66,7 @@ export default function Register() {
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(SignInFormSchema),
-    
+
   });
 
   const { errors, isSubmitting } = formState;
@@ -82,13 +82,13 @@ export default function Register() {
     expires_at,
   }) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    
 
-    if(page == 1 && hasDriverLicence){
-  
+
+
+    if (page == 1 && hasDriverLicence) {
+
       setPage(2)
-      
+
       return;
     }
 
@@ -119,7 +119,7 @@ export default function Register() {
     }
   };
 
- 
+
 
 
 
@@ -316,18 +316,18 @@ export default function Register() {
               </Flex>
 
               <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
-                
+
                 <Input
                   name="register_number"
                   label="Register number"
                   type={"number"}
                   {...register("register_number")}
                   error={errors.register_number}
-                  
+
                 />
-                
-                
-                
+
+
+
               </SimpleGrid>
 
               <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
@@ -364,12 +364,12 @@ export default function Register() {
                 alignItems={"center"}
               >
                 <Link href="/" >
-                <Button
-                  bg={"gray.300"}
-                  cursor={"pointer"}
-                >
-                  Return
-                </Button>
+                  <Button
+                    bg={"gray.300"}
+                    cursor={"pointer"}
+                  >
+                    Return
+                  </Button>
                 </Link>
 
                 <Button colorScheme={"twitter"} type={"submit"} isLoading={isSubmitting}>

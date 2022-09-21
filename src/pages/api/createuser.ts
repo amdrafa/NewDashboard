@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { NextApiRequest, NextApiResponse } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from "faunadb";
@@ -16,6 +17,8 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
       expires_at,
     } = request.body;
 
+    
+
     hash(password, 10, async function (err, hash) {
       // Store hash in your password DB.
 
@@ -25,6 +28,8 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
           month: "long",
           year: "numeric",
         });
+
+        console.log('AAAAAAAAAAAAAAAAAAASDASDASD')
 
         await fauna.query(
           q.If(
@@ -62,3 +67,4 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
     response.status(405).end("Method not allowed");
   }
 };
+

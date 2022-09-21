@@ -105,9 +105,11 @@ export function LoginContextProvider({ children }: authProviderProps) {
   }, [statusLogin]);
 
   useEffect(() => {
-    {
-      statusRegister == 200 && Router.push("/successredirect");
-    }
+    
+    statusRegister == 201 && Router.push("/successredirect");
+    
+
+    statusRegister == 201 && setStatusRegister(0);
   }, [statusRegister]);
 
   useEffect(() => {
