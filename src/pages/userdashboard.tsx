@@ -453,6 +453,7 @@ export default function UserDashboard() {
         </Flex>
 
         <Modal
+          
           isOpen={isModalOpen}
           onRequestClose={() => {
             setIsModalOpen(false);
@@ -467,6 +468,7 @@ export default function UserDashboard() {
             gap="1"
             minChildWidth="320px"
             alignItems="flex-start"
+            
           >
             <Box
               display="flex"

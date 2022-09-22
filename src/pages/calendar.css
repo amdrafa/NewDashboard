@@ -26,6 +26,7 @@
     bottom: 0;
     right: 0;
     left: 0;
+    
 
     display: flex;
     justify-content: center;
@@ -45,6 +46,8 @@
 .react-modal-delete-message{
     width: 100%;
     max-width: 600px;
+    max-height: 600px;
+    overflow-y: scroll;
     background: #292A36;
     padding: 1rem;
     position: relative;
