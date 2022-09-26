@@ -12,7 +12,7 @@ export function Logo({width = '200px'}:Logoprops){
         letterSpacing="tight"
         w={width}
         >
-            Bosch
+            Logo
             <Text as="span" ml="1" color="red.500">
                 .
             </Text>

@@ -132,7 +132,7 @@ export default function Schedule() {
   }, [page])
 
   useEffect(() => {
-    if(status == 200){
+    if(status == 201){
       setIsModalOpen(false)
       toast({
         title: "Appointment scheduled",

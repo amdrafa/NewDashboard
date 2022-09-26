@@ -145,6 +145,7 @@ export default function CreateCompany() {
 
             <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
               <Input
+              
                 name="responsable_name"
                 label="Responsable name"
                 {...register("responsable_name")}
