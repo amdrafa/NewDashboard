@@ -17,7 +17,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
       expires_at,
     } = request.body;
 
-    
+
 
     hash(password, 10, async function (err, hash) {
       // Store hash in your password DB.
@@ -56,10 +56,10 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
           )
         );
 
-        return response.status(201).json({message: "User created"});
+        return response.status(201).json({ message: "User created" });
       } catch (err) {
         console.log("Error when adding user to database", err);
-        return response.status(400).json({err});
+        return response.status(400).json({ err });
       }
     });
   } else {

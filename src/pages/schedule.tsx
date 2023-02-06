@@ -12,12 +12,19 @@ import {
   Checkbox,
   Heading,
   HStack,
-  Input,
   Link,
   useToast,
   Link as ChakraLink,
   Spinner,
   useBreakpointValue,
+  Table,
+  TableCaption,
+  Tbody,
+  Td,
+  Tfoot,
+  Th,
+  Thead,
+  Tr,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -32,7 +39,7 @@ import {
   RiCloseCircleLine,
   RiMotorbikeLine,
 } from "react-icons/ri";
-import { GiMineTruck } from "react-icons/gi";
+import { GiAutoRepair, GiMineTruck } from "react-icons/gi";
 import { FaCircle, FaTruckMonster } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Modal from "react-modal";
@@ -49,6 +56,8 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import { Footer } from "../components/footer";
+import { Input } from "../components/Form/input";
+import { BiBuilding, BiTrash } from "react-icons/bi";
 
 export type DecodedToken = {
   sub: string;
@@ -82,26 +91,26 @@ export default function Schedule() {
 
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
 
-  function AddTimeSlot(slot: string){
-    
-  let updatedSlots = [...selectedSlots]
+  function AddTimeSlot(slot: string) {
 
-  const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot === slot)
-    
+    let updatedSlots = [...selectedSlots]
 
-  if(slotIndex >= 0){
-    updatedSlots.splice(slotIndex, 1)
-    setSelectedSlots(updatedSlots)
-  }else{
-    if(dayjs(selectedSlots[0]).format('D') == dayjs(slot).format('D') || selectedSlots.length == 0){
-      setIsSameDay(true)
-      updatedSlots.push(slot)
+    const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot === slot)
+
+
+    if (slotIndex >= 0) {
+      updatedSlots.splice(slotIndex, 1)
       setSelectedSlots(updatedSlots)
-    }else{
-      setIsSameDay(false)
+    } else {
+      if (dayjs(selectedSlots[0]).format('D') == dayjs(slot).format('D') || selectedSlots.length == 0) {
+        setIsSameDay(true)
+        updatedSlots.push(slot)
+        setSelectedSlots(updatedSlots)
+      } else {
+        setIsSameDay(false)
+      }
+
     }
-    
-  }
 
   }
 
@@ -110,7 +119,7 @@ export default function Schedule() {
     lg: true,
   });
 
-
+  const [selectedResources, setSelectedResources] = useState([''])
   const [speedway, setSpeedway] = useState("");
   const [vehicle, setVehicle] = useState("Light vehicle");
 
@@ -122,17 +131,23 @@ export default function Schedule() {
 
   const { isAuthenticated, user } = useContext(LoginContext);
 
+  const [selectedTab, setSelectedTab] = useState('Resource')
+
+  function updateTab(tab: string) {
+    setSelectedTab(tab);
+  }
+
   useEffect(() => {
-    if(page == 2){
+    if (page == 2) {
       setTimeout(() => {
         setIsSlotLoading(false);
       }, 4000)
     }
-    
+
   }, [page])
 
   useEffect(() => {
-    if(status == 201){
+    if (status == 201) {
       setIsModalOpen(false)
       toast({
         title: "Appointment scheduled",
@@ -160,6 +175,10 @@ export default function Schedule() {
 
   function handleCloseModal() {
     setIsModalOpen(false);
+  }
+
+  function updateSelectedResource(resource: string) {
+    setSelectedResources([...selectedResources, resource])
   }
 
 
@@ -192,296 +211,661 @@ export default function Schedule() {
         });
       });
 
-    
+
     setVehicle("Light vehicle");
     setSpeedway("Select option");
-    
+
   }
+
+
   return (
     <Box mt={-3}>
       <Header />
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        {page == 1? (
-           <Box
-           flex="1"
-           borderRadius={8}
-           bg="gray.800"
-           p="8"
-           mt={5}
-         >
-           <Flex justifyContent={"space-between"} align="center">
-             <Heading size="lg" fontWeight="normal">
-               Schedule
-             </Heading>
-             
- 
-             <Box mr={1}>
-               <Icon fontSize={12} mr={2} color={"blue.500"} as={FaCircle} />
-               <Icon fontSize={12} as={FaCircle} color={"gray.600"} />
-             </Box>
-           </Flex>
- 
-           <Divider my="6" borderColor="gray.700" />
- 
-           <VStack spacing="8">
-             <Text w="100%" fontSize="20">
-               Select a vehicle:
-             </Text>
- 
-             <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-               <ChooseVehicle
-                 icon={RiCarLine}
-                 vehicleType="Light vehicle"
-                 onClick={() => {
-                   setVehicle("Light vehicle");
-                 }}
-                 isActive={vehicle == "Light vehicle"}
-               />
- 
-               <ChooseVehicle
-                 icon={FaTruckMonster}
-                 vehicleType="Heavy vehicle"
-                 onClick={() => {
-                   setVehicle("Heavy vehicle");
-                 }}
-                 isActive={vehicle == "Heavy vehicle"}
-               />
- 
-               <ChooseVehicle
-                 icon={GiMineTruck}
-                 vehicleType="Truck"
-                 onClick={() => {
-                   setVehicle("Truck");
-                 }}
-                 isActive={vehicle == "Truck"}
-               />
- 
-               <ChooseVehicle
-                 icon={RiMotorbikeLine}
-                 vehicleType="Motorcycle"
-                 onClick={() => {
-                   setVehicle("Motorcycle");
-                 }}
-                 isActive={vehicle == "Motorcycle"}
-               />
-             </SimpleGrid>
- 
-             <Text ml="1" w="100%" fontSize="18">
-               Test track
-             </Text>
-             <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-               <Select
-                 mt="-4"
-                 onChange={(e) => setSpeedway(e.target.value)}
-                 placeholder="Select option"
-                 color="gray.300"
-                 bg="gray.900"
-                 border="none"
-                 height="45px"
-               >
-                 {isLoading ? (
-                   <option value={"loading"}>loading</option>
-                 ) : (
-                   data.map((speed) => (
-                     <option
-                       key={speed.data.speedway}
-                       value={speed.data.speedway}
-                     >
-                       {speed.data.speedway}
-                     </option>
-                   ))
-                 )}
-               </Select>
-             </SimpleGrid>
-           </VStack>
- 
-           <Flex mt="8" justify="flex-end">
-             <HStack spacing="4">
-               <Link href="/home">
-                 <Button colorScheme="whiteAlpha">Cancel</Button>
-               </Link>
-               <Button colorScheme="blue" onClick={() => {
 
-                {speedway == '' ? (toast({
-                  title: "Select a test track",
-                  description: `You need to select a test track to proceed.`,
-                  status: "info",
-                  duration: 5000,
-                  isClosable: true,
-                  position: 'top-right'
-                })) : (
-                  setPage(2)
-                )}
+        <Box
+          flex="1"
+          borderRadius={8}
+          bg="gray.800"
+          p="8"
+          mt={5}
+        >
+          <Flex justifyContent={"space-between"} align="center">
+            <Heading size="lg" fontWeight="normal">
+              <HStack spacing={'1rem'}>
+                <Button
+                  w={'10rem'}
+                  background={selectedTab === 'Resource' ? 'blue.500' : 'gray.800'}
+                  _hover={selectedTab === 'Resource' ? { background: "blue.700" } : { background: "blackAlpha.500" }}
+                  onClick={() => updateTab('Resource')}
+                >
+                  Resources
+                </Button>
+                <Button
+                  w={'10rem'}
+                  background={selectedTab === 'Extra' ? 'blue.500' : 'gray.800'}
+                  _hover={selectedTab === 'Extra' ? { background: "blue.700" } : { background: "blackAlpha.500" }}
+                  onClick={() => updateTab('Extra')}
+                >
+                  Atendees | Vehicles
+                </Button>
+              </HStack>
 
-                
-               }}>
-                 Next
-               </Button>
-             </HStack>
-           </Flex>
-         </Box>
-        ) : (
-          
-          <Box
-           borderRadius={8}
-           bg="gray.800"
-           p="8"
-           mt={5}
-           height='100%'
-           w={isWideVersioon ? '' : '100%'}
-           minW='400px'
-         >
-           <Flex justifyContent={"space-between"} align="center">
-            <Flex>
-            <Heading mr={4} size="lg" fontWeight="normal">
-               Schedule
-             </Heading>
-             {/* {selectedSlots.map(slot => (slot))} */}
-             <CalendarHeader />
-            </Flex>
-             
- 
-             <Box mr={1}>
-               <Icon fontSize={12} mr={2} color={"gray.600"} as={FaCircle} />
-               <Icon fontSize={12} as={FaCircle} color={"blue.500"} />
-             </Box>
-           </Flex>
- 
-           <Divider my="6" borderColor="gray.700" />
- 
-           <Box 
-           sx={
-            { "&::-webkit-scrollbar": {
-                width: "4px",
-                
-              },
-              "&::-webkit-scrollbar-track": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "blackAlpha.400",
-                borderRadius: "24px",
-              },
-            }
-  } border={'8px'} borderColor='gray.800' overflowX={'auto'} maxW={1180} as="form" flex="1" borderRadius={8} bg="gray.800" py="2" mt={5} onSubmit={CreateSchedule} h='100%' marginTop={'0'}>
-            
-            <Box>
-                {isSlotLoading? (
-                  <Flex w={'1170px'} justifyContent='center'>
-                    <Spinner my={'32'}/>
-                  </Flex>
-                ) : (
-                  <CalendarIndex
-                  addTimeSlot={AddTimeSlot}
-                  selectedSlots={selectedSlots}
-                  setSelectedSlots={setSelectedSlots}
-                  setIsSlotLoading={setIsSlotLoading}
-                  sameDay={isSameDay}
-                  testTrack={speedway}
-                  />
-                )}
-              
+            </Heading>
+
+
+            <Box mr={1}>
+              <Icon fontSize={12} mr={2} color={"blue.500"} as={FaCircle} />
+              <Icon fontSize={12} as={FaCircle} color={"gray.600"} />
             </Box>
-            
-          </Box>
- 
-           <Flex mt="4" justify="flex-end">
-             <HStack spacing="4">
-          
-              <Button onClick={() => {
-                setPage(1)
-                setSelectedSlots([])
-                window.location.reload();
-                }} colorScheme="whiteAlpha">Back</Button>
-               
-               <Button colorScheme="blue" onClick={() => {
-                  selectedSlots.length <= 0? toast({
-                    title: "Select a slot",
-                    description: `You need to select at least one slot.`,
+          </Flex>
+
+          <Divider my="6" borderColor="gray.700" />
+
+          {selectedTab === 'Resource' ? (
+            <Flex justifyContent={'space-between'}>
+              <VStack spacing="4">
+                <Text w="100%" fontSize="20" mb={3}>
+                  Category
+                </Text>
+
+                <HStack spacing={'1rem'} mb={'1rem'} w={"22rem"}>
+                  <ChooseVehicle onClick={() => setVehicle} isActive vehicleType="Test track" icon={RiCarLine} />
+                  <ChooseVehicle onClick={() => setVehicle} vehicleType="Office" icon={BiBuilding} />
+                  <ChooseVehicle onClick={() => setVehicle} vehicleType="Workshop" icon={GiAutoRepair} />
+                </HStack>
+
+                <Text w="100%" fontSize="20">
+                  Resource
+                </Text>
+
+                <Flex w='100%'>
+                  <Select
+                    maxW={'22rem'}
+                    onChange={(e) => setSpeedway(e.target.value)}
+                    placeholder="Select option"
+                    color="gray.300"
+                    bg="gray.900"
+                    border="none"
+                    height="45px"
+                  >
+                    {isLoading ? (
+                      <option value={"loading"}>loading</option>
+                    ) : (
+                      data.map((speed) => (
+                        <option
+                          key={speed.data.speedway}
+                          value={speed.data.speedway}
+                        >
+                          {speed.data.speedway}
+                        </option>
+                      ))
+                    )}
+                  </Select>
+                </Flex>
+
+
+                <Text w="100%" fontSize="20">
+                  Start date:
+                </Text>
+
+                <HStack spacing={'1rem'}>
+
+                  <Input
+                    name="FromDate"
+                    color={'gray.300'}
+                    type={'date'}
+                    width='12rem'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          filter: 'invert(1)',
+                          opacity: 0.3
+                        }
+                      }
+                    }
+                  />
+
+                  <Input
+                    name="FromDate"
+                    color={'gray.300'}
+                    type={'time'}
+                    width='8rem'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          filter: 'invert(1)',
+                          opacity: 0.3
+                        }
+                      }
+                    }
+                  />
+
+                </HStack>
+
+                <Text w="100%" fontSize="20">
+                  End date:
+                </Text>
+
+
+                <HStack spacing={'1rem'}>
+                  <Input
+                    name="FromDate"
+                    color={'gray.300'}
+                    type={'date'}
+                    width='12rem'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          filter: 'invert(1)',
+                          opacity: 0.3
+                        }
+                      }
+                    }
+                  />
+
+                  <Input
+                    name="FromDate"
+                    color={'gray.300'}
+                    type={'time'}
+                    width='8rem'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          filter: 'invert(1)',
+                          opacity: 0.3
+                        }
+                      }
+                    }
+                  />
+                </HStack>
+              </VStack>
+
+              <Flex height={'30rem'} minHeight={'400px'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
+                {
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }
+              }>
+
+
+                <Table colorScheme="whiteAlpha">
+                  <Thead>
+                    <Tr>
+                      <Th px={["4", "4", "6"]} color="gray.300" width="">
+                        <Text>Company</Text>
+                      </Th>
+
+                      <Th px={["4", "4", "6"]} width="">
+                        <Text>Responsable</Text>
+                      </Th>
+
+                      <Th>CNPJ</Th>
+
+                      {isWideVersioon && <Th >Register date</Th>}
+                      <Th w="8">Status</Th>
+
+                      <Th w="8"></Th>
+                    </Tr>
+                  </Thead>
+
+                  <Tbody>
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+
+                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        teste
+                      </Td>
+                      <Td>
+                        <BiTrash />
+                      </Td>
+                    </Tr>
+                  </Tbody>
+
+                </Table>
+              </Flex>
+
+              {/* <Flex background={'gray.900'} alignItems='center' justify={'start'} width={'22rem'} borderRadius='0.5rem'>
+
+                <VStack w={'100%'}>
+                  <Flex justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Passenger car</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="LighDutyTruck"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Light duty truck</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="LighDutyTruck"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex w='100%' justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Heavy duty truck</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="LighDutyTruck"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex w='100%' justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Urban light bus</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="LighDutyTruck"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex w='100%' justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Urban heavy bus</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="LighDutyTruck"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex w='100%' justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Coach bus</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="Coach bus"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                  <Flex w='100%' justifyContent={'center'} alignItems='center'>
+                    <Text w={'8rem'} mr='1rem'>Others</Text>
+                    <Flex w={'4rem'}>
+                      <Input
+                        name="Others"
+                        bgColor={'gray.800'}
+                        size='sm'
+                      />
+                    </Flex>
+                  </Flex>
+                </VStack>
+
+              </Flex> */}
+            </Flex>
+          ) : (
+            <VStack spacing="8">
+              <Text w="100%" fontSize="20">
+                Invite participants:
+              </Text>
+
+              <Flex w={'100%'}>
+                <Input
+                  name="Participant"
+                  label="Participant name"
+                />
+              </Flex>
+
+              <Text ml="1" w="100%" fontSize="18">
+                Test track
+              </Text>
+
+              <HStack w={'100%'}>
+                <Box>
+                  <Input
+                    name="FromDate"
+                    type={'date'}
+                    width='100%'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          cursor: 'not-allowed',
+                          // filter: invert(100%)
+                        }
+                      }
+                    }
+                  />
+                </Box>
+
+
+                <Box>
+                  <Input
+                    name="FromDate"
+                    type={'time'}
+                    width='100%'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          color: "#fff"
+                        }
+                      }
+                    }
+                  />
+                </Box>
+
+              </HStack>
+
+              <HStack w={'100%'}>
+                <Box>
+                  <Input
+                    name="FromDate"
+                    type={'date'}
+                    width='100%'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          cursor: 'not-allowed',
+                          // filter: invert(100%)
+                        }
+                      }
+                    }
+                  />
+                </Box>
+
+
+                <Box>
+                  <Input
+                    name="FromDate"
+                    type={'time'}
+                    width='100%'
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          cursor: 'not-allowed',
+                          // filter: invert(100%)
+                        }
+                      }
+                    }
+                  />
+                </Box>
+
+              </HStack>
+
+            </VStack>
+
+          )}
+
+
+
+          <Flex mt="8" justify="flex-end">
+            <HStack spacing="4">
+              <Link href="/home">
+                <Button colorScheme="whiteAlpha">Cancel</Button>
+              </Link>
+              <Button colorScheme="blue" onClick={() => {
+
+                {
+                  speedway == '' ? (toast({
+                    title: "Select a test track",
+                    description: `You need to select a test track to proceed.`,
                     status: "info",
                     duration: 5000,
                     isClosable: true,
                     position: 'top-right'
-                  }) : setIsModalOpen(true)
-                }}>
-                 Next
-               </Button>
-             </HStack>
-           </Flex>
-           <Modal
-          isOpen={isModalOpen}
-          onRequestClose={handleCloseModal}
-          overlayClassName="react-modal-overlay"
-          className="react-modal-content"
-          ariaHideApp={false}
-        >
-          <SimpleGrid
-            as={'form'}
-            flex="1"
-            gap="1"
-            minChildWidth="320px"
-            alignItems="flex-start"
-            onSubmit={CreateSchedule}
-          >
-            <Flex justifyContent="flex-start">
-              <Text fontSize={24} fontWeight='bold' color={'gray.100'}>Confirm appointment</Text>
-            </Flex>
+                  })) : (
+                    setPage(2)
+                  )
+                }
 
-            <Box my='4'>
-            <Divider/>
-            <Text mt={6} mb={2} fontSize={18} >
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting.
-            </Text>
-            </Box>
 
-            <HStack spacing={4} justify='end'>
-            <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
-                  Cancel
-                </Button>
-              
-
-              <Button type="submit" colorScheme="green">
-                Confirm
+              }}>
+                Next
               </Button>
             </HStack>
-          </SimpleGrid>
-        </Modal>
-           
-         </Box> 
-         )}
+          </Flex>
+        </Box>
+
+
+      </Flex >
+
+
+      <Flex >
+        <Flex w={{ lg: '275px' }}></Flex>
+        <Footer />
       </Flex>
 
-      
-      <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
-      </Flex>
-      
-      
-    </Box>
-    
+
+    </Box >
+
   );
 }
 
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-  const {auth} = parseCookies(ctx)
+  const { auth } = parseCookies(ctx)
 
   const decodedUser = decode(auth as string) as DecodedToken;
 
 
   const necessaryPermissions = ["SCHEDULE"]
 
-  if(necessaryPermissions?.length > 0){
+  if (necessaryPermissions?.length > 0) {
     const hasAllPermissions = necessaryPermissions.some(permission => {
       return decodedUser?.permissions?.includes(permission)
     })
 
 
-    if(!hasAllPermissions){
+    if (!hasAllPermissions) {
       return {
         redirect: {
           destination: '/home',
@@ -493,7 +877,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   // const necessaryRoles = ['USER']
-  
+
   // if(necessaryRoles?.length > 0){
   //   const hasAllRoles = necessaryRoles.some(role => {
   //     return decodedUser.roles.includes(role)
