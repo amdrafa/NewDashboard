@@ -130,7 +130,7 @@ export default function UserDashboard() {
       return ReturnedData;
     }
   );
-  
+
 
   function handleAppointmentApprovalFirstStep({
     companyName,
@@ -226,149 +226,149 @@ export default function UserDashboard() {
               </Flex>
             ) : total > 0 ? (
               <>
-              <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
-                <Table colorScheme="whiteAlpha">
-                  <Thead>
-                    <Tr>
-                      <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Test track</Text>
-                      </Th>
+                <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                  <Table colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>Test track</Text>
+                        </Th>
 
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Date</Text>
-                      </Th>
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Date</Text>
+                        </Th>
 
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Slots</Text>
-                      </Th>
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Slots</Text>
+                        </Th>
 
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Status</Text>
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data.map((appointment) => (
-                      <Tr
-                        key={appointment.ts}
-                        _hover={{
-                          bg: "gray.900",
-                          color: "gray.300",
-                          transition: "0.2s",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          handleAppointmentApprovalFirstStep({
-                            appointmentId: appointment.ref["@ref"].id,
-                            companyName: appointment.data.companyName,
-                            selectedSlots: appointment.data.selectedSlots,
-                            speedway: appointment.data.speedway,
-                            status: appointment.data.status,
-                            vehicle: appointment.data.vehicle,
-                            companyRef: appointment.data.companyRef
-                          });
-                        }}
-                      >
-                        <Td>
-                          <Box>
-                            <Text fontWeight="bold">
-                              {appointment.data.speedway}
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>Status</Text>
+                        </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {data.map((appointment) => (
+                        <Tr
+                          key={appointment.ts}
+                          _hover={{
+                            bg: "gray.900",
+                            color: "gray.300",
+                            transition: "0.2s",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            handleAppointmentApprovalFirstStep({
+                              appointmentId: appointment.ref["@ref"].id,
+                              companyName: appointment.data.companyName,
+                              selectedSlots: appointment.data.selectedSlots,
+                              speedway: appointment.data.speedway,
+                              status: appointment.data.status,
+                              vehicle: appointment.data.vehicle,
+                              companyRef: appointment.data.companyRef
+                            });
+                          }}
+                        >
+                          <Td>
+                            <Box>
+                              <Text fontWeight="bold">
+                                {appointment.data.speedway}
+                              </Text>
+                              <Text color={"gray.300"}>
+                                {appointment.data.vehicle}
+                              </Text>
+                            </Box>
+                          </Td>
+
+                          <Td>
+                            <Text>
+                              {dayjs(appointment.data.selectedSlots[0]).format(
+                                "DD/MM/YYYY"
+                              )}
                             </Text>
-                            <Text color={"gray.300"}>
-                              {appointment.data.vehicle}
-                            </Text>
-                          </Box>
-                        </Td>
+                          </Td>
 
-                        <Td>
-                          <Text>
-                            {dayjs(appointment.data.selectedSlots[0]).format(
-                              "DD/MM/YYYY"
-                            )}
-                          </Text>
-                        </Td>
+                          <Td>
+                            <Flex
+                              wrap="wrap"
+                              alignSelf={"center"}
+                              alignItems={"center"}>
+                              {appointment.data.selectedSlots.map((slot) => {
+                                return (
+                                  <Text
+                                    key={slot}
+                                    color={"gray.100"}
+                                    fontWeight={"bold"}
+                                    ml="2"
+                                    my="1"
+                                    p={2}
+                                    rounded="lg"
+                                    bg={"blue.600"}
+                                  >
+                                    {dayjs(slot).format("H")}:00 to{" "}
+                                    {Number(dayjs(slot).format("H")) + 1}:00
+                                  </Text>
+                                );
+                              })}
+                            </Flex>
+                          </Td>
 
-                        <Td>
-                          <Flex
-                                wrap="wrap"
-                                alignSelf={"center"}
-                                alignItems={"center"}>
-                            {appointment.data.selectedSlots.map((slot) => {
-                              return (
+                          <Td>
+                            {appointment.data.status == "approved" && (
+                              <Flex alignItems={"center"}>
                                 <Text
-                                  key={slot}
-                                  color={"gray.100"}
+                                  mr={1}
                                   fontWeight={"bold"}
-                                  ml="2"
-                                  my="1"
-                                  p={2}
-                                  rounded="lg"
-                                  bg={"blue.600"}
+                                  color="whatsapp.400"
                                 >
-                                  {dayjs(slot).format("H")}:00 to{" "}
-                                  {Number(dayjs(slot).format("H")) + 1}:00
+                                  Approved
                                 </Text>
-                              );
-                            })}
-                          </Flex>
-                        </Td>
+                                <Icon as={BsCheckLg} color="green.500" />
+                              </Flex>
+                            )}
 
-                        <Td>
-                          {appointment.data.status == "approved" && (
-                            <Flex alignItems={"center"}>
-                              <Text
-                                mr={1}
-                                fontWeight={"bold"}
-                                color="whatsapp.400"
-                              >
-                                Approved
-                              </Text>
-                              <Icon as={BsCheckLg} color="green.500" />
-                            </Flex>
-                          )}
+                            {appointment.data.status == "rejected" && (
+                              <Flex alignItems={"center"}>
+                                <Text mr={1} fontWeight={"bold"} color="red.500">
+                                  Rejected
+                                </Text>
+                                <Icon
+                                  as={FiX}
+                                  fontWeight="bold"
+                                  fontSize={"22"}
+                                  color="red.500"
+                                />
+                              </Flex>
+                            )}
 
-                          {appointment.data.status == "rejected" && (
-                            <Flex alignItems={"center"}>
-                              <Text mr={1} fontWeight={"bold"} color="red.500">
-                                Rejected
-                              </Text>
-                              <Icon
-                                as={FiX}
-                                fontWeight="bold"
-                                fontSize={"22"}
-                                color="red.500"
-                              />
-                            </Flex>
-                          )}
+                            {appointment.data.status == "pending" && (
+                              <Flex alignItems={"center"}>
+                                <Text mr={1} fontWeight={"bold"} color="blue.500">
+                                  Pending
+                                </Text>
+                                <Icon
+                                  as={CgSandClock}
+                                  fontWeight="bold"
+                                  fontSize={"22"}
+                                  color="blue.500"
+                                />
+                              </Flex>
+                            )}
 
-                          {appointment.data.status == "pending" && (
-                            <Flex alignItems={"center"}>
-                              <Text mr={1} fontWeight={"bold"} color="blue.500">
-                                Pending
-                              </Text>
-                              <Icon
-                                as={CgSandClock}
-                                fontWeight="bold"
-                                fontSize={"22"}
-                                color="blue.500"
-                              />
-                            </Flex>
-                          )}
-
-                          {appointment.data.status == "canceled" && (
-                            <Flex alignItems={"center"}>
-                              <Text mr={1} fontWeight={"bold"} color="red.700">
-                                Canceled
-                              </Text>
-                              <Icon
-                                as={FiX}
-                                fontWeight="bold"
-                                fontSize={"22"}
-                                color="red.700"
-                              />
-                            </Flex>
-                          )}
-                          {/* {appointment.data.status == "approved" ? (
+                            {appointment.data.status == "canceled" && (
+                              <Flex alignItems={"center"}>
+                                <Text mr={1} fontWeight={"bold"} color="red.700">
+                                  Canceled
+                                </Text>
+                                <Icon
+                                  as={FiX}
+                                  fontWeight="bold"
+                                  fontSize={"22"}
+                                  color="red.700"
+                                />
+                              </Flex>
+                            )}
+                            {/* {appointment.data.status == "approved" ? (
                                 <Flex alignItems={"center"}>
                                   <Text
                                     mr={1}
@@ -414,16 +414,16 @@ export default function UserDashboard() {
                                 </Flex>
                                 )
                               )} */}
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-                <Pagination
-                  totalCountOfRegisters={total}
-                  currentPage={page}
-                  onPageChanges={setPage}
-                />
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                  <Pagination
+                    totalCountOfRegisters={total}
+                    currentPage={page}
+                    onPageChanges={setPage}
+                  />
                 </Flex>
               </>
             ) : total == -1 ? (
@@ -431,10 +431,10 @@ export default function UserDashboard() {
                 <Spinner mt="10" mb="80px" />
               </Flex>
             ) : (
-              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'} > 
+              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'} >
                 <Box justifyContent="center" mb={8} display='flex' flexDirection={'column'}>
                   <Flex justifyContent={'center'}>
-                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'}/>
+                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'} />
                   </Flex>
                   <Flex w="100%" justifyContent="center">
                     <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
@@ -453,7 +453,7 @@ export default function UserDashboard() {
         </Flex>
 
         <Modal
-          
+
           isOpen={isModalOpen}
           onRequestClose={() => {
             setIsModalOpen(false);
@@ -468,7 +468,7 @@ export default function UserDashboard() {
             gap="1"
             minChildWidth="320px"
             alignItems="flex-start"
-            
+
           >
             <Box
               display="flex"
@@ -556,42 +556,42 @@ export default function UserDashboard() {
               </Text>
               {isConfirmMessageOpen ? (
                 <Box mb={4}>
-                <Text display={"flex"}>
-                  Do you really want to set this appointment status to{" "}
-                  <Text color={"red.500"} fontWeight="bold">
-                    &nbsp;Canceled
+                  <Text display={"flex"}>
+                    Do you really want to set this appointment status to{" "}
+                    <Text color={"red.500"} fontWeight="bold">
+                      &nbsp;Canceled
+                    </Text>
+                    ?
                   </Text>
-                  ?
-                </Text>
 
-                <Text color={"gray.200"}>
-                  Once you cancel an appointment, it never can be undone or edited. In case of mistake you cancel and schedule again.
-                </Text>
-              </Box>
+                  <Text color={"gray.200"}>
+                    Once you cancel an appointment, it never can be undone or edited. In case of mistake you cancel and schedule again.
+                  </Text>
+                </Box>
               ) : (
                 <Flex flexDir={"column"}>
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    8
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        8
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      8
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          8
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -601,31 +601,31 @@ export default function UserDashboard() {
                               8
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    9
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        9
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      9
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          9
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -635,31 +635,31 @@ export default function UserDashboard() {
                               9
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    10
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        10
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      10
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          10
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -669,31 +669,31 @@ export default function UserDashboard() {
                               10
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    11
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        11
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      11
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          11
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -703,31 +703,31 @@ export default function UserDashboard() {
                               11
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    12
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        12
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      12
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          12
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -737,31 +737,31 @@ export default function UserDashboard() {
                               12
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    13
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        13
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      13
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          13
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -771,31 +771,31 @@ export default function UserDashboard() {
                               13
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    14
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        14
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      14
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          14
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -805,31 +805,31 @@ export default function UserDashboard() {
                               14
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    15
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        15
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      15
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          15
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -839,31 +839,31 @@ export default function UserDashboard() {
                               15
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    16
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        16
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      16
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          16
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -873,31 +873,31 @@ export default function UserDashboard() {
                               16
                             ).toString()
                         )
-                  }
-                />
+                    }
+                  />
 
-                <ApprovalTimeCard
-                  slot={new Date(
-                    Number(dayjs(selectedSlots[0]).format("YYYY")),
-                    Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                    Number(dayjs(selectedSlots[0]).format("D")),
-                    17
-                  ).toString()}
-                  timeLabel="20/02/2022"
-                  isCurrentUserAppointment={selectedSlots.some(
-                    (slot) =>
-                      slot ===
-                      new Date(
-                        Number(dayjs(selectedSlots[0]).format("YYYY")),
-                        Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                        Number(dayjs(selectedSlots[0]).format("D")),
-                        17
-                      ).toString()
-                  )}
-                  isBusy={
-                    isLoadingBusylots
-                      ? false
-                      : dataBusySlots.busySlots.some(
+                  <ApprovalTimeCard
+                    slot={new Date(
+                      Number(dayjs(selectedSlots[0]).format("YYYY")),
+                      Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                      Number(dayjs(selectedSlots[0]).format("D")),
+                      17
+                    ).toString()}
+                    timeLabel="20/02/2022"
+                    isCurrentUserAppointment={selectedSlots.some(
+                      (slot) =>
+                        slot ===
+                        new Date(
+                          Number(dayjs(selectedSlots[0]).format("YYYY")),
+                          Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                          Number(dayjs(selectedSlots[0]).format("D")),
+                          17
+                        ).toString()
+                    )}
+                    isBusy={
+                      isLoadingBusylots
+                        ? false
+                        : dataBusySlots.busySlots.some(
                           (slot) =>
                             slot ===
                             new Date(
@@ -907,9 +907,9 @@ export default function UserDashboard() {
                               17
                             ).toString()
                         )
-                  }
-                />
-              </Flex>
+                    }
+                  />
+                </Flex>
               )}
             </Box>
 
@@ -925,13 +925,14 @@ export default function UserDashboard() {
                 </Button>
 
                 {isConfirmMessageOpen ? (<Button type="submit" onClick={() => {
-                  handleCancelAppointment(appointmentId)}
-                  } colorScheme={"red"}>
+                  handleCancelAppointment(appointmentId)
+                }
+                } colorScheme={"red"}>
                   Yes, I want to cancel
                 </Button>) : (
-                  <Button type="submit" onClick={() => {setIsConfirmMessageOpen(true)}} colorScheme={"red"}>
-                  Cancel appointment
-                </Button>
+                  <Button type="submit" onClick={() => { setIsConfirmMessageOpen(true) }} colorScheme={"red"}>
+                    Cancel appointment
+                  </Button>
                 )}
               </Flex>
             ) : (
@@ -950,9 +951,9 @@ export default function UserDashboard() {
         </Modal>
 
         <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
-      </Flex>
+          <Flex w={{ lg: '275px' }}></Flex>
+          <Footer />
+        </Flex>
       </Box>
     </>
   );

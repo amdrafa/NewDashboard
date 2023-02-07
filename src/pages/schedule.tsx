@@ -3,54 +3,39 @@ import {
   SimpleGrid,
   Box,
   Text,
-  Image,
   VStack,
   Icon,
-  Select,
   Button,
   Divider,
-  Checkbox,
   Heading,
   HStack,
   Link,
   useToast,
-  Link as ChakraLink,
-  Spinner,
   useBreakpointValue,
   Table,
-  TableCaption,
   Tbody,
   Td,
-  Tfoot,
   Th,
   Thead,
   Tr,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
-import { DateRangePicker } from "react-date-range";
 import { FormEvent, useContext, useEffect, useState } from "react";
-import { Calendar } from "react-date-range";
 import {
-  RiCalendarLine,
   RiCarLine,
-  RiCloseCircleLine,
-  RiMotorbikeLine,
 } from "react-icons/ri";
-import { GiAutoRepair, GiMineTruck } from "react-icons/gi";
-import { FaCircle, FaTruckMonster } from "react-icons/fa";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { GiAutoRepair } from "react-icons/gi";
+import { FaCircle } from "react-icons/fa";
 import Modal from "react-modal";
 import { LoginContext } from "../contexts/LoginContext";
 import { api } from "../services/axios";
 import Router from "next/router";
-import { errors } from "faunadb";
 import { ChooseVehicle } from "../components/ChooseVehicle";
 import { useQuery } from "react-query";
-import { CalendarHeader } from "../components/Calendar/CalendarHeader";
-import { CalendarIndex } from "../components/Calendar";
 import dayjs from "dayjs";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
@@ -58,6 +43,8 @@ import { decode } from "jsonwebtoken";
 import { Footer } from "../components/footer";
 import { Input } from "../components/Form/input";
 import { BiBuilding, BiTrash } from "react-icons/bi";
+import { GoPlus } from "react-icons/go";
+import { MultiSelect } from "react-multi-select-component";
 
 export type DecodedToken = {
   sub: string;
@@ -84,6 +71,15 @@ interface dataProps {
 export default function Schedule() {
 
   const toast = useToast()
+
+  const [selected, setSelected] = useState([]);
+
+  const options = [
+    { label: "VDA", value: "VDA" },
+    { label: "Gravel track", value: "Gravel track" },
+    { label: "Rough road", value: "Rough road" },
+    { label: "Highspeed track", value: "Highspeed track", disabled: true },
+  ];
 
   const [isSameDay, setIsSameDay] = useState(true)
 
@@ -237,16 +233,16 @@ export default function Schedule() {
               <HStack spacing={'1rem'}>
                 <Button
                   w={'10rem'}
-                  background={selectedTab === 'Resource' ? 'blue.500' : 'gray.800'}
-                  _hover={selectedTab === 'Resource' ? { background: "blue.700" } : { background: "blackAlpha.500" }}
+                  background={selectedTab === 'Resource' ? 'blue.500' : 'gray.900'}
+                  _hover={{ opacity: 0.7 }}
                   onClick={() => updateTab('Resource')}
                 >
                   Resources
                 </Button>
                 <Button
                   w={'10rem'}
-                  background={selectedTab === 'Extra' ? 'blue.500' : 'gray.800'}
-                  _hover={selectedTab === 'Extra' ? { background: "blue.700" } : { background: "blackAlpha.500" }}
+                  background={selectedTab === 'Extra' ? 'blue.500' : 'gray.900'}
+                  _hover={{ opacity: 0.7 }}
                   onClick={() => updateTab('Extra')}
                 >
                   Atendees | Vehicles
@@ -281,8 +277,18 @@ export default function Schedule() {
                   Resource
                 </Text>
 
-                <Flex w='100%'>
-                  <Select
+                <Flex w='100%' mb={'1rem'}>
+
+                  <MultiSelect
+                    options={options}
+                    value={selected}
+                    onChange={setSelected}
+                    labelledBy="Select"
+                    className="multiSelector"
+                    disableSearch
+                  />
+
+                  {/* <Select
                     maxW={'22rem'}
                     onChange={(e) => setSpeedway(e.target.value)}
                     placeholder="Select option"
@@ -303,7 +309,8 @@ export default function Schedule() {
                         </option>
                       ))
                     )}
-                  </Select>
+                  </Select> */}
+
                 </Flex>
 
 
@@ -350,7 +357,7 @@ export default function Schedule() {
                 </Text>
 
 
-                <HStack spacing={'1rem'}>
+                <HStack spacing={'1rem'} mb='1.5rem'>
                   <Input
                     name="FromDate"
                     color={'gray.300'}
@@ -381,9 +388,11 @@ export default function Schedule() {
                     }
                   />
                 </HStack>
+
+                <Button colorScheme={'blue'} w='100%'>Schedule</Button>
               </VStack>
 
-              <Flex height={'30rem'} minHeight={'400px'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
+              <Flex height={'100%'} maxHeight={'34.2rem'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
                 {
                   "&::-webkit-scrollbar": {
                     width: "10px",
@@ -725,109 +734,166 @@ export default function Schedule() {
                 />
               </Flex>
 
-              <Text ml="1" w="100%" fontSize="18">
-                Test track
-              </Text>
+              <Flex color={'blue.500'} justify={'start'} alignItems='center' w={'100%'} >
+                <GoPlus cursor={'pointer'} />
+                <Text _hover={
+                  { color: 'blue.700' }
+                } cursor={'pointer'} color={'blue.500'} ml={'0.5rem'}>Add non registered participants</Text>
+              </Flex>
 
-              <HStack w={'100%'}>
-                <Box>
-                  <Input
-                    name="FromDate"
-                    type={'date'}
-                    width='100%'
-                    sx={
-                      {
-                        "&::-webkit-calendar-picker-indicator": {
-                          cursor: 'not-allowed',
-                          // filter: invert(100%)
-                        }
-                      }
-                    }
-                  />
-                </Box>
+              <Divider borderColor="gray.700" />
 
+              <Flex height={'100%'} maxHeight={'22rem'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
+                {
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
 
-                <Box>
-                  <Input
-                    name="FromDate"
-                    type={'time'}
-                    width='100%'
-                    sx={
-                      {
-                        "&::-webkit-calendar-picker-indicator": {
-                          color: "#fff"
-                        }
-                      }
-                    }
-                  />
-                </Box>
-
-              </HStack>
-
-              <HStack w={'100%'}>
-                <Box>
-                  <Input
-                    name="FromDate"
-                    type={'date'}
-                    width='100%'
-                    sx={
-                      {
-                        "&::-webkit-calendar-picker-indicator": {
-                          cursor: 'not-allowed',
-                          // filter: invert(100%)
-                        }
-                      }
-                    }
-                  />
-                </Box>
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }
+              }>
 
 
-                <Box>
-                  <Input
-                    name="FromDate"
-                    type={'time'}
-                    width='100%'
-                    sx={
-                      {
-                        "&::-webkit-calendar-picker-indicator": {
-                          cursor: 'not-allowed',
-                          // filter: invert(100%)
-                        }
-                      }
-                    }
-                  />
-                </Box>
+                <Table colorScheme="whiteAlpha">
+                  <Thead>
+                    <Tr>
+                      <Th px={["4", "4", "6"]} color="gray.300" width="">
+                        <Text>Name</Text>
+                      </Th>
 
-              </HStack>
+                      <Th px={["4", "4", "6"]} width="">
+                        <Text>Email</Text>
+                      </Th>
+
+                      <Th>CPF</Th>
+
+                      <Th w="8"></Th>
+                    </Tr>
+                  </Thead>
+
+                  <Tbody>
+                    <Tr>
+                      <Td>
+                        João Silva Pereira
+                      </Td>
+                      <Td>
+                        joaopereira@gmail.com
+                      </Td>
+                      <Td>
+                        07384617819
+                      </Td>
+                      <Td w={'26rem'}>
+                        <Flex justify={'center'} alignItems='center' w={'100%'}>
+                          <Checkbox mr={'0.5rem'} />
+                          <Text>Notify by e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr>
+
+                    <Tr>
+                      <Td>
+                        João Silva Pereira
+                      </Td>
+                      <Td>
+                        joaopereira@gmail.com
+                      </Td>
+                      <Td>
+                        07384617819
+                      </Td>
+                      <Td w={'26rem'}>
+                        <Flex cursor={'pointer'} color={'blue.500'} justify={'center'} alignItems='center' w={'100%'} _hover={
+                          { color: 'blue.700' }
+                        }>
+                          <GoPlus />
+                          <Text ml={'0.5rem'}>Add e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr>
+
+                    <Tr>
+                      <Td>
+                        João Silva Pereira
+                      </Td>
+                      <Td>
+                        joaopereira@gmail.com
+                      </Td>
+                      <Td>
+                        07384617819
+                      </Td>
+                      <Td w={'26rem'}>
+                        <Flex justify={'center'} alignItems='center' w={'100%'}>
+                          <Checkbox mr={'0.5rem'} />
+                          <Text>Notify by e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr>
+
+                    <Tr>
+                      <Td>
+                        João Silva Pereira
+                      </Td>
+                      <Td>
+                        joaopereira@gmail.com
+                      </Td>
+                      <Td>
+                        07384617819
+                      </Td>
+                      <Td w={'26rem'}>
+                        <Flex cursor={'pointer'} color={'blue.500'} justify={'center'} alignItems='center' w={'100%'} _hover={
+                          { color: 'blue.700' }
+                        }>
+                          <GoPlus />
+                          <Text ml={'0.5rem'}>Add e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr>
+
+                    <Tr>
+                      <Td>
+                        João Silva Pereira
+                      </Td>
+                      <Td>
+                        joaopereira@gmail.com
+                      </Td>
+                      <Td>
+                        07384617819
+                      </Td>
+                      <Td w={'26rem'}>
+                        <Flex cursor={'pointer'} color={'blue.500'} justify={'center'} alignItems='center' w={'100%'} _hover={
+                          { color: 'blue.700' }
+                        }>
+                          <GoPlus />
+                          <Text ml={'0.5rem'}>Add e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr>
+
+
+                  </Tbody>
+
+                </Table>
+              </Flex>
+
+
 
             </VStack>
 
           )}
 
+          <Divider mt='2.5rem' borderColor="gray.700" />
 
-
-          <Flex mt="8" justify="flex-end">
+          <Flex mt="2rem" justify="flex-end">
             <HStack spacing="4">
               <Link href="/home">
                 <Button colorScheme="whiteAlpha">Cancel</Button>
               </Link>
-              <Button colorScheme="blue" onClick={() => {
-
-                {
-                  speedway == '' ? (toast({
-                    title: "Select a test track",
-                    description: `You need to select a test track to proceed.`,
-                    status: "info",
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'top-right'
-                  })) : (
-                    setPage(2)
-                  )
-                }
-
-
-              }}>
+              <Button colorScheme="blue" onClick={() => { setIsModalOpen(true) }}>
                 Next
               </Button>
             </HStack>
@@ -843,6 +909,217 @@ export default function Schedule() {
         <Footer />
       </Flex>
 
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={handleCloseModal}
+        overlayClassName="react-modal-overlay"
+        className="react-modal-content-slots-confirmation"
+        ariaHideApp={false}
+      >
+
+        <Flex justifyContent="flex-start">
+          <Text fontSize={24} fontWeight='bold' color={'gray.100'}>Confirm appointment</Text>
+        </Flex>
+
+        <Divider my='4' />
+
+        <Flex mb={'2rem'} maxH={'30rem'} flexDir={'column'} mt={'1.2rem'} w={"100%"} overflowY={'scroll'} sx={
+          {
+            "&::-webkit-scrollbar": {
+              width: "10px",
+
+            },
+            "&::-webkit-scrollbar-track": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "blackAlpha.500",
+              borderRadius: "24px",
+            },
+          }
+        }>
+
+
+          <Table colorScheme="whiteAlpha">
+            <Thead>
+              <Tr >
+                <Th px={["4", "4", "6"]} color="gray.300" width="">
+                  <Text>Company</Text>
+                </Th>
+
+                <Th px={["4", "4", "6"]} width="">
+                  <Text>Responsable</Text>
+                </Th>
+
+                <Th>CNPJ</Th>
+
+                {isWideVersioon && <Th >Register date</Th>}
+                <Th w="8">Status</Th>
+
+                <Th w="8"></Th>
+              </Tr>
+            </Thead>
+
+            <Tbody >
+              <Tr background={'red.500'} >
+                <Td >
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  <HStack spacing={'0.8rem'}>
+                    <Button colorScheme={'blackAlpha'}>
+                      Reschedule
+                    </Button>
+                    <Button colorScheme={'blackAlpha'}>
+                      Excluir
+                    </Button>
+                  </HStack>
+                </Td>
+              </Tr>
+
+              <Tr background={'green.500'}>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  <HStack spacing={'0.8rem'}>
+                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                      Exclusive
+                    </Button>
+                    <Button colorScheme={'blackAlpha'}>
+                      Excluir
+                    </Button>
+                  </HStack>
+                </Td>
+              </Tr>
+
+              <Tr background={'red.500'}>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  <HStack spacing={'0.8rem'}>
+                    <Button colorScheme={'blackAlpha'}>
+                      Reschedule
+                    </Button>
+                    <Button colorScheme={'blackAlpha'}>
+                      Excluir
+                    </Button>
+                  </HStack>
+                </Td>
+              </Tr>
+
+              <Tr background={'green.500'}>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  <HStack spacing={'0.8rem'}>
+                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                      Exclusive
+                    </Button>
+                    <Button colorScheme={'blackAlpha'}>
+                      Excluir
+                    </Button>
+                  </HStack>
+                </Td>
+              </Tr>
+
+              <Tr background={'green.500'}>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  teste
+                </Td>
+                <Td>
+                  <HStack spacing={'0.8rem'}>
+                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                      Exclusive
+                    </Button>
+                    <Button colorScheme={'blackAlpha'}>
+                      Excluir
+                    </Button>
+                  </HStack>
+                </Td>
+              </Tr>
+
+
+            </Tbody>
+
+          </Table>
+        </Flex>
+
+        <HStack spacing={4} justify='end'>
+          <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
+            Cancel
+          </Button>
+
+
+          <Button type="submit" colorScheme="green">
+            Confirm
+          </Button>
+        </HStack>
+
+      </Modal>
 
     </Box >
 
