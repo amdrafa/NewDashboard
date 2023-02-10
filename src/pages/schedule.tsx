@@ -654,55 +654,49 @@ export default function Schedule() {
               </Flex> */}
             </Flex>
           ) : (
-            <VStack spacing="8">
+            <VStack spacing="8" >
               <Text w="100%" fontSize="20">
                 Invite participants:
               </Text>
 
-              <Grid Grid templateColumns='repeat(2, 1fr)' gap={6} w='100%'>
-                <Input
-                  name="Participant"
-                  label="Participant name"
-                />
-                <Flex w={'100%'} background={'gray.800'} justifyContent={'center'} borderRadius='2xl'>
+              <Flex w={'100%'} justify='space-between' mb={'2rem'}>
+                <Flex flexDir={'column'} >
+                  <Input
+                    name="Participant"
+                    label="Participant name"
+                  />
+                  <Flex mt={'1.5rem'} color={'blue.500'} justify={'start'} alignItems='center' w={'100%'} >
+                    <GoPlus cursor={'pointer'} />
+                    <Text _hover={
+                      { color: 'blue.700' }
+                    } cursor={'pointer'} color={'blue.500'} ml={'0.5rem'}>Add non registered participants</Text>
+                  </Flex>
+                </Flex>
+                <Flex w={'100%'} background={'gray.800'} justifyContent={'end'} borderRadius='2xl'>
                   <VStack>
                     <HStack>
-                      <Text w={'14rem'}>Passanger car</Text>
+                      <Text w={'20rem'}>Passanger car</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                      <Text w={'20rem'}>Light duty truck</Text>
                       <Input w={'4rem'} name="passangerCar" />
                     </HStack>
                     <HStack>
-                      <Text w={'14rem'}>Light duty truck</Text>
+                      <Text w={'20rem'}>Urban light bus</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                      <Text w={'20rem'}>Urban heavy bus</Text>
                       <Input w={'4rem'} name="passangerCar" />
                     </HStack>
                     <HStack>
-                      <Text w={'14rem'}>Urban light bus</Text>
+                      <Text w={'20rem'}>Coach bus</Text>
                       <Input w={'4rem'} name="passangerCar" />
-                    </HStack>
-                    <HStack>
-                      <Text w={'14rem'}>Urban heavy bus</Text>
-                      <Input w={'4rem'} name="passangerCar" />
-                    </HStack>
-                    <HStack>
-                      <Text w={'14rem'}>Coach bus</Text>
-                      <Input w={'4rem'} name="passangerCar" />
-                    </HStack>
-                    <HStack>
-                      <Text w={'14rem'}>Others</Text>
+                      <Text w={'20rem'}>Others</Text>
                       <Input w={'4rem'} name="passangerCar" />
                     </HStack>
                   </VStack>
 
                 </Flex>
-              </Grid>
-
-              <Flex color={'blue.500'} justify={'start'} alignItems='center' w={'100%'} >
-                <GoPlus cursor={'pointer'} />
-                <Text _hover={
-                  { color: 'blue.700' }
-                } cursor={'pointer'} color={'blue.500'} ml={'0.5rem'}>Add non registered participants</Text>
               </Flex>
 
-              <Divider borderColor="gray.700" />
 
               <Flex height={'100%'} maxHeight={'22rem'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
                 {
