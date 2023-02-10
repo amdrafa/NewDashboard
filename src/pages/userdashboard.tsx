@@ -23,6 +23,7 @@ import {
   Image,
   useToast
 } from "@chakra-ui/react";
+import { IoDiamondOutline } from "react-icons/io5";
 import { CgSandClock } from "react-icons/cg";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -231,6 +232,10 @@ export default function UserDashboard() {
                     <Thead>
                       <Tr>
                         <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>ID</Text>
+                        </Th>
+
+                        <Th px={["4", "4", "6"]} width="">
                           <Text>Test track</Text>
                         </Th>
 
@@ -239,7 +244,15 @@ export default function UserDashboard() {
                         </Th>
 
                         <Th px={["4", "4", "6"]} width="">
-                          <Text>Slots</Text>
+                          <Text>From</Text>
+                        </Th>
+
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>To</Text>
+                        </Th>
+
+                        <Th display={'flex'} justifyContent={'center'} px={["4", "4", "6"]} width="">
+                          <Text>Exclusive</Text>
                         </Th>
 
                         <Th px={["4", "4", "6"]} width="">
@@ -248,6 +261,7 @@ export default function UserDashboard() {
                       </Tr>
                     </Thead>
                     <Tbody>
+
                       {data.map((appointment) => (
                         <Tr
                           key={appointment.ts}
@@ -270,14 +284,14 @@ export default function UserDashboard() {
                           }}
                         >
                           <Td>
-                            <Box>
-                              <Text fontWeight="bold">
-                                {appointment.data.speedway}
-                              </Text>
-                              <Text color={"gray.300"}>
-                                {appointment.data.vehicle}
-                              </Text>
-                            </Box>
+                            <Text fontWeight="bold">
+                              0001
+                            </Text>
+                          </Td>
+                          <Td>
+                            <Text fontWeight="bold">
+                              {appointment.data.speedway}
+                            </Text>
                           </Td>
 
                           <Td>
@@ -289,27 +303,20 @@ export default function UserDashboard() {
                           </Td>
 
                           <Td>
-                            <Flex
-                              wrap="wrap"
-                              alignSelf={"center"}
-                              alignItems={"center"}>
-                              {appointment.data.selectedSlots.map((slot) => {
-                                return (
-                                  <Text
-                                    key={slot}
-                                    color={"gray.100"}
-                                    fontWeight={"bold"}
-                                    ml="2"
-                                    my="1"
-                                    p={2}
-                                    rounded="lg"
-                                    bg={"blue.600"}
-                                  >
-                                    {dayjs(slot).format("H")}:00 to{" "}
-                                    {Number(dayjs(slot).format("H")) + 1}:00
-                                  </Text>
-                                );
-                              })}
+                            <Text fontWeight="bold">
+                              Feb 9, 2023 - 9:00 PM
+                            </Text>
+                          </Td>
+
+                          <Td>
+                            <Text fontWeight="bold">
+                              Feb 9, 2023 - 9:00 PM
+                            </Text>
+                          </Td>
+
+                          <Td>
+                            <Flex color={'blue.500'} justify='center' align={'centers'}>
+                              <IoDiamondOutline />
                             </Flex>
                           </Td>
 

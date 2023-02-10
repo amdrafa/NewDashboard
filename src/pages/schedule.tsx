@@ -20,6 +20,7 @@ import {
   Tr,
   Checkbox,
   Grid,
+  Select,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -31,8 +32,6 @@ import {
 } from "react-icons/ri";
 import { FiTool } from "react-icons/fi";
 import { IoDiamondOutline } from "react-icons/io5";
-
-import { FaCircle } from "react-icons/fa";
 import Modal from "react-modal";
 import { LoginContext } from "../contexts/LoginContext";
 import { api } from "../services/axios";
@@ -56,8 +55,8 @@ interface SelectedResourceProps {
   resources: string[];
   fromDate: Date;
   toDate: Date;
-  fromTime: Date;
-  toTime: Date;
+  fromTime: string;
+  toTime: string;
   isExclusive: boolean;
 }
 
@@ -113,11 +112,11 @@ export default function Schedule() {
 
   const [toDate, setToDate] = useState<Date>();
 
-  const [fromTime, setFromTime] = useState<Date>();
+  const [fromTime, setFromTime] = useState<string>();
 
   const [isSelectedResourceExclusive, setIsSelectedResourceExclusive] = useState(false);
 
-  const [toTime, setToTime] = useState<Date>();
+  const [toTime, setToTime] = useState<string>();
 
   const [selectedResources, setSelectedResources] = useState<SelectedResourceProps[]>([])
 
@@ -131,7 +130,7 @@ export default function Schedule() {
 
   function updateSelectedResource() {
 
-    console.log(fromDate, fromTime, toDate, toTime, selected)
+    console.log(fromDate, toDate, fromTime, toTime, selected)
 
     if (fromDate === undefined || fromTime === undefined || selected.length < 1 || toTime === undefined || toDate === undefined) {
 
@@ -187,11 +186,25 @@ export default function Schedule() {
 
 
 
-  const options = [
+  const testTrackOptions = [
     { label: "VDA", value: "VDA" },
     { label: "Gravel track", value: "Gravel track" },
     { label: "Rough road", value: "Rough road" },
     { label: "Highspeed track", value: "Highspeed track", disabled: true },
+  ];
+
+  const officeOptions = [
+    { label: "Office 1", value: "Office 1" },
+    { label: "Office 2", value: "Office 2", disabled: true },
+    { label: "Office 3", value: "Office 3" },
+    { label: "Office 4", value: "Office 4" },
+  ];
+
+  const workshopOptions = [
+    { label: "Workshop 1", value: "Workshop 1" },
+    { label: "Workshop 2", value: "Workshop 2", disabled: true },
+    { label: "Workshop 3", value: "Workshop 3" },
+    { label: "Workshop 4", value: "Workshop 4" },
   ];
 
 
@@ -363,7 +376,7 @@ export default function Schedule() {
                   </Text>
 
                   <HStack spacing={'0.5rem'} w='100%'>
-                    <Checkbox onChange={(e) => setIsSelectedResourceExclusive(e.target.checked)} />
+                    <Checkbox isChecked={isSelectedResourceExclusive} onChange={(e) => setIsSelectedResourceExclusive(e.target.checked)} />
                     <Text color={'gray.200'}>
                       Exclusive booking
                     </Text>
@@ -373,7 +386,7 @@ export default function Schedule() {
                 <Flex w='100%' mb={'1rem'}>
 
                   <MultiSelect
-                    options={options}
+                    options={category === "Test track" ? testTrackOptions : category === "Office" ? officeOptions : workshopOptions}
                     value={selected}
                     onChange={setSelected}
                     labelledBy="Select"
@@ -411,7 +424,53 @@ export default function Schedule() {
                   Start date:
                 </Text>
 
-                <HStack spacing={'1rem'}>
+                <HStack spacing={'0.5rem'}>
+
+                  <Input
+                    name="FromDate"
+                    color={'gray.300'}
+                    type={'date'}
+                    width='12rem'
+                    onChange={(e) => setFromDate(new Date(e.target.value))}
+                    sx={
+                      {
+                        "&::-webkit-calendar-picker-indicator": {
+                          filter: 'invert(1)',
+                          opacity: 0.3
+                        }
+                      }
+                    }
+                  />
+
+                  <Select onChange={(e) => setFromTime(e.target.value)} h={'3rem'} width='8rem' border={'none'} bg={'gray.900'} color={'gray.300'}>
+                    <option value={'- 07:00 PM'}>7:00</option>
+                    <option value={'- 07:30 PM'}>7:30</option>
+                    <option value={'- 08:00 PM'}>8:00</option>
+                    <option value={'- 08:30 PM'}>8:30</option>
+                    <option value={'- 09:00 PM'}>9:00</option>
+                    <option value={'- 09:30 PM'}>9:30</option>
+                    <option value={'- 10:00 PM'}>10:00</option>
+                    <option value={'- 10:30 PM'}>10:30</option>
+                    <option value={'- 11:00 PM'}>11:00</option>
+                    <option value={'- 11:30 PM'}>11:30</option>
+                    <option value={'- 12:00 PM'}>12:00</option>
+                    <option value={'- 12:30 PM'}>12:30</option>
+                    <option value={'- 13:00 PM'}>13:00</option>
+                    <option value={'- 13:30 PM'}>13:30</option>
+                    <option value={'- 14:00 PM'}>14:00</option>
+                    <option value={'- 14:30 PM'}>14:30</option>
+                    <option value={'- 15:00 PM'}>15:00</option>
+                    <option value={'- 15:30 PM'}>15:30</option>
+                    <option value={'- 16:00 PM'}>16:00</option>
+                    <option value={'- 16:30 PM'}>16:30</option>
+                    <option value={'- 17:00 PM'}>17:00</option>
+                    <option value={'- 17:30 PM'}>17:30</option>
+                    <option value={'- 18:00 PM'}>18:00</option>
+                  </Select>
+
+                </HStack>
+
+                {/* <HStack spacing={'1rem'}>
 
                   <Input
                     name="FromDate"
@@ -433,6 +492,7 @@ export default function Schedule() {
                     name="FromTime"
                     color={'gray.300'}
                     type={'time'}
+                    step={1800}
                     width='8rem'
                     onChange={(e) => setFromTime(new Date(e.target.value))}
                     sx={
@@ -445,13 +505,13 @@ export default function Schedule() {
                     }
                   />
 
-                </HStack>
+                </HStack> */}
 
                 <Text w="100%" fontSize="20">
                   End date:
                 </Text>
 
-                <HStack spacing={'1rem'} mb='1.5rem'>
+                <HStack spacing={'0.5rem'} mb='1.5rem'>
                   <Input
                     name="endDate"
                     color={'gray.300'}
@@ -468,21 +528,33 @@ export default function Schedule() {
                     }
                   />
 
-                  <Input
-                    name="endTime"
-                    color={'gray.300'}
-                    type={'time'}
-                    width='8rem'
-                    onChange={(e) => setToTime(new Date(e.target.value))}
-                    sx={
-                      {
-                        "&::-webkit-calendar-picker-indicator": {
-                          filter: 'invert(1)',
-                          opacity: 0.3
-                        }
-                      }
-                    }
-                  />
+                  { }
+
+                  <Select onChange={(e) => setToTime(e.target.value)} h={'3rem'} width='8rem' border={'none'} bg={'gray.900'} color={'gray.300'}>
+                    <option value={'- 07:00 PM'}>7:00</option>
+                    <option value={'- 07:30 PM'}>7:30</option>
+                    <option value={'- 08:00 PM'}>8:00</option>
+                    <option value={'- 08:30 PM'}>8:30</option>
+                    <option value={'- 09:00 PM'}>9:00</option>
+                    <option value={'- 09:30 PM'}>9:30</option>
+                    <option value={'- 10:00 PM'}>10:00</option>
+                    <option value={'- 10:30 PM'}>10:30</option>
+                    <option value={'- 11:00 PM'}>11:00</option>
+                    <option value={'- 11:30 PM'}>11:30</option>
+                    <option value={'- 12:00 PM'}>12:00</option>
+                    <option value={'- 12:30 PM'}>12:30</option>
+                    <option value={'- 13:00 PM'}>13:00</option>
+                    <option value={'- 13:30 PM'}>13:30</option>
+                    <option value={'- 14:00 PM'}>14:00</option>
+                    <option value={'- 14:30 PM'}>14:30</option>
+                    <option value={'- 15:00 PM'}>15:00</option>
+                    <option value={'- 15:30 PM'}>15:30</option>
+                    <option value={'- 16:00 PM'}>16:00</option>
+                    <option value={'- 16:30 PM'}>16:30</option>
+                    <option value={'- 17:00 PM'}>17:00</option>
+                    <option value={'- 17:30 PM'}>17:30</option>
+                    <option value={'- 18:00 PM'}>18:00</option>
+                  </Select>
                 </HStack>
 
                 <Button colorScheme={'blue'} w='100%' onClick={() => updateSelectedResource()}>Schedule</Button>
@@ -537,10 +609,10 @@ export default function Schedule() {
                               })}
                             </Td>
                             <Td>
-                              {dayjs(resource.fromDate).format('MMM D, YYYY - h:mm A')}
+                              {dayjs(resource.fromDate).format('MMM D, YYYY ') + fromTime}
                             </Td>
                             <Td>
-                              {dayjs(resource.toDate).format('MMM D, YYYY - h:mm A')}
+                              {dayjs(resource.toDate).format('MMM D, YYYY ') + toTime}
                             </Td>
 
                             <Td >
