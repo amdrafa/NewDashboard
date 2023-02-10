@@ -19,6 +19,7 @@ import {
   Thead,
   Tr,
   Checkbox,
+  Grid,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -28,7 +29,9 @@ import { FormEvent, useContext, useEffect, useState } from "react";
 import {
   RiCarLine,
 } from "react-icons/ri";
-import { GiAutoRepair } from "react-icons/gi";
+import { FiTool } from "react-icons/fi";
+import { IoDiamondOutline } from "react-icons/io5";
+
 import { FaCircle } from "react-icons/fa";
 import Modal from "react-modal";
 import { LoginContext } from "../contexts/LoginContext";
@@ -44,7 +47,19 @@ import { Footer } from "../components/footer";
 import { Input } from "../components/Form/input";
 import { BiBuilding, BiTrash } from "react-icons/bi";
 import { GoPlus } from "react-icons/go";
+import { BsCartX } from "react-icons/bs";
 import { MultiSelect } from "react-multi-select-component";
+import { v4 } from "uuid";
+
+interface SelectedResourceProps {
+  id: string;
+  resources: string[];
+  fromDate: Date;
+  toDate: Date;
+  fromTime: Date;
+  toTime: Date;
+  isExclusive: boolean;
+}
 
 export type DecodedToken = {
   sub: string;
@@ -70,9 +85,107 @@ interface dataProps {
 
 export default function Schedule() {
 
+  const [isSameDay, setIsSameDay] = useState(true)
+
+  const [isSlotLoading, setIsSlotLoading] = useState(true)
+
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
+
   const toast = useToast()
 
+  const [speedway, setSpeedway] = useState("");
+
+  const [category, setCategory] = useState("Test track");
+
+  const [page, setPage] = useState(1)
+
+  const [status, setStatus] = useState(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { isAuthenticated, user } = useContext(LoginContext);
+
+  const [selectedTab, setSelectedTab] = useState('Resource')
+
   const [selected, setSelected] = useState([]);
+
+  const [fromDate, setFromDate] = useState<Date>();
+
+  const [toDate, setToDate] = useState<Date>();
+
+  const [fromTime, setFromTime] = useState<Date>();
+
+  const [isSelectedResourceExclusive, setIsSelectedResourceExclusive] = useState(false);
+
+  const [toTime, setToTime] = useState<Date>();
+
+  const [selectedResources, setSelectedResources] = useState<SelectedResourceProps[]>([])
+
+  function deleteSelectedResource(id: string) {
+    const updatedSelectedResources = selectedResources.filter((src) => src.id != id)
+
+    setSelectedResources(updatedSelectedResources);
+
+    return;
+  }
+
+  function updateSelectedResource() {
+
+    console.log(fromDate, fromTime, toDate, toTime, selected)
+
+    if (fromDate === undefined || fromTime === undefined || selected.length < 1 || toTime === undefined || toDate === undefined) {
+
+      toast({
+        title: "Select a valid resource",
+        description: `Complete all fields to proceed.`,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+      return;
+    }
+
+
+    const isRepeatedResource = selectedResources.find((resourceSelected) => {
+      return resourceSelected.fromDate === fromDate && resourceSelected.fromTime === fromTime && resourceSelected.toDate === toDate && resourceSelected.toTime === toTime && resourceSelected.resources.every((src) => {
+        const sameResource = selected.filter(srcSelected => srcSelected === src);
+
+
+      })
+
+    })
+
+    if (!isRepeatedResource) {
+      setSelectedResources([...selectedResources, {
+        id: v4(),
+        resources: selected,
+        fromDate: fromDate,
+        fromTime: fromTime,
+        toDate: toDate,
+        toTime: toTime,
+        isExclusive: isSelectedResourceExclusive
+      }])
+
+      setIsSelectedResourceExclusive(false);
+      setSelected([]);
+
+      return;
+    }
+
+    toast({
+      title: "You have already selected an appointment with the same data.",
+      description: `It's necessary to change at least the resource or date to be able to schedule. `,
+      status: "info",
+      duration: 5000,
+      isClosable: true,
+      position: 'top-right'
+    });
+
+    return;
+  }
+
+
 
   const options = [
     { label: "VDA", value: "VDA" },
@@ -81,11 +194,6 @@ export default function Schedule() {
     { label: "Highspeed track", value: "Highspeed track", disabled: true },
   ];
 
-  const [isSameDay, setIsSameDay] = useState(true)
-
-  const [isSlotLoading, setIsSlotLoading] = useState(true)
-
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
 
   function AddTimeSlot(slot: string) {
 
@@ -115,19 +223,6 @@ export default function Schedule() {
     lg: true,
   });
 
-  const [selectedResources, setSelectedResources] = useState([''])
-  const [speedway, setSpeedway] = useState("");
-  const [vehicle, setVehicle] = useState("Light vehicle");
-
-  const [page, setPage] = useState(1)
-
-  const [status, setStatus] = useState(0);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { isAuthenticated, user } = useContext(LoginContext);
-
-  const [selectedTab, setSelectedTab] = useState('Resource')
 
   function updateTab(tab: string) {
     setSelectedTab(tab);
@@ -173,10 +268,6 @@ export default function Schedule() {
     setIsModalOpen(false);
   }
 
-  function updateSelectedResource(resource: string) {
-    setSelectedResources([...selectedResources, resource])
-  }
-
 
 
   async function CreateSchedule(event: FormEvent) {
@@ -186,7 +277,7 @@ export default function Schedule() {
     await api
       .post("scheduletime", {
         selectedSlots,
-        vehicle,
+        vehicle: "fix api post create schedule",
         speedway,
         userId: user.userId,
         userEmail: user.email,
@@ -207,8 +298,6 @@ export default function Schedule() {
         });
       });
 
-
-    setVehicle("Light vehicle");
     setSpeedway("Select option");
 
   }
@@ -228,7 +317,7 @@ export default function Schedule() {
           p="8"
           mt={5}
         >
-          <Flex justifyContent={"space-between"} align="center">
+          <Flex justifyContent={"start"} align="center">
             <Heading size="lg" fontWeight="normal">
               <HStack spacing={'1rem'}>
                 <Button
@@ -251,11 +340,6 @@ export default function Schedule() {
 
             </Heading>
 
-
-            <Box mr={1}>
-              <Icon fontSize={12} mr={2} color={"blue.500"} as={FaCircle} />
-              <Icon fontSize={12} as={FaCircle} color={"gray.600"} />
-            </Box>
           </Flex>
 
           <Divider my="6" borderColor="gray.700" />
@@ -268,14 +352,23 @@ export default function Schedule() {
                 </Text>
 
                 <HStack spacing={'1rem'} mb={'1rem'} w={"22rem"}>
-                  <ChooseVehicle onClick={() => setVehicle} isActive vehicleType="Test track" icon={RiCarLine} />
-                  <ChooseVehicle onClick={() => setVehicle} vehicleType="Office" icon={BiBuilding} />
-                  <ChooseVehicle onClick={() => setVehicle} vehicleType="Workshop" icon={GiAutoRepair} />
+                  <ChooseVehicle onClick={() => setCategory("Test track")} isActive={category === "Test track"} vehicleType="Test track" icon={RiCarLine} />
+                  <ChooseVehicle onClick={() => setCategory("Office")} isActive={category === "Office"} vehicleType="Office" icon={BiBuilding} />
+                  <ChooseVehicle onClick={() => setCategory("Workshop")} isActive={category === "Workshop"} vehicleType="Workshop" icon={FiTool} />
                 </HStack>
 
-                <Text w="100%" fontSize="20">
-                  Resource
-                </Text>
+                <Flex justify={'space-between'} w='100%' align={'center'} mb='0.5rem'>
+                  <Text w="100%" fontSize="20">
+                    Resource
+                  </Text>
+
+                  <HStack spacing={'0.5rem'} w='100%'>
+                    <Checkbox onChange={(e) => setIsSelectedResourceExclusive(e.target.checked)} />
+                    <Text color={'gray.200'}>
+                      Exclusive booking
+                    </Text>
+                  </HStack>
+                </Flex>
 
                 <Flex w='100%' mb={'1rem'}>
 
@@ -325,6 +418,7 @@ export default function Schedule() {
                     color={'gray.300'}
                     type={'date'}
                     width='12rem'
+                    onChange={(e) => setFromDate(new Date(e.target.value))}
                     sx={
                       {
                         "&::-webkit-calendar-picker-indicator": {
@@ -336,10 +430,11 @@ export default function Schedule() {
                   />
 
                   <Input
-                    name="FromDate"
+                    name="FromTime"
                     color={'gray.300'}
                     type={'time'}
                     width='8rem'
+                    onChange={(e) => setFromTime(new Date(e.target.value))}
                     sx={
                       {
                         "&::-webkit-calendar-picker-indicator": {
@@ -356,13 +451,13 @@ export default function Schedule() {
                   End date:
                 </Text>
 
-
                 <HStack spacing={'1rem'} mb='1.5rem'>
                   <Input
-                    name="FromDate"
+                    name="endDate"
                     color={'gray.300'}
                     type={'date'}
                     width='12rem'
+                    onChange={(e) => setToDate(new Date(e.target.value))}
                     sx={
                       {
                         "&::-webkit-calendar-picker-indicator": {
@@ -374,10 +469,11 @@ export default function Schedule() {
                   />
 
                   <Input
-                    name="FromDate"
+                    name="endTime"
                     color={'gray.300'}
                     type={'time'}
                     width='8rem'
+                    onChange={(e) => setToTime(new Date(e.target.value))}
                     sx={
                       {
                         "&::-webkit-calendar-picker-indicator": {
@@ -389,7 +485,7 @@ export default function Schedule() {
                   />
                 </HStack>
 
-                <Button colorScheme={'blue'} w='100%'>Schedule</Button>
+                <Button colorScheme={'blue'} w='100%' onClick={() => updateSelectedResource()}>Schedule</Button>
               </VStack>
 
               <Flex height={'100%'} maxHeight={'34.2rem'} flexDir={'column'} mt={'1.2rem'} ml={'4rem'} w={"100%"} overflowY={'scroll'} sx={
@@ -409,239 +505,75 @@ export default function Schedule() {
               }>
 
 
-                <Table colorScheme="whiteAlpha">
-                  <Thead>
-                    <Tr>
-                      <Th px={["4", "4", "6"]} color="gray.300" width="">
-                        <Text>Company</Text>
-                      </Th>
+                {selectedResources.length > 0 ? (
+                  <Table colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th px={["4", "4", "6"]} color="gray.300" width="">
+                          <Text>Resources</Text>
+                        </Th>
 
-                      <Th px={["4", "4", "6"]} width="">
-                        <Text>Responsable</Text>
-                      </Th>
+                        <Th px={["4", "4", "6"]} width="">
+                          <Text>From</Text>
+                        </Th>
 
-                      <Th>CNPJ</Th>
+                        <Th>To</Th>
 
-                      {isWideVersioon && <Th >Register date</Th>}
-                      <Th w="8">Status</Th>
+                        <Th>Exclusive</Th>
 
-                      <Th w="8"></Th>
-                    </Tr>
-                  </Thead>
+                        <Th w="8"></Th>
+                      </Tr>
+                    </Thead>
 
-                  <Tbody>
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
+                    <Tbody>
+                      {selectedResources.map(resource => {
+                        return (
+                          <Tr key={resource.id}>
+                            <Td>
+                              {resource.resources.map((unitResource: any) => {
+                                return (
+                                  <Text key={unitResource.value}>{unitResource.value}</Text>
+                                )
+                              })}
+                            </Td>
+                            <Td>
+                              {dayjs(resource.fromDate).format('MMM D, YYYY - h:mm A')}
+                            </Td>
+                            <Td>
+                              {dayjs(resource.toDate).format('MMM D, YYYY - h:mm A')}
+                            </Td>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
+                            <Td >
+                              <Text display={'flex'} align='center' justifyContent={'center'} color={resource.isExclusive ? 'blue.500' : 'gray.300'} fontWeight='bold'><IoDiamondOutline fontSize={'1.2rem'} /></Text>
+                            </Td>
+                            <Td>
+                              <Flex color={'gray.500'} fontWeight='semibold' _hover={{ color: 'red.500', cursor: 'pointer' }}>
+                                <BiTrash onClick={() => deleteSelectedResource(resource.id)} size={'1.2rem'} />
+                              </Flex>
+                            </Td>
+                          </Tr>
+                        )
+                      })}
+                    </Tbody>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
+                  </Table>
+                ) : (
+                  <Flex flexDir={'column'} h='34.2rem' w={'100%'} justifyContent='center' alignContent={'center'}>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
+                    <Flex w={'100%'} display='flex' justifyContent={'center'} >
+                      <Box color={'gray.500'} display={'flex'} flexDir='column' justifyContent={'center'} alignItems='center'>
+                        <BsCartX size={'4rem'} />
+                        <Text fontSize={'xl'} mt='1'>
+                          No feature has been selected
+                        </Text>
+                      </Box>
+                    </Flex>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
+                  </Flex>
+                )}
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
 
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
-
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
-
-                    <Tr _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        teste
-                      </Td>
-                      <Td>
-                        <BiTrash />
-                      </Td>
-                    </Tr>
-                  </Tbody>
-
-                </Table>
               </Flex>
 
               {/* <Flex background={'gray.900'} alignItems='center' justify={'start'} width={'22rem'} borderRadius='0.5rem'>
@@ -727,12 +659,41 @@ export default function Schedule() {
                 Invite participants:
               </Text>
 
-              <Flex w={'100%'}>
+              <Grid Grid templateColumns='repeat(2, 1fr)' gap={6} w='100%'>
                 <Input
                   name="Participant"
                   label="Participant name"
                 />
-              </Flex>
+                <Flex w={'100%'} background={'gray.800'} justifyContent={'center'} borderRadius='2xl'>
+                  <VStack>
+                    <HStack>
+                      <Text w={'14rem'}>Passanger car</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                    <HStack>
+                      <Text w={'14rem'}>Light duty truck</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                    <HStack>
+                      <Text w={'14rem'}>Urban light bus</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                    <HStack>
+                      <Text w={'14rem'}>Urban heavy bus</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                    <HStack>
+                      <Text w={'14rem'}>Coach bus</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                    <HStack>
+                      <Text w={'14rem'}>Others</Text>
+                      <Input w={'4rem'} name="passangerCar" />
+                    </HStack>
+                  </VStack>
+
+                </Flex>
+              </Grid>
 
               <Flex color={'blue.500'} justify={'start'} alignItems='center' w={'100%'} >
                 <GoPlus cursor={'pointer'} />

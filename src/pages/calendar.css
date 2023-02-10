@@ -102,6 +102,7 @@
 .multiSelector{
     width: 100%;
     color:#616488;
+    font-size: 1.1rem;
     --rmsc-bg: #181b23 !important;
     --rmsc-border: #181b23 !important;
     --rmsc-main: #3182CE !important;

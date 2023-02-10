@@ -84,7 +84,7 @@ export default function Home() {
             </Box>
 
             <Box mt={isWideVersioon ? '' : '20'}>
-              <Image alt="main image" w={'500px'} src="images/pista.png" />
+              SOME INFORMATION
             </Box>
 
 
