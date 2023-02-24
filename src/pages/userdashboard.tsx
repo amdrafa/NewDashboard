@@ -45,6 +45,7 @@ import { IoMdClose } from "react-icons/io";
 import { ApprovalTimeCard } from "../components/approvalTimeCard";
 import noAppointments from '../../public/noappointments.png'
 import { Footer } from "../components/footer";
+import EditBooking from "../components/editBooking";
 
 interface appointmentsDataProps {
   data: appointmentProps;
@@ -84,7 +85,7 @@ export default function UserDashboard() {
 
   const toast = useToast()
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModeOpen, setIsEditModeOpen] = useState(false);
 
   const [isConfirmMessageOpen, setIsConfirmMessageOpen] = useState(false);
 
@@ -150,7 +151,7 @@ export default function UserDashboard() {
     setAppointmentStatus(status);
     setCompanyRef(companyRef)
 
-    setIsModalOpen(true);
+    setIsEditModeOpen(true);
     return;
   }
 
@@ -192,190 +193,201 @@ export default function UserDashboard() {
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
 
-          <Box
-            flex="1"
-            borderRadius={8}
-            bg="gray.800"
-            p="8"
-            mt={5}
-            height="100%"
-          >
-            <Flex mb="8" justify="space-between" align="center">
-              <Heading size="lg" fontWeight="normal">
-                My appointments
-              </Heading>
+          {isEditModeOpen ? (
+            <EditBooking
+              companyName="dsa"
+              companyRef="213231"
+              setIsEditMode={setIsEditModeOpen}
+              speedway='asdsa'
+              status="'dsadsa"
+              vehicle="dsadasaaaa"
 
-              <Link href="/schedule">
-                <Button
-                  size="sm"
-                  fontSize="sm"
-                  colorScheme="blue"
-                  leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-                >
-                  Schedule an appointment
-                </Button>
-              </Link>
-            </Flex>
+            />
+          ) : (
+            <Box
+              flex="1"
+              borderRadius={8}
+              bg="gray.800"
+              p="8"
+              mt={5}
+              height="100%"
+            >
+              <Flex mb="8" justify="space-between" align="center">
+                <Heading size="lg" fontWeight="normal">
+                  My bookings
+                </Heading>
 
-            {isLoading ? (
-              <Flex justify="center">
-                <Spinner mt="10" mb="80px" />
+                <Link href="/schedule">
+                  <Button
+                    size="sm"
+                    fontSize="sm"
+                    colorScheme="blue"
+                    leftIcon={<Icon as={RiAddLine} fontSize="20" />}
+                  >
+                    Schedule an appointment
+                  </Button>
+                </Link>
               </Flex>
-            ) : error ? (
-              <Flex justify="center">
-                <Text>The requisition failed</Text>
-              </Flex>
-            ) : total > 0 ? (
-              <>
-                <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
-                  <Table colorScheme="whiteAlpha">
-                    <Thead>
-                      <Tr>
-                        <Th px={["4", "4", "6"]} color="gray.300" width="">
-                          <Text>ID</Text>
-                        </Th>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>Test track</Text>
-                        </Th>
+              {isLoading ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
+                </Flex>
+              ) : error ? (
+                <Flex justify="center">
+                  <Text>The requisition failed</Text>
+                </Flex>
+              ) : total > 0 ? (
+                <>
+                  <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                    <Table colorScheme="whiteAlpha">
+                      <Thead>
+                        <Tr>
+                          <Th px={["4", "4", "6"]} color="gray.300" width="">
+                            <Text>ID</Text>
+                          </Th>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>Date</Text>
-                        </Th>
+                          <Th px={["4", "4", "6"]} width="">
+                            <Text>Test track</Text>
+                          </Th>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>From</Text>
-                        </Th>
+                          <Th px={["4", "4", "6"]} width="">
+                            <Text>Date</Text>
+                          </Th>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>To</Text>
-                        </Th>
+                          <Th px={["4", "4", "6"]} width="">
+                            <Text>From</Text>
+                          </Th>
 
-                        <Th display={'flex'} justifyContent={'center'} px={["4", "4", "6"]} width="">
-                          <Text>Exclusive</Text>
-                        </Th>
+                          <Th px={["4", "4", "6"]} width="">
+                            <Text>To</Text>
+                          </Th>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>Status</Text>
-                        </Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
+                          <Th display={'flex'} justifyContent={'center'} px={["4", "4", "6"]} width="">
+                            <Text>Exclusive</Text>
+                          </Th>
 
-                      {data.map((appointment) => (
-                        <Tr
-                          key={appointment.ts}
-                          _hover={{
-                            bg: "gray.900",
-                            color: "gray.300",
-                            transition: "0.2s",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => {
-                            handleAppointmentApprovalFirstStep({
-                              appointmentId: appointment.ref["@ref"].id,
-                              companyName: appointment.data.companyName,
-                              selectedSlots: appointment.data.selectedSlots,
-                              speedway: appointment.data.speedway,
-                              status: appointment.data.status,
-                              vehicle: appointment.data.vehicle,
-                              companyRef: appointment.data.companyRef
-                            });
-                          }}
-                        >
-                          <Td>
-                            <Text fontWeight="bold">
-                              0001
-                            </Text>
-                          </Td>
-                          <Td>
-                            <Text fontWeight="bold">
-                              {appointment.data.speedway}
-                            </Text>
-                          </Td>
+                          <Th px={["4", "4", "6"]} width="">
+                            <Text>Status</Text>
+                          </Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
 
-                          <Td>
-                            <Text>
-                              {dayjs(appointment.data.selectedSlots[0]).format(
-                                "DD/MM/YYYY"
+                        {data.map((appointment) => (
+                          <Tr
+                            key={appointment.ts}
+                            _hover={{
+                              bg: "gray.900",
+                              color: "gray.300",
+                              transition: "0.2s",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              handleAppointmentApprovalFirstStep({
+                                appointmentId: appointment.ref["@ref"].id,
+                                companyName: appointment.data.companyName,
+                                selectedSlots: appointment.data.selectedSlots,
+                                speedway: appointment.data.speedway,
+                                status: appointment.data.status,
+                                vehicle: appointment.data.vehicle,
+                                companyRef: appointment.data.companyRef
+                              });
+                            }}
+                          >
+                            <Td>
+                              <Text fontWeight="bold">
+                                0001
+                              </Text>
+                            </Td>
+                            <Td>
+                              <Text fontWeight="bold">
+                                {appointment.data.speedway}
+                              </Text>
+                            </Td>
+
+                            <Td>
+                              <Text>
+                                {dayjs(appointment.data.selectedSlots[0]).format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </Text>
+                            </Td>
+
+                            <Td>
+                              <Text fontWeight="bold">
+                                Feb 9, 2023 - 9:00 PM
+                              </Text>
+                            </Td>
+
+                            <Td>
+                              <Text fontWeight="bold">
+                                Feb 9, 2023 - 9:00 PM
+                              </Text>
+                            </Td>
+
+                            <Td>
+                              <Flex color={'blue.500'} justify='center' align={'centers'}>
+                                <IoDiamondOutline />
+                              </Flex>
+                            </Td>
+
+                            <Td>
+                              {appointment.data.status == "approved" && (
+                                <Flex alignItems={"center"}>
+                                  <Text
+                                    mr={1}
+                                    fontWeight={"bold"}
+                                    color="green.500"
+                                  >
+                                    Approved
+                                  </Text>
+                                  <Icon as={BsCheckLg} color="green.500" />
+                                </Flex>
                               )}
-                            </Text>
-                          </Td>
 
-                          <Td>
-                            <Text fontWeight="bold">
-                              Feb 9, 2023 - 9:00 PM
-                            </Text>
-                          </Td>
+                              {appointment.data.status == "rejected" && (
+                                <Flex alignItems={"center"}>
+                                  <Text mr={1} fontWeight={"bold"} color="red.500">
+                                    Rejected
+                                  </Text>
+                                  <Icon
+                                    as={FiX}
+                                    fontWeight="bold"
+                                    fontSize={"22"}
+                                    color="red.500"
+                                  />
+                                </Flex>
+                              )}
 
-                          <Td>
-                            <Text fontWeight="bold">
-                              Feb 9, 2023 - 9:00 PM
-                            </Text>
-                          </Td>
+                              {appointment.data.status == "pending" && (
+                                <Flex alignItems={"center"}>
+                                  <Text mr={1} fontWeight={"bold"} color="blue.500">
+                                    Pending
+                                  </Text>
+                                  <Icon
+                                    as={CgSandClock}
+                                    fontWeight="bold"
+                                    fontSize={"22"}
+                                    color="blue.500"
+                                  />
+                                </Flex>
+                              )}
 
-                          <Td>
-                            <Flex color={'blue.500'} justify='center' align={'centers'}>
-                              <IoDiamondOutline />
-                            </Flex>
-                          </Td>
-
-                          <Td>
-                            {appointment.data.status == "approved" && (
-                              <Flex alignItems={"center"}>
-                                <Text
-                                  mr={1}
-                                  fontWeight={"bold"}
-                                  color="whatsapp.400"
-                                >
-                                  Approved
-                                </Text>
-                                <Icon as={BsCheckLg} color="green.500" />
-                              </Flex>
-                            )}
-
-                            {appointment.data.status == "rejected" && (
-                              <Flex alignItems={"center"}>
-                                <Text mr={1} fontWeight={"bold"} color="red.500">
-                                  Rejected
-                                </Text>
-                                <Icon
-                                  as={FiX}
-                                  fontWeight="bold"
-                                  fontSize={"22"}
-                                  color="red.500"
-                                />
-                              </Flex>
-                            )}
-
-                            {appointment.data.status == "pending" && (
-                              <Flex alignItems={"center"}>
-                                <Text mr={1} fontWeight={"bold"} color="blue.500">
-                                  Pending
-                                </Text>
-                                <Icon
-                                  as={CgSandClock}
-                                  fontWeight="bold"
-                                  fontSize={"22"}
-                                  color="blue.500"
-                                />
-                              </Flex>
-                            )}
-
-                            {appointment.data.status == "canceled" && (
-                              <Flex alignItems={"center"}>
-                                <Text mr={1} fontWeight={"bold"} color="red.700">
-                                  Canceled
-                                </Text>
-                                <Icon
-                                  as={FiX}
-                                  fontWeight="bold"
-                                  fontSize={"22"}
-                                  color="red.700"
-                                />
-                              </Flex>
-                            )}
-                            {/* {appointment.data.status == "approved" ? (
+                              {appointment.data.status == "canceled" && (
+                                <Flex alignItems={"center"}>
+                                  <Text mr={1} fontWeight={"bold"} color="red.700">
+                                    Canceled
+                                  </Text>
+                                  <Icon
+                                    as={FiX}
+                                    fontWeight="bold"
+                                    fontSize={"22"}
+                                    color="red.700"
+                                  />
+                                </Flex>
+                              )}
+                              {/* {appointment.data.status == "approved" ? (
                                 <Flex alignItems={"center"}>
                                   <Text
                                     mr={1}
@@ -421,45 +433,46 @@ export default function UserDashboard() {
                                 </Flex>
                                 )
                               )} */}
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                  <Pagination
-                    totalCountOfRegisters={total}
-                    currentPage={page}
-                    onPageChanges={setPage}
-                  />
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                    <Pagination
+                      totalCountOfRegisters={total}
+                      currentPage={page}
+                      onPageChanges={setPage}
+                    />
+                  </Flex>
+                </>
+              ) : total == -1 ? (
+                <Flex justify="center">
+                  <Spinner mt="10" mb="80px" />
                 </Flex>
-              </>
-            ) : total == -1 ? (
-              <Flex justify="center">
-                <Spinner mt="10" mb="80px" />
-              </Flex>
-            ) : (
-              <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'} >
-                <Box justifyContent="center" mb={8} display='flex' flexDirection={'column'}>
-                  <Flex justifyContent={'center'}>
-                    <Image opacity={0.4} src='images/noappointments.png' w={'200px'} />
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
-                      You still don't have any appointment.
-                    </Text>
-                  </Flex>
-                  <Flex w="100%" justifyContent="center">
-                    <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
-                      Go to the schedule page and book an appointment.
-                    </Text>
-                  </Flex>
-                </Box>
-              </Flex>
-            )}
-          </Box>
+              ) : (
+                <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'} >
+                  <Box justifyContent="center" mb={8} display='flex' flexDirection={'column'}>
+                    <Flex justifyContent={'center'}>
+                      <Image opacity={0.4} src='images/noappointments.png' w={'200px'} />
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={24} fontWeight="bold" color={'blackAlpha.400'}>
+                        You still don't have any appointment.
+                      </Text>
+                    </Flex>
+                    <Flex w="100%" justifyContent="center">
+                      <Text fontSize={18} color={'blackAlpha.400'} fontWeight='semibold'>
+                        Go to the schedule page and book an appointment.
+                      </Text>
+                    </Flex>
+                  </Box>
+                </Flex>
+              )}
+            </Box>
+          )}
         </Flex>
 
-        <Modal
+        {/* <Modal
 
           isOpen={isModalOpen}
           onRequestClose={() => {
@@ -955,7 +968,7 @@ export default function UserDashboard() {
               </Flex>
             )}
           </SimpleGrid>
-        </Modal>
+        </Modal> */}
 
         <Flex >
           <Flex w={{ lg: '275px' }}></Flex>

@@ -21,6 +21,9 @@ import {
   Checkbox,
   Grid,
   Select,
+  Radio,
+  RadioGroup,
+  Stack,
 } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -86,6 +89,8 @@ export default function Schedule() {
 
   const [isSameDay, setIsSameDay] = useState(true)
 
+  const [isTermOpen, setIsTermOpen] = useState(false)
+
   const [isSlotLoading, setIsSlotLoading] = useState(true)
 
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
@@ -112,11 +117,11 @@ export default function Schedule() {
 
   const [toDate, setToDate] = useState<Date>();
 
-  const [fromTime, setFromTime] = useState<string>();
+  const [fromTime, setFromTime] = useState<string>('- 07:00 AM');
 
   const [isSelectedResourceExclusive, setIsSelectedResourceExclusive] = useState(false);
 
-  const [toTime, setToTime] = useState<string>();
+  const [toTime, setToTime] = useState<string>('- 18:00 PM');
 
   const [selectedResources, setSelectedResources] = useState<SelectedResourceProps[]>([])
 
@@ -250,35 +255,36 @@ export default function Schedule() {
 
   }, [page])
 
-  useEffect(() => {
-    if (status == 201) {
-      setIsModalOpen(false)
-      toast({
-        title: "Appointment scheduled",
-        description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was scheduled successfully.`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: 'top-right'
-      });
-      Router.push('/userdashboard')
-    }
-    setStatus(0);
-  }, [status]);
+  // useEffect(() => {
+  //   if (status == 201) {
+  //     setIsModalOpen(false)
+  //     toast({
+  //       title: "Appointment scheduled",
+  //       description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was scheduled successfully.`,
+  //       status: "success",
+  //       duration: 5000,
+  //       isClosable: true,
+  //       position: 'top-right'
+  //     });
+  //     Router.push('/userdashboard')
+  //   }
+  //   setStatus(0);
+  // }, [status]);
 
-  const { data, isLoading, error } = useQuery<dataProps[]>(
-    `SpeedwayList`,
-    async () => {
-      const response = await api.get(`getspeedwaylist`);
-      const { updatedSpeedways } = response.data;
+  // const { data, isLoading, error } = useQuery<dataProps[]>(
+  //   `SpeedwayList`,
+  //   async () => {
+  //     const response = await api.get(`getspeedwaylist`);
+  //     const { updatedSpeedways } = response.data;
 
-      return updatedSpeedways;
-    }
-  );
+  //     return updatedSpeedways;
+  //   }
+  // );
 
 
   function handleCloseModal() {
     setIsModalOpen(false);
+    setIsTermOpen(false)
   }
 
 
@@ -443,29 +449,29 @@ export default function Schedule() {
                   />
 
                   <Select onChange={(e) => setFromTime(e.target.value)} h={'3rem'} width='8rem' border={'none'} bg={'gray.900'} color={'gray.300'}>
-                    <option value={'- 07:00 PM'}>7:00</option>
-                    <option value={'- 07:30 PM'}>7:30</option>
-                    <option value={'- 08:00 PM'}>8:00</option>
-                    <option value={'- 08:30 PM'}>8:30</option>
-                    <option value={'- 09:00 PM'}>9:00</option>
-                    <option value={'- 09:30 PM'}>9:30</option>
-                    <option value={'- 10:00 PM'}>10:00</option>
-                    <option value={'- 10:30 PM'}>10:30</option>
-                    <option value={'- 11:00 PM'}>11:00</option>
-                    <option value={'- 11:30 PM'}>11:30</option>
-                    <option value={'- 12:00 PM'}>12:00</option>
-                    <option value={'- 12:30 PM'}>12:30</option>
-                    <option value={'- 13:00 PM'}>13:00</option>
-                    <option value={'- 13:30 PM'}>13:30</option>
-                    <option value={'- 14:00 PM'}>14:00</option>
-                    <option value={'- 14:30 PM'}>14:30</option>
-                    <option value={'- 15:00 PM'}>15:00</option>
-                    <option value={'- 15:30 PM'}>15:30</option>
-                    <option value={'- 16:00 PM'}>16:00</option>
-                    <option value={'- 16:30 PM'}>16:30</option>
-                    <option value={'- 17:00 PM'}>17:00</option>
-                    <option value={'- 17:30 PM'}>17:30</option>
-                    <option value={'- 18:00 PM'}>18:00</option>
+                    <option value={'- 07:00'}>7:00</option>
+                    <option value={'- 07:30'}>7:30</option>
+                    <option value={'- 08:00'}>8:00</option>
+                    <option value={'- 08:30'}>8:30</option>
+                    <option value={'- 09:00'}>9:00</option>
+                    <option value={'- 09:30'}>9:30</option>
+                    <option value={'- 10:00'}>10:00</option>
+                    <option value={'- 10:30'}>10:30</option>
+                    <option value={'- 11:00'}>11:00</option>
+                    <option value={'- 11:30'}>11:30</option>
+                    <option value={'- 12:00'}>12:00</option>
+                    <option value={'- 12:30'}>12:30</option>
+                    <option value={'- 13:00'}>13:00</option>
+                    <option value={'- 13:30'}>13:30</option>
+                    <option value={'- 14:00'}>14:00</option>
+                    <option value={'- 14:30'}>14:30</option>
+                    <option value={'- 15:00'}>15:00</option>
+                    <option value={'- 15:30'}>15:30</option>
+                    <option value={'- 16:00'}>16:00</option>
+                    <option value={'- 16:30'}>16:30</option>
+                    <option value={'- 17:00'}>17:00</option>
+                    <option value={'- 17:30'}>17:30</option>
+                    <option value={'- 18:00'}>18:00</option>
                   </Select>
 
                 </HStack>
@@ -531,29 +537,29 @@ export default function Schedule() {
                   { }
 
                   <Select onChange={(e) => setToTime(e.target.value)} h={'3rem'} width='8rem' border={'none'} bg={'gray.900'} color={'gray.300'}>
-                    <option value={'- 07:00 PM'}>7:00</option>
-                    <option value={'- 07:30 PM'}>7:30</option>
-                    <option value={'- 08:00 PM'}>8:00</option>
-                    <option value={'- 08:30 PM'}>8:30</option>
-                    <option value={'- 09:00 PM'}>9:00</option>
-                    <option value={'- 09:30 PM'}>9:30</option>
-                    <option value={'- 10:00 PM'}>10:00</option>
-                    <option value={'- 10:30 PM'}>10:30</option>
-                    <option value={'- 11:00 PM'}>11:00</option>
-                    <option value={'- 11:30 PM'}>11:30</option>
-                    <option value={'- 12:00 PM'}>12:00</option>
-                    <option value={'- 12:30 PM'}>12:30</option>
-                    <option value={'- 13:00 PM'}>13:00</option>
-                    <option value={'- 13:30 PM'}>13:30</option>
-                    <option value={'- 14:00 PM'}>14:00</option>
-                    <option value={'- 14:30 PM'}>14:30</option>
-                    <option value={'- 15:00 PM'}>15:00</option>
-                    <option value={'- 15:30 PM'}>15:30</option>
-                    <option value={'- 16:00 PM'}>16:00</option>
-                    <option value={'- 16:30 PM'}>16:30</option>
-                    <option value={'- 17:00 PM'}>17:00</option>
-                    <option value={'- 17:30 PM'}>17:30</option>
-                    <option value={'- 18:00 PM'}>18:00</option>
+                    <option value={'- 07:00'}>7:00</option>
+                    <option value={'- 07:30'}>7:30</option>
+                    <option value={'- 08:00'}>8:00</option>
+                    <option value={'- 08:30'}>8:30</option>
+                    <option value={'- 09:00'}>9:00</option>
+                    <option value={'- 09:30'}>9:30</option>
+                    <option value={'- 10:00'}>10:00</option>
+                    <option value={'- 10:30'}>10:30</option>
+                    <option value={'- 11:00'}>11:00</option>
+                    <option value={'- 11:30'}>11:30</option>
+                    <option value={'- 12:00'}>12:00</option>
+                    <option value={'- 12:30'}>12:30</option>
+                    <option value={'- 13:00'}>13:00</option>
+                    <option value={'- 13:30'}>13:30</option>
+                    <option value={'- 14:00'}>14:00</option>
+                    <option value={'- 14:30'}>14:30</option>
+                    <option value={'- 15:00'}>15:00</option>
+                    <option value={'- 15:30'}>15:30</option>
+                    <option value={'- 16:00'}>16:00</option>
+                    <option value={'- 16:30'}>16:30</option>
+                    <option value={'- 17:00'}>17:00</option>
+                    <option value={'- 17:30'}>17:30</option>
+                    <option value={'- 18:00'}>18:00</option>
                   </Select>
                 </HStack>
 
@@ -951,200 +957,288 @@ export default function Schedule() {
 
         <Divider my='4' />
 
-        <Flex mb={'2rem'} maxH={'30rem'} flexDir={'column'} mt={'1.2rem'} w={"100%"} overflowY={'scroll'} sx={
-          {
-            "&::-webkit-scrollbar": {
-              width: "10px",
+        {isTermOpen ? (
+          <>
+            <Box my={"4"} border='2px' borderColor={'gray.700'} p='0.5rem' borderRadius={'0.5rem'}>
+              <Text mb={2} fontSize={"md"}>
+                1) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae interdum nibh, id ultricies lorem.
+              </Text>
+              <RadioGroup value={'2'}>
+                <Stack direction='row'>
+                  <Radio value='1'>True</Radio>
+                  <Radio value='2'>False</Radio>
+                </Stack>
+              </RadioGroup>
+            </Box>
 
-            },
-            "&::-webkit-scrollbar-track": {
-              width: "6px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: "blackAlpha.500",
-              borderRadius: "24px",
-            },
-          }
-        }>
+            <Box my={"4"} border='2px' borderColor={'gray.700'} p='0.5rem' borderRadius={'0.5rem'}>
+              <Text mb={2} fontSize={"md"}>
+                2) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae interdum nibh, id ultricies lorem.
+              </Text>
+              <RadioGroup value={'2'}>
+                <Stack direction='row'>
+                  <Radio value='1'>True</Radio>
+                  <Radio value='2'>False</Radio>
+                </Stack>
+              </RadioGroup>
+            </Box>
 
+            <Box my={"4"} border='2px' borderColor={'gray.700'} p='0.5rem' borderRadius={'0.5rem'}>
+              <Text mb={2} fontSize={"md"}>
+                3) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae interdum nibh, id ultricies lorem.
+              </Text>
+              <RadioGroup value={'2'}>
+                <Stack direction='row'>
+                  <Radio value='1'>True</Radio>
+                  <Radio value='2'>False</Radio>
+                </Stack>
+              </RadioGroup>
+            </Box>
 
-          <Table colorScheme="whiteAlpha">
-            <Thead>
-              <Tr >
-                <Th px={["4", "4", "6"]} color="gray.300" width="">
-                  <Text>Company</Text>
-                </Th>
+            <Box my={"4"} border='2px' borderColor={'gray.700'} p='0.5rem' borderRadius={'0.5rem'}>
+              <Text mb={2} fontSize={"md"}>
+                4) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae interdum nibh, id ultricies lorem.
+              </Text>
+              <RadioGroup value={'2'}>
+                <Stack direction='row'>
+                  <Radio value='1'>True</Radio>
+                  <Radio value='2'>False</Radio>
+                </Stack>
+              </RadioGroup>
+            </Box>
 
-                <Th px={["4", "4", "6"]} width="">
-                  <Text>Responsable</Text>
-                </Th>
+            <Box my={"4"} border='2px' borderColor={'gray.700'} p='0.5rem' borderRadius={'0.5rem'}>
+              <Text mb={2} fontSize={"md"}>
+                5) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae interdum nibh, id ultricies lorem.
+              </Text>
+              <RadioGroup value={'2'}>
+                <Stack direction='row'>
+                  <Radio value='1'>True</Radio>
+                  <Radio value='2'>False</Radio>
+                </Stack>
+              </RadioGroup>
+            </Box>
 
-                <Th>CNPJ</Th>
-
-                {isWideVersioon && <Th >Register date</Th>}
-                <Th w="8">Status</Th>
-
-                <Th w="8"></Th>
-              </Tr>
-            </Thead>
-
-            <Tbody >
-              <Tr background={'red.500'} >
-                <Td >
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  <HStack spacing={'0.8rem'}>
-                    <Button colorScheme={'blackAlpha'}>
-                      Reschedule
-                    </Button>
-                    <Button colorScheme={'blackAlpha'}>
-                      Excluir
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
-
-              <Tr background={'green.500'}>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  <HStack spacing={'0.8rem'}>
-                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
-                      Exclusive
-                    </Button>
-                    <Button colorScheme={'blackAlpha'}>
-                      Excluir
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
-
-              <Tr background={'red.500'}>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  <HStack spacing={'0.8rem'}>
-                    <Button colorScheme={'blackAlpha'}>
-                      Reschedule
-                    </Button>
-                    <Button colorScheme={'blackAlpha'}>
-                      Excluir
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
-
-              <Tr background={'green.500'}>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  <HStack spacing={'0.8rem'}>
-                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
-                      Exclusive
-                    </Button>
-                    <Button colorScheme={'blackAlpha'}>
-                      Excluir
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
-
-              <Tr background={'green.500'}>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  teste
-                </Td>
-                <Td>
-                  <HStack spacing={'0.8rem'}>
-                    <Button minW={'7rem'} colorScheme={'blackAlpha'}>
-                      Exclusive
-                    </Button>
-                    <Button colorScheme={'blackAlpha'}>
-                      Excluir
-                    </Button>
-                  </HStack>
-                </Td>
-              </Tr>
+            <HStack spacing={4} justify='end'>
+              <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
+                Cancel
+              </Button>
 
 
-            </Tbody>
+              <Button type="submit" colorScheme="green" onClick={() => {
+                toast({
+                  title: "Aguardando integração do sistema",
+                  description: `Previsão de entrega: 01/03/2023 `,
+                  status: "info",
+                  duration: 5000,
+                  isClosable: true,
+                  position: 'top-right'
+                });
+              }}>
+                Submit
+              </Button>
+            </HStack>
+          </>
+        ) : (
+          <>
+            <Flex mb={'2rem'} maxH={'30rem'} flexDir={'column'} mt={'1.2rem'} w={"100%"} overflowY={'scroll'} sx={
+              {
+                "&::-webkit-scrollbar": {
+                  width: "10px",
 
-          </Table>
-        </Flex>
+                },
+                "&::-webkit-scrollbar-track": {
+                  width: "6px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "blackAlpha.500",
+                  borderRadius: "24px",
+                },
+              }
+            }>
 
-        <HStack spacing={4} justify='end'>
-          <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
-            Cancel
-          </Button>
+
+              <Table colorScheme="whiteAlpha">
+                <Thead>
+                  <Tr >
+                    <Th px={["4", "4", "6"]} color="gray.300" width="">
+                      <Text>Company</Text>
+                    </Th>
+
+                    <Th px={["4", "4", "6"]} width="">
+                      <Text>Responsable</Text>
+                    </Th>
+
+                    <Th>CNPJ</Th>
+
+                    {isWideVersioon && <Th >Register date</Th>}
+                    <Th w="8">Status</Th>
+
+                    <Th w="8"></Th>
+                  </Tr>
+                </Thead>
+
+                <Tbody >
+                  <Tr background={'red.500'} >
+                    <Td >
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      <HStack spacing={'0.8rem'}>
+                        <Button colorScheme={'blackAlpha'}>
+                          Reschedule
+                        </Button>
+                        <Button colorScheme={'blackAlpha'}>
+                          Excluir
+                        </Button>
+                      </HStack>
+                    </Td>
+                  </Tr>
+
+                  <Tr background={'green.500'}>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      <HStack spacing={'0.8rem'}>
+                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                          Exclusive
+                        </Button>
+                        <Button colorScheme={'blackAlpha'}>
+                          Excluir
+                        </Button>
+                      </HStack>
+                    </Td>
+                  </Tr>
+
+                  <Tr background={'red.500'}>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      <HStack spacing={'0.8rem'}>
+                        <Button colorScheme={'blackAlpha'}>
+                          Reschedule
+                        </Button>
+                        <Button colorScheme={'blackAlpha'}>
+                          Excluir
+                        </Button>
+                      </HStack>
+                    </Td>
+                  </Tr>
+
+                  <Tr background={'green.500'}>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      <HStack spacing={'0.8rem'}>
+                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                          Exclusive
+                        </Button>
+                        <Button colorScheme={'blackAlpha'}>
+                          Excluir
+                        </Button>
+                      </HStack>
+                    </Td>
+                  </Tr>
+
+                  <Tr background={'green.500'}>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      teste
+                    </Td>
+                    <Td>
+                      <HStack spacing={'0.8rem'}>
+                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                          Exclusive
+                        </Button>
+                        <Button colorScheme={'blackAlpha'}>
+                          Excluir
+                        </Button>
+                      </HStack>
+                    </Td>
+                  </Tr>
 
 
-          <Button type="submit" colorScheme="green">
-            Confirm
-          </Button>
-        </HStack>
+                </Tbody>
+
+              </Table>
+            </Flex>
+
+            <HStack spacing={4} justify='end'>
+              <Button onClick={handleCloseModal} colorScheme='whiteAlpha'>
+                Cancel
+              </Button>
+
+
+              <Button type="submit" colorScheme="green" onClick={() => setIsTermOpen(true)}>
+                Next
+              </Button>
+            </HStack>
+          </>
+
+        )}
+
 
       </Modal>
 

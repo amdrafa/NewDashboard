@@ -65,7 +65,7 @@ export function SidebarNav() {
           hrefs="/userdashboard"
           icon={RiDashboardLine}
         >
-          Dashboard
+          Bookings
         </NavLink>
 
         {user ? (

@@ -20,6 +20,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { IoDiamondOutline } from "react-icons/io5";
+import { BiSearchAlt2 } from "react-icons/bi";
 import Modal from "react-modal";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -38,6 +39,7 @@ import { GetServerSideProps } from "next";
 import { decode } from "jsonwebtoken";
 import { parseCookies } from "nookies";
 import { Footer } from "../components/footer";
+import { Input } from "../components/Form/input";
 
 export type DecodedToken = {
   sub: string;
@@ -341,6 +343,7 @@ export default function Approvals() {
                   Approvals
                 </Heading>
 
+
                 <Button
                   size="sm"
                   fontSize="sm"
@@ -369,6 +372,17 @@ export default function Approvals() {
                     flexDir={"column"}
                     justifyContent="space-between"
                   >
+                    <Flex width={'14rem'} mb={'1rem'} align='center'>
+                      <HStack>
+                        <Input
+                          name="adsdsa"
+                          height='2rem'
+                          placeholder="Search"
+                          fontSize={'16'}
+                        />
+                        <BiSearchAlt2 size={'1.5rem'} />
+                      </HStack>
+                    </Flex>
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>

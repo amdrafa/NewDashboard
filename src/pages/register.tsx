@@ -9,6 +9,7 @@ import {
   SimpleGrid,
   Box,
   Checkbox,
+  HStack,
 } from "@chakra-ui/react";
 import { Input } from "../components/Form/input";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -40,7 +41,7 @@ type SignInFormData = {
 const SignInFormSchema = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().required().email(),
-  cpf: yup.string().required().min(10, "Minimum 10 characteres").max(14, "Maximum 14 characteres"),
+  cpf: yup.string().required().max(50, "Maximum 50 characteres"),
   phone: yup.string().required().min(10, "Minimum 10 letters.").max(14, "Maximum 14 characteres"),
   email_confirmation: yup
     .string()
@@ -61,6 +62,7 @@ export default function Register() {
 
   const [hasDriverLicence, setHasDriverLicence] = useState(false);
 
+  const [isForeigner, setIsForeigner] = useState(false);
 
   const { createUser } = useContext(LoginContext);
 
@@ -191,14 +193,20 @@ export default function Register() {
                 />
               </SimpleGrid>
 
+              <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={'1rem'}>
+                <HStack color={'gray.200'}>
+                  <Checkbox checked={isForeigner} onChange={e => setIsForeigner(e.target.checked)} />
+                  <Text>I'm foreigner</Text>
+                </HStack>
+              </SimpleGrid>
+
               <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                 <Input
                   name="cpf"
-                  label="CPF"
-                  type="number"
+                  label={isForeigner ? "Passport" : "CPF"}
                   {...register("cpf")}
                   error={errors.cpf}
-                  maxLength={10}
+                  maxLength={50}
                 />
                 <Input
                   name="phone"
@@ -320,10 +328,9 @@ export default function Register() {
                 <Input
                   name="register_number"
                   label="Register number"
-                  type={"number"}
                   {...register("register_number")}
                   error={errors.register_number}
-
+                  maxLength={20}
                 />
 
 
@@ -334,7 +341,7 @@ export default function Register() {
                 <Box>
                   <Input
                     name="driver_category"
-                    label="License"
+                    label="Licence"
                     {...register("driver_category")}
                     error={errors.driver_category}
                     maxLength={5}
