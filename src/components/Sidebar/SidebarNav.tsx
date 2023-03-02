@@ -68,24 +68,11 @@ export function SidebarNav() {
           Bookings
         </NavLink>
 
-        {user ? (
-          user.permissions?.some((permission) => permission == "SCHEDULE") ? (
-            <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
+       <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
               Schedule
             </NavLink>
-          ) : (
-            <Flex cursor={"not-allowed"} alignItems="center">
-              <Icon as={RiTimeLine} fontSize="20" color={"gray.600"} />
-              <Text ml="4" fontWeight="semibold" color={"gray.600"}>
-                Schedule
-              </Text>
-            </Flex>
-          )
-        ) : (
-          "Loading"
-        )}
 
-        <Can roles={["ADMINISTRATOR"]}>
+        {/* <Can roles={["ADMINISTRATOR"]}> */}
           <NavLink hasPermission={true} hrefs="/users" icon={RiContactsLine}>
             Users
           </NavLink>
@@ -106,7 +93,7 @@ export function SidebarNav() {
           >
             Test tracks
           </NavLink>
-        </Can>
+        {/* </Can> */}
       </NavSection>
 
       <NavSection title="CONFIGURATIONS">

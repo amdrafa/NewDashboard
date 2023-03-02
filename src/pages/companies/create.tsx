@@ -33,19 +33,11 @@ export type DecodedToken = {
 type CreateCompanyFormData = {
   company: string;
   cnpj: string;
-  responsable_name: string;
-  email: string;
-  phone: number;
-  hours: number;
 };
 
 const createCompanyFormSchema = yup.object().shape({
   company: yup.string().required(),
-  cnpj: yup.string().required(),
-  responsable_name: yup.string().required().min(4, "Minimum 6 letters."),
-  email: yup.string(),
-  phone: yup.number(),
-  hours: yup.number(),
+  cnpj: yup.string().required()
 });
 
 export default function CreateCompany() {
@@ -60,19 +52,11 @@ export default function CreateCompany() {
   const handleCreateUser: SubmitHandler<CreateCompanyFormData> = async ({
     company,
     cnpj,
-    responsable_name,
-    email,
-    phone,
-    hours,
   }) => {
     await api
-      .post("createcompany", {
-        data: company,
+      .post("/company/create", {
+        name: company,
         cnpj,
-        responsable_name,
-        email,
-        phone,
-        hours,
       })
       .then((response) => {
         toast({
@@ -115,6 +99,7 @@ export default function CreateCompany() {
           flex="1"
           borderRadius={8}
           bg="gray.800"
+          maxH={'20rem'}
           p="8"
           mt={5}
           onSubmit={handleSubmit(handleCreateUser)}
@@ -143,7 +128,7 @@ export default function CreateCompany() {
               />
             </SimpleGrid>
 
-            <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+            {/* <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
               <Input
               
                 name="responsable_name"
@@ -178,7 +163,7 @@ export default function CreateCompany() {
                 maxLength={3}
                 autoComplete={"off"}
               />
-            </SimpleGrid>
+            </SimpleGrid> */}
           </VStack>
 
           <Flex mt="8" justify="flex-end">
@@ -208,30 +193,30 @@ export default function CreateCompany() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { auth } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const { auth } = parseCookies(ctx);
 
-  const decodedUser = decode(auth as string) as DecodedToken;
+//   const decodedUser = decode(auth as string) as DecodedToken;
 
-  const necessaryRoles = ["ADMINISTRATOR"];
+//   const necessaryRoles = ["ADMINISTRATOR"];
 
-  if (necessaryRoles?.length > 0) {
-    const hasAllRoles = necessaryRoles.some((role) => {
-      return decodedUser?.roles?.includes(role);
-    });
+//   if (necessaryRoles?.length > 0) {
+//     const hasAllRoles = necessaryRoles.some((role) => {
+//       return decodedUser?.roles?.includes(role);
+//     });
 
-    if (!hasAllRoles) {
-      console.log(hasAllRoles);
-      return {
-        redirect: {
-          destination: "/home",
-          permanent: false,
-        },
-      };
-    }
-  }
+//     if (!hasAllRoles) {
+//       console.log(hasAllRoles);
+//       return {
+//         redirect: {
+//           destination: "/home",
+//           permanent: false,
+//         },
+//       };
+//     }
+//   }
 
-  return {
-    props: {},
-  };
-};
+//   return {
+//     props: {},
+//   };
+// };

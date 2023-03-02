@@ -40,13 +40,7 @@ export default function Login() {
 
   return (
     <Flex w="100vw" h="100vh" alignItems="center" justifyContent="center">
-      
-      
-      
       <Box>
-      
-
-     
         <Flex
         as="form"
         w="100%"
@@ -56,7 +50,6 @@ export default function Login() {
         borderRadius={8}
         flexDir="column"
         onSubmit={handleSubmit(handleSignin)}
-        
       >
         <Stack spacing={4}>
         <Input

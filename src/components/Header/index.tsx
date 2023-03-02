@@ -15,8 +15,6 @@ export function Header(){
         lg: true,
     })
 
-    console.log(isWideVersion)
-
     return (
        <Flex
         px="6"

@@ -39,24 +39,13 @@ export type DecodedToken = {
 
 interface companyDataProps {
   data: companyProps;
-  ref: {
-    "@ref": {
-      id: number;
-    };
-  };
-  ts: number;
 }
 
 interface companyProps {
-  company: string;
+  id: number;
+  name: string;
   cnpj: string;
-  responsable_name: string;
-  email: string;
-  phone: number;
-  avaiableHours: number;
-  companyId: string;
   status: string;
-  createdAt?: string;
 }
 
 
@@ -75,14 +64,10 @@ export default function CompanyList() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   function handleEditCompany({
-    company,
+    name,
     cnpj,
-    responsable_name,
-    email,
-    phone,
-    avaiableHours,
-    companyId,
-    status
+    status,
+    id
   }): companyProps {
 
 
@@ -284,32 +269,32 @@ export default function CompanyList() {
 
 
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-  const { auth } = parseCookies(ctx)
+//   const { auth } = parseCookies(ctx)
 
-  const decodedUser = decode(auth as string) as DecodedToken;
+//   const decodedUser = decode(auth as string) as DecodedToken;
 
-  const necessaryRoles = ['ADMINISTRATOR']
+//   const necessaryRoles = ['ADMINISTRATOR']
 
-  if (necessaryRoles?.length > 0) {
-    const hasAllRoles = necessaryRoles.some(role => {
-      return decodedUser?.roles?.includes(role)
-    });
+//   if (necessaryRoles?.length > 0) {
+//     const hasAllRoles = necessaryRoles.some(role => {
+//       return decodedUser?.roles?.includes(role)
+//     });
 
-    if (!hasAllRoles) {
-      console.log(hasAllRoles)
-      return {
-        redirect: {
-          destination: '/home',
-          permanent: false
-        }
-      }
-    }
-  }
+//     if (!hasAllRoles) {
+//       console.log(hasAllRoles)
+//       return {
+//         redirect: {
+//           destination: '/home',
+//           permanent: false
+//         }
+//       }
+//     }
+//   }
 
 
-  return {
-    props: {}
-  }
-}
+//   return {
+//     props: {}
+//   }
+// }

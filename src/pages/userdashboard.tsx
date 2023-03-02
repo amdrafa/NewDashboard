@@ -36,34 +36,23 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { GiConfirmed } from "react-icons/gi";
-import { getMonth } from "../util";
 import dayjs from "dayjs";
 import { FiX } from "react-icons/fi";
 import { BsCheckLg, BsFillCircleFill } from "react-icons/bs";
-import Modal from "react-modal";
-import { IoMdClose } from "react-icons/io";
-import { ApprovalTimeCard } from "../components/approvalTimeCard";
-import noAppointments from '../../public/noappointments.png'
 import { Footer } from "../components/footer";
 import EditBooking from "../components/editBooking";
 
 interface appointmentsDataProps {
   data: appointmentProps;
-  ref: {
-    "@ref": {
-      id: number;
-    };
-  };
-  ts: number;
 }
 
 interface appointmentProps {
-  speedway: string;
-  vehicle: string;
-  selectedSlots: string[];
-  companyName: string;
+  id: number;
+  bookingId?: string;
+  userId: number;
+  dataInicial: Date;
+  dataFinal: Date;
   status: string;
-  companyRef: string;
 }
 
 interface busySlotsProps {
@@ -81,7 +70,6 @@ interface appointmentFunctionProps {
 }
 
 export default function UserDashboard() {
-  console.log(getMonth());
 
   const toast = useToast()
 
@@ -109,81 +97,27 @@ export default function UserDashboard() {
 
   const [total, setTotal] = useState(-1);
 
-  const {
-    data: dataBusySlots,
-    isLoading: isLoadingBusylots,
-    error: errorBusylots,
-  } = useQuery<busySlotsProps>(`busySlotsListUserDashboard${speedway}`, async () => {
-    const response = await api.get(`getbusyslots?testtrack=${speedway}`);
-
-    return response.data;
-  });
 
   const { data, isLoading, error } = useQuery<appointmentsDataProps[]>(
-    `userappointmentslist${page}`,
+    `userbookinglist${page}`,
     async () => {
       const response = await api.get(
-        `getalluserappointments?page=${page}&limit=${limit}`
+        `/booking/list?page=${page}&limit=${limit}`
       );
-      const { PaginateData: ReturnedData, totalcount } = response.data;
+      const { allBooking } = response.data;
 
-      setTotal(totalcount);
+      // set total count coming from response to paginate correctly
 
-      return ReturnedData;
+      setTotal(20);
+
+      console.log(allBooking)
+
+      return allBooking;
+    },
+    {
+      retry: false
     }
   );
-
-
-  function handleAppointmentApprovalFirstStep({
-    companyName,
-    selectedSlots,
-    speedway,
-    vehicle,
-    appointmentId,
-    status,
-    companyRef
-  }: appointmentFunctionProps) {
-    setCompanyName(companyName);
-    setSelectedSlots(selectedSlots);
-    setSpeedway(speedway);
-    setVehicle(vehicle);
-    setAppointmentId(appointmentId);
-    setAppointmentStatus(status);
-    setCompanyRef(companyRef)
-
-    setIsEditModeOpen(true);
-    return;
-  }
-
-  async function handleCancelAppointment(id: number) {
-    await api
-      .put("cancelappointment", {
-        id,
-        companyRef,
-        selectedSlots: selectedSlots.length
-      })
-      .then((response) => {
-        toast({
-          title: "Appointment canceled",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} was canceled.`,
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right'
-        });
-        window.location.reload();
-      })
-      .catch((err) => {
-        toast({
-          title: "Something went wrong",
-          description: `Appointment at ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} couldn't be canceled.`,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right'
-        });
-      });
-  }
 
   return (
     <>
@@ -274,25 +208,16 @@ export default function UserDashboard() {
                       </Thead>
                       <Tbody>
 
-                        {data.map((appointment) => (
+                        {data ? (
+                          <>
+                            {data.map((appointment) => (
                           <Tr
-                            key={appointment.ts}
+                            key={appointment.data.bookingId}
                             _hover={{
                               bg: "gray.900",
                               color: "gray.300",
                               transition: "0.2s",
                               cursor: "pointer",
-                            }}
-                            onClick={() => {
-                              handleAppointmentApprovalFirstStep({
-                                appointmentId: appointment.ref["@ref"].id,
-                                companyName: appointment.data.companyName,
-                                selectedSlots: appointment.data.selectedSlots,
-                                speedway: appointment.data.speedway,
-                                status: appointment.data.status,
-                                vehicle: appointment.data.vehicle,
-                                companyRef: appointment.data.companyRef
-                              });
                             }}
                           >
                             <Td>
@@ -302,13 +227,13 @@ export default function UserDashboard() {
                             </Td>
                             <Td>
                               <Text fontWeight="bold">
-                                {appointment.data.speedway}
+                                "test"
                               </Text>
                             </Td>
 
                             <Td>
                               <Text>
-                                {dayjs(appointment.data.selectedSlots[0]).format(
+                                {dayjs(new Date()).format(
                                   "DD/MM/YYYY"
                                 )}
                               </Text>
@@ -436,6 +361,10 @@ export default function UserDashboard() {
                             </Td>
                           </Tr>
                         ))}
+                          </>
+                        ) : (
+                          "menor"
+                        )}
                       </Tbody>
                     </Table>
                     <Pagination

@@ -52,12 +52,46 @@ import { GoPlus } from "react-icons/go";
 import { BsCartX } from "react-icons/bs";
 import { MultiSelect } from "react-multi-select-component";
 import { v4 } from "uuid";
+import { MdDownloadDone, MdOutlineDone } from "react-icons/md";
+
+interface scheduleResponse {
+  startDate: string;
+  finalDate: string;
+  id: number;
+  isExclusive: boolean;
+  status: string;
+  resources
+}
+
+interface bookingAndScheduleResponse {
+    dataInicial: Date;
+    dataFinal: Date;
+    id: number;
+    schedules: scheduleResponse[];
+} 
+
+interface resourceDataProps {
+  data: resourceProps;
+}
+
+interface resourceProps{
+  id: number;
+  name: string;
+  type: string;
+  capacity: number;
+  isActive: boolean;
+}
+
+interface resourceLibraryType {
+  label: string;
+  value: number
+}
 
 interface SelectedResourceProps {
   id: string;
-  resources: string[];
-  fromDate: Date;
-  toDate: Date;
+  resource: any;
+  startDate: Date;
+  finalDate: Date;
   fromTime: string;
   toTime: string;
   isExclusive: boolean;
@@ -72,32 +106,18 @@ export type DecodedToken = {
   name: string;
 }
 
-interface speedwayProps {
-  speedway: string;
-  vehicles_limit: number;
-  description: string;
-}
-
-interface dataProps {
-  data: speedwayProps;
-  ref: string;
-  ts: number;
-}
-
 
 export default function Schedule() {
 
-  const [isSameDay, setIsSameDay] = useState(true)
+  const [bookingResponse, setBookingResponse] = useState<bookingAndScheduleResponse>()
+
+  const [isBookingResponseLoading, setIsBookingResponseLoading] = useState(true);
 
   const [isTermOpen, setIsTermOpen] = useState(false)
 
   const [isSlotLoading, setIsSlotLoading] = useState(true)
 
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
-
   const toast = useToast()
-
-  const [speedway, setSpeedway] = useState("");
 
   const [category, setCategory] = useState("Test track");
 
@@ -124,6 +144,29 @@ export default function Schedule() {
   const [toTime, setToTime] = useState<string>('- 18:00 PM');
 
   const [selectedResources, setSelectedResources] = useState<SelectedResourceProps[]>([])
+
+  const { data, isLoading, error } = useQuery<resourceDataProps[]>(
+    `/resource/list${page}`,
+    async () => {
+      const response = await api.get(
+        `/resource/list?page=${page}`
+      );
+      const { data } = response;
+
+      // set total count coming from response to paginate correctly
+
+      // setTotal(20);
+
+      console.log(data)
+
+      return data;
+    },
+    {
+      retry: false,
+      // refetchInterval: 100000
+      
+    }
+  );
 
   function deleteSelectedResource(id: string) {
     const updatedSelectedResources = selectedResources.filter((src) => src.id != id)
@@ -152,10 +195,8 @@ export default function Schedule() {
 
 
     const isRepeatedResource = selectedResources.find((resourceSelected) => {
-      return resourceSelected.fromDate === fromDate && resourceSelected.fromTime === fromTime && resourceSelected.toDate === toDate && resourceSelected.toTime === toTime && resourceSelected.resources.every((src) => {
+      return resourceSelected.startDate === fromDate && resourceSelected.fromTime === fromTime && resourceSelected.finalDate === toDate && resourceSelected.toTime === toTime && resourceSelected.resource.every((src) => {
         const sameResource = selected.filter(srcSelected => srcSelected === src);
-
-
       })
 
     })
@@ -163,10 +204,10 @@ export default function Schedule() {
     if (!isRepeatedResource) {
       setSelectedResources([...selectedResources, {
         id: v4(),
-        resources: selected,
-        fromDate: fromDate,
+        resource: selected,
+        startDate: fromDate,
         fromTime: fromTime,
-        toDate: toDate,
+        finalDate: toDate,
         toTime: toTime,
         isExclusive: isSelectedResourceExclusive
       }])
@@ -189,13 +230,93 @@ export default function Schedule() {
     return;
   }
 
+  async function postBooking(){
+
+    selectedResources.forEach(schedule => {
+      const updatedResourceList: number[] = [];
+      schedule?.resource.forEach(resource => {
+        updatedResourceList.push(resource?.value)
+      })
+      schedule.resource = updatedResourceList
+    })
+
+    await api.post<bookingAndScheduleResponse>("/booking/create/schedules",{
+      booking:{
+        userId: user.id,
+        dataInicial: selectedResources[0].startDate,
+        dataFinal: selectedResources[0].finalDate,
+        status: "Pre-approved",
+        terms: [2]
+      },
+      scheduleArray: selectedResources
+    })
+    .then(response => {
+      setBookingResponse(response.data)
+      setIsBookingResponseLoading(false)
+      setIsModalOpen(true)
+      
+    })
+
+   
+    
+
+    // console.log(
+    //   {
+    //     booking: {
+    //       userId: user.id,
+    //       dataInicial: selectedResources[0].startDate,
+    //       dataFinal: selectedResources[selectedResources.length - 1].finalDate,
+    //       status: "Pre-approved",
+    //       terms: [
+    //         2
+    //       ]
+    //     },
+    //     scheduleArray: [
+    //       {
+    //         startDate: "2023-03-24T14:04:50.458Z",
+    //         finalDate: "2023-03-26T11:04:50.458Z",
+    //         listResource: [
+    //           2
+    //         ],
+    //         isExclusive: false
+    //       },
+    //       {
+    //         startDate: "2023-04-24T14:04:50.458Z",
+    //         finalDate: "2023-04-26T17:04:50.458Z",
+    //         listResource: [
+    //           2
+    //         ],
+    //         isExclusive:  true
+    //       }
+    //     ]
+    //   }
+    // )
+
+    // console.log({
+    //     userId: user.id,
+    //     dataInicial: selectedResources[0].startDate,
+    //     dataFinal: selectedResources[selectedResources.length - 1].finalDate,
+    //     schedules: selectedResources,
+    //     status: "Pre-approved",
+    //     term: [],
+    //   })
+    // const response = await api.post("/booking/create/schedules", {
+    //   booking: {
+    //     userId: user.id,
+    //     dataInicial: selectedResources[0].startDate,
+    //     dataFinal: selectedResources[selectedResources.length - 1].finalDate,
+    //     schedules: selectedResources
+    //   }
+    // })
+  }
+
 
 
   const testTrackOptions = [
-    { label: "VDA", value: "VDA" },
-    { label: "Gravel track", value: "Gravel track" },
-    { label: "Rough road", value: "Rough road" },
-    { label: "Highspeed track", value: "Highspeed track", disabled: true },
+    { label: "VDA", value: 1 },
+    { label: "Gravel track", value: 2 },
+    { label: "Rough road", value: 3 },
+    { label: "Highspeed track", value: 4, disabled: true },
   ];
 
   const officeOptions = [
@@ -212,29 +333,6 @@ export default function Schedule() {
     { label: "Workshop 4", value: "Workshop 4" },
   ];
 
-
-  function AddTimeSlot(slot: string) {
-
-    let updatedSlots = [...selectedSlots]
-
-    const slotIndex = updatedSlots.findIndex(registeredSlot => registeredSlot === slot)
-
-
-    if (slotIndex >= 0) {
-      updatedSlots.splice(slotIndex, 1)
-      setSelectedSlots(updatedSlots)
-    } else {
-      if (dayjs(selectedSlots[0]).format('D') == dayjs(slot).format('D') || selectedSlots.length == 0) {
-        setIsSameDay(true)
-        updatedSlots.push(slot)
-        setSelectedSlots(updatedSlots)
-      } else {
-        setIsSameDay(false)
-      }
-
-    }
-
-  }
 
   const isWideVersioon = useBreakpointValue({
     base: false,
@@ -285,40 +383,6 @@ export default function Schedule() {
   function handleCloseModal() {
     setIsModalOpen(false);
     setIsTermOpen(false)
-  }
-
-
-
-  async function CreateSchedule(event: FormEvent) {
-    event.preventDefault();
-    console.log(user.companyName)
-
-    await api
-      .post("scheduletime", {
-        selectedSlots,
-        vehicle: "fix api post create schedule",
-        speedway,
-        userId: user.userId,
-        userEmail: user.email,
-        userName: user.name,
-        companyName: user.companyName,
-        companyRef: user.companyRef
-      })
-      .then((response) => setStatus(response.status))
-      .catch((err) => {
-        console.log(err);
-        toast({
-          title: "Your company don't have enough credits.",
-          description: `Credits must be acquired if you want to schedule a test track.`,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right'
-        });
-      });
-
-    setSpeedway("Select option");
-
   }
 
 
@@ -398,6 +462,7 @@ export default function Schedule() {
                     labelledBy="Select"
                     className="multiSelector"
                     disableSearch
+                    disabled={false}
                   />
 
                   {/* <Select
@@ -606,23 +671,25 @@ export default function Schedule() {
                     <Tbody>
                       {selectedResources.map(resource => {
                         return (
-                          <Tr key={resource.id}>
+                          <Tr key={resource?.id}>
                             <Td>
-                              {resource.resources.map((unitResource: any) => {
+                              {/* {resource.listResource.map((unitResource: any) => {
                                 return (
-                                  <Text key={unitResource.value}>{unitResource.value}</Text>
+                                  <Text key={resource?.id + unitResource?.value}>{unitResource.value}</Text>
                                 )
-                              })}
+                              })} */}
                             </Td>
                             <Td>
-                              {dayjs(resource.fromDate).format('MMM D, YYYY ') + fromTime}
+                              {dayjs(resource.startDate).format('MMM D, YYYY ') + fromTime}
                             </Td>
                             <Td>
-                              {dayjs(resource.toDate).format('MMM D, YYYY ') + toTime}
+                              {dayjs(resource.finalDate).format('MMM D, YYYY ') + toTime}
                             </Td>
 
                             <Td >
-                              <Text display={'flex'} align='center' justifyContent={'center'} color={resource.isExclusive ? 'blue.500' : 'gray.300'} fontWeight='bold'><IoDiamondOutline fontSize={'1.2rem'} /></Text>
+                              <Text display={'flex'} align='center' justifyContent={'center'} color={resource.isExclusive ? 'blue.500' : 'gray.300'} fontWeight='bold'>
+                                <IoDiamondOutline fontSize={'1.2rem'} />
+                                </Text>
                             </Td>
                             <Td>
                               <Flex color={'gray.500'} fontWeight='semibold' _hover={{ color: 'red.500', cursor: 'pointer' }}>
@@ -926,7 +993,7 @@ export default function Schedule() {
               <Link href="/home">
                 <Button colorScheme="whiteAlpha">Cancel</Button>
               </Link>
-              <Button colorScheme="blue" onClick={() => { setIsModalOpen(true) }}>
+              <Button colorScheme="blue" onClick={postBooking}>
                 Next
               </Button>
             </HStack>
@@ -1025,7 +1092,7 @@ export default function Schedule() {
               </Button>
 
 
-              <Button type="submit" colorScheme="green" onClick={() => {
+              <Button type="submit" colorScheme="blue" onClick={() => {
                 toast({
                   title: "Aguardando integração do sistema",
                   description: `Previsão de entrega: 01/03/2023 `,
@@ -1062,162 +1129,59 @@ export default function Schedule() {
                 <Thead>
                   <Tr >
                     <Th px={["4", "4", "6"]} color="gray.300" width="">
-                      <Text>Company</Text>
+                      <Text>Id</Text>
                     </Th>
 
                     <Th px={["4", "4", "6"]} width="">
-                      <Text>Responsable</Text>
+                      <Text>From</Text>
                     </Th>
 
-                    <Th>CNPJ</Th>
+                    <Th>To</Th>
 
-                    {isWideVersioon && <Th >Register date</Th>}
-                    <Th w="8">Status</Th>
+                    {isWideVersioon && <Th >Recursos</Th>}
+                    
 
                     <Th w="8"></Th>
                   </Tr>
                 </Thead>
 
                 <Tbody >
-                  <Tr background={'red.500'} >
-                    <Td >
-                      teste
+                  {bookingResponse?.schedules.map(schedule => {
+                    return (
+                      <Tr  key={schedule.id} background={schedule.status === "Pre-approved" ? '' : 'red.500'}>
+                    <Td>
+                      {schedule.id}
                     </Td>
                     <Td>
-                      teste
+                      {dayjs(schedule.startDate).format('MMMM D, YYYY h:mm A')}
                     </Td>
                     <Td>
-                      teste
+                    {dayjs(schedule.finalDate).format('MMMM D, YYYY h:mm A')}
                     </Td>
                     <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      <HStack spacing={'0.8rem'}>
-                        <Button colorScheme={'blackAlpha'}>
-                          Reschedule
-                        </Button>
-                        <Button colorScheme={'blackAlpha'}>
-                          Excluir
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
-
-                  <Tr background={'green.500'}>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
+                      VDA
                     </Td>
                     <Td>
                       <HStack spacing={'0.8rem'}>
-                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
+                        {schedule.isExclusive? (
+                          <Flex color={'blue.500'} justifyContent={'center'} alignItems={'center'} minW={'7rem'} fontWeight={'semibold'}>
+                          <Text>Exclusive</Text>
+                        <MdDownloadDone size={'1.5rem'}/>
+                        </Flex>
+                        ) : (
+                          <Button minW={'7rem'} colorScheme={'blackAlpha'} _hover={{bg: 'blue.500'}}>
                           Exclusive
                         </Button>
-                        <Button colorScheme={'blackAlpha'}>
+                        )}
+                        <Button colorScheme={'red'}>
                           Excluir
                         </Button>
                       </HStack>
                     </Td>
                   </Tr>
-
-                  <Tr background={'red.500'}>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      <HStack spacing={'0.8rem'}>
-                        <Button colorScheme={'blackAlpha'}>
-                          Reschedule
-                        </Button>
-                        <Button colorScheme={'blackAlpha'}>
-                          Excluir
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
-
-                  <Tr background={'green.500'}>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      <HStack spacing={'0.8rem'}>
-                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
-                          Exclusive
-                        </Button>
-                        <Button colorScheme={'blackAlpha'}>
-                          Excluir
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
-
-                  <Tr background={'green.500'}>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      teste
-                    </Td>
-                    <Td>
-                      <HStack spacing={'0.8rem'}>
-                        <Button minW={'7rem'} colorScheme={'blackAlpha'}>
-                          Exclusive
-                        </Button>
-                        <Button colorScheme={'blackAlpha'}>
-                          Excluir
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
+                    )
+                  })}
+                  
 
 
                 </Tbody>
@@ -1231,7 +1195,7 @@ export default function Schedule() {
               </Button>
 
 
-              <Button type="submit" colorScheme="green" onClick={() => setIsTermOpen(true)}>
+              <Button type="submit" colorScheme="blue" onClick={() => setIsTermOpen(true)}>
                 Next
               </Button>
             </HStack>
@@ -1248,31 +1212,33 @@ export default function Schedule() {
 }
 
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
-  const { auth } = parseCookies(ctx)
+//   const { auth } = parseCookies(ctx)
 
-  const decodedUser = decode(auth as string) as DecodedToken;
-
-
-  const necessaryPermissions = ["SCHEDULE"]
-
-  if (necessaryPermissions?.length > 0) {
-    const hasAllPermissions = necessaryPermissions.some(permission => {
-      return decodedUser?.permissions?.includes(permission)
-    })
+//   const decodedUser = decode(auth as string) as DecodedToken;
 
 
-    if (!hasAllPermissions) {
-      return {
-        redirect: {
-          destination: '/home',
-          permanent: false
-        }
-      }
-    }
+//   const necessaryPermissions = ["SCHEDULE"]
 
-  }
+//   if (necessaryPermissions?.length > 0) {
+//     const hasAllPermissions = necessaryPermissions.some(permission => {
+//       return decodedUser?.permissions?.includes(permission)
+//     })
+
+
+//     if (!hasAllPermissions) {
+//       return {
+//         redirect: {
+//           destination: '/home',
+//           permanent: false
+//         }
+//       }
+//     }
+
+//   }
+
+// -------------------------------------------------------
 
   // const necessaryRoles = ['USER']
 
@@ -1293,7 +1259,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // }
   // }
 
-  return {
-    props: {}
-  }
-}
+
+  // --------------------------------------
+
+//   return {
+//     props: {}
+//   }
+// }
