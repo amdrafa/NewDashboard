@@ -28,6 +28,7 @@ import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import EditCompany from "../../components/editCompany";
 import { Footer } from "../../components/footer";
+import dayjs from "dayjs";
 
 export type DecodedToken = {
   sub: string;
@@ -37,29 +38,24 @@ export type DecodedToken = {
   name: string;
 }
 
-interface companyDataProps {
-  data: companyProps;
-}
+
 
 interface companyProps {
   id: number;
   name: string;
   cnpj: string;
   status: string;
+  createdAt?: string;
 }
 
 
 export default function CompanyList() {
 
 
-  const [companyId, setCompanyId] = useState("");
+  const [companyId, setCompanyId] = useState(0);
   const [company, setCompany] = useState('');
   const [cnpj, setCnpj] = useState('false');
-  const [responsable_name, setResponsable_name] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState(0);
   const [status, setStatus] = useState('');
-  const [avaiableHours, setAvaiableHours] = useState(0);
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -71,13 +67,9 @@ export default function CompanyList() {
   }): companyProps {
 
 
-    setCompany(company)
+    setCompany(name)
     setCnpj(cnpj)
-    setResponsable_name(responsable_name)
-    setEmail(email)
-    setPhone(phone)
-    setAvaiableHours(avaiableHours)
-    setCompanyId(companyId)
+    setCompanyId(id)
     setStatus(status)
 
 
@@ -99,13 +91,13 @@ export default function CompanyList() {
 
 
 
-  const { data, isLoading, error } = useQuery<companyDataProps[]>(`companylist${page}`, async () => {
-    const response = await api.get(`getallcompanies?page=${page}&limit=${limit}&search=${''}`)
-    const { PaginateData: ReturnedData, totalcount } = response.data;
+  const { data, isLoading, error } = useQuery<companyProps[]>(`companylist${page}`, async () => {
+    const response = await api.get(`/company/list?page=${page}&limit=${limit}&search=${''}`)
+    
 
-    setTotal(totalcount)
+    // setTotal(totalcount)
 
-    return ReturnedData;
+    return response.data;
   });
 
 
@@ -118,15 +110,11 @@ export default function CompanyList() {
 
         {isEditMode ? (
           <EditCompany
-            company={company}
             cnpj={cnpj}
-            responsable_name={responsable_name}
-            phone={phone}
-            hours={avaiableHours}
-            email={email}
-            companyId={companyId}
-            status={status}
+            company={company}
+            id={companyId}
             setIsEditMode={setIsEditMode}
+            status={status}
           />
         ) : (
           <Box flex="1" borderRadius={8} bg="gray.800" height='100%' p="8" mt={5}>
@@ -163,16 +151,16 @@ export default function CompanyList() {
                     <Thead>
                       <Tr>
                         <Th px={["4", "4", "6"]} color="gray.300" width="">
-                          <Text>Company</Text>
+                          <Text>Id</Text>
                         </Th>
 
                         <Th px={["4", "4", "6"]} width="">
-                          <Text>Responsable</Text>
+                          <Text>Name</Text>
                         </Th>
 
                         <Th>CNPJ</Th>
 
-                        {isWideVersioon && <Th>Register date</Th>}
+                        {isWideVersioon && <Th>Created at</Th>}
                         <Th w="8">Status</Th>
                       </Tr>
                     </Thead>
@@ -181,39 +169,29 @@ export default function CompanyList() {
                         <Tr
                           onClick={() => {
                             handleEditCompany({
-                              company: company.data.company,
-                              cnpj: company.data.cnpj,
-                              responsable_name: company.data.responsable_name,
-                              email: company.data.email,
-                              phone: company.data.phone,
-                              avaiableHours: company.data.avaiableHours,
-                              companyId: company.ref["@ref"].id,
-                              status: company.data.status
-
+                              id: company.id,
+                              cnpj: company.cnpj,
+                              name: company.name,
+                              status: company.status
                             })
                           }}
                           _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}
-                          key={company.data.cnpj}>
+                          key={company.cnpj}>
                           <Td px={["4", "4", "6"]}>
-                            <Text>{company.data.company}</Text>
+                            <Text>{company.id}</Text>
                           </Td>
                           <Td>
-                            <Box>
                               <Text fontWeight="bold">
-                                {company.data.responsable_name}
+                                {company.name}
                               </Text>
-                              <Text fontSize="sm" color="gray.300">
-                                {company.data.email}
-                              </Text>
-                            </Box>
                           </Td>
-                          <Td>{company.data.cnpj}</Td>
+                          <Td>{company.cnpj}</Td>
 
-                          {isWideVersioon && <Td>{company.data.createdAt}</Td>}
+                          {isWideVersioon && <Td>{dayjs(company.createdAt).format('MMMM D, YYYY h:mm A')}</Td>}
 
                           <Td w={'10rem'}>
 
-                            {company.data.status == "active" ? (
+                            {company.status == "Active" ? (
                               <Text fontWeight={"medium"} color={"blue.400"}>
                                 Active
                               </Text>

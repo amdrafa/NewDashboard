@@ -25,15 +25,12 @@ import { IoMdClose } from "react-icons/io";
 import { FaUnlockAlt } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import { AiOutlineDashboard } from "react-icons/ai";
+import { BiBadgeCheck } from "react-icons/bi";
 
 type EditCompanyFormData = {
+  id: number;
   company: string;
   cnpj: string;
-  responsable_name: string;
-  email: string;
-  phone: number;
-  hours: number;
-  companyId: string;
   status: string;
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -41,21 +38,13 @@ type EditCompanyFormData = {
 const EditCompanyFormSchema = yup.object().shape({
   company: yup.string().required(),
   cnpj: yup.string().required(),
-  responsable_name: yup.string().required().min(4, "Minimum 6 letters."),
-  email: yup.string(),
-  phone: yup.number(),
-  hours: yup.number(),
 });
 
 export default function EditCompany({
   setIsEditMode,
   company,
   cnpj,
-  email,
-  phone,
-  hours: propsHours,
-  responsable_name,
-  companyId,
+  id,
   status
 }: EditCompanyFormData) {
   const { register, handleSubmit, formState, resetField } = useForm({
@@ -73,20 +62,12 @@ export default function EditCompany({
   const handleEditCompany: SubmitHandler<EditCompanyFormData> = async ({
     cnpj,
     company,
-    responsable_name,
-    email,
-    phone,
-    hours,
   }) => {
     await api
-      .put("editcompany", {
+      .put("/company/update", {
         cnpj,
-        company,
-        responsable_name,
-        email,
-        phone,
-        hours,
-        companyId
+        name: company,
+        id: id
       })
       .then((response) => {
         toast({
@@ -110,12 +91,12 @@ export default function EditCompany({
       });
   };
 
-  async function deleteCompany(id: string){
+  async function disableCompany(){
     await api
-      .put("disablecompany", {
+      .put("/company/update", {
         id,
-        email,
-        responsable_name
+        status: "Inactive"
+        // MANDAR UPDATE NORMALMENTE POREM TROCANDO STATUS
       })
     .then((response) => {
       toast({
@@ -140,12 +121,11 @@ export default function EditCompany({
     });
   }
 
-  async function activeCompany(id: string){
+  async function activeCompany(){
     await api
-      .put("activecompany", {
+      .put("/company/update", {
         id,
-        email,
-        responsable_name
+        status: "Active"
       })
     .then((response) => {
       toast({
@@ -178,6 +158,7 @@ export default function EditCompany({
       flex="1"
       borderRadius={8}
       bg="gray.800"
+      maxH={'20rem'}
       p="8"
       mt={5}
       onSubmit={handleSubmit(handleEditCompany)}
@@ -186,14 +167,14 @@ export default function EditCompany({
       <Heading size="lg" fontWeight="normal">
         Edit company
       </Heading>
-          {status == 'active' ? (
+          {status == 'Active' ? (
             <Button bg='red.500' _hover={{bg:'red.400'}} onClick={() => setIsModalOpen(true)}>
             <Icon mr={1.5} as={FiTrash2} />
             Disable company
           </Button>
           ) : (
             <Button bg='blue.500' _hover={{bg:'blue.400'}} onClick={() => setIsModalOpenActive(true)}>
-            <Icon mr={1.5} as={AiOutlineDashboard} />
+            <Icon mr={1.5} as={BiBadgeCheck} />
             Active company
           </Button>
           )}
@@ -221,46 +202,6 @@ export default function EditCompany({
           />
         </SimpleGrid>
 
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-          <Input
-            defaultValue={responsable_name}
-            name="responsable_name"
-            label="Responsable name"
-            {...register("responsable_name")}
-            error={errors.responsable_name}
-            autoComplete={"off"}
-          />
-          <Input
-            defaultValue={email}
-            name="email"
-            label="E-mail"
-            {...register("email")}
-            error={errors.email}
-            autoComplete={"off"}
-          />
-        </SimpleGrid>
-
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-          <Input
-            defaultValue={phone}
-            name="phone"
-            label="Phone"
-            type={"number"}
-            {...register("phone")}
-            error={errors.phone}
-            autoComplete={"off"}
-          />
-          <Input
-            defaultValue={propsHours}
-            name="hours"
-            label="Contracted hours"
-            {...register("hours")}
-            error={errors.hours}
-            maxLength={3}
-            type='number'
-            autoComplete={"off"}
-          />
-        </SimpleGrid>
       </VStack>
 
       <Flex mt="8" justify="flex-end">
@@ -318,10 +259,10 @@ export default function EditCompany({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to disable this company? All users registered to this company are going to be disconnected from {company}.
+              Do you really want to disable {company}?
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              If you want to enable this company again, an e-mail will be sent to the responsable for the company informing the new secret key.
+              In case of changes the company can be enabled again.
             </Text>
           </Box>
 
@@ -338,7 +279,7 @@ export default function EditCompany({
               <Button
                 type="submit"
                 onClick={() => {
-                  deleteCompany(companyId)
+                  disableCompany()
                 }}
                 colorScheme={"red"}
               >
@@ -383,10 +324,10 @@ export default function EditCompany({
 
           <Box my={"4"}>
             <Text mb={2} fontSize={"md"}>
-              Do you really want to active this company? All users registered to this company were disconnected.
+              Do you really want to activete {company}?
             </Text>
             <Text color={"gray.300"} mb={2} fontSize={"md"}>
-              If you enable this company again, an e-mail will be sent to the responsable for the company informing the new secret key.
+            In case of changes the company can be disabled again.
             </Text>
           </Box>
 
@@ -403,7 +344,7 @@ export default function EditCompany({
               <Button
                 type="submit"
                 onClick={() => {
-                  activeCompany(companyId)
+                  activeCompany()
                 }}
                 colorScheme={"blue"}
               >
