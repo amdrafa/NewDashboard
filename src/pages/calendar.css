@@ -43,6 +43,15 @@
     border-radius: 0.25rem;
 }
 
+.react-modal-content-slots-confirmation{
+    width: 100%;
+    max-width: 900px;
+    background: #292A36;
+    padding: 1rem;
+    position: relative;
+    border-radius: 0.25rem;
+}
+
 .react-modal-delete-message{
     width: 100%;
     max-width: 600px;
@@ -88,5 +97,15 @@
 
 .arrowcolor{
     background: #000;
+}
+
+.multiSelector{
+    width: 100%;
+    color:#616488;
+    font-size: 1.1rem;
+    --rmsc-bg: #181b23 !important;
+    --rmsc-border: #181b23 !important;
+    --rmsc-main: #3182CE !important;
+
 }
 

@@ -83,28 +83,27 @@ export default authenticated(
         let emailSlots = "|";
 
         selectedSlots.forEach((slot) => {
-          const data = `${dayjs(slot).format("H")}:00 to ${
-            Number(dayjs(slot).format("H")) + 1
-          }:00`;
+          const data = `${dayjs(slot).format("H")}:00 to ${Number(dayjs(slot).format("H")) + 1
+            }:00`;
 
           emailSlots = emailSlots + ` ${data} |`;
         });
 
         const message = `Hello, dear ${userName} <br> <br> <br> Your appointment on ${dayjs(selectedSlots[0]).format('DD/MM/YYYY')} is confirmed! Selected slots:  <br> <br> ${emailSlots}  <br> <br> <br> We hope you enjoy the tests. Good luck!`;
-  
-  
-          const companyResponsableEmail = companyData.data.email
-  
-          const emailData = {
-            to: userEmail,
-            cc: companyResponsableEmail,
-            from: "services@rafael.network",
-            subject: "Appointment confirmed.",
-            text: message,
-            html: message.replace(/\r\n/g, "<br>"),
-          };
-  
-          mail.send(emailData);
+
+
+        const companyResponsableEmail = companyData.data.email
+
+        const emailData = {
+          to: userEmail,
+          cc: companyResponsableEmail,
+          from: "services@rafael.network",
+          subject: "Appointment confirmed.",
+          text: message,
+          html: message.replace(/\r\n/g, "<br>"),
+        };
+
+        mail.send(emailData);
 
         return response.status(201).json({ Message: "Appointment scheduled" });
       } catch (err) {

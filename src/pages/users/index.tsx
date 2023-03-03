@@ -133,7 +133,7 @@ export default function UserList() {
       const { PaginateData: ReturnedData, totalcount } = response.data;
 
       setTotal(totalcount);
-
+    
       return ReturnedData;
     }
   );
@@ -236,7 +236,7 @@ export default function UserList() {
                         <Th px={["4", "4", "6"]} color="gray.300" width="">
                           <Text>User</Text>
                         </Th>
-                        <Th>CPF</Th>
+                        <Th>CPF/Passport</Th>
                         <Th>Company</Th>
 
                         {isWideVersioon && <Th>Driver licence</Th>}
@@ -289,7 +289,7 @@ export default function UserList() {
                             </Td>
                             <Td>
                               {!user.data.register_number ||
-                              user.data.register_number == "" ? (
+                                user.data.register_number == "" ? (
                                 <Text color={"gray.300"}>Not registered</Text>
                               ) : (
                                 <Box>
@@ -358,7 +358,7 @@ export default function UserList() {
                             </Td>
                             <Td>
                               {!user.data.register_number ||
-                              user.data.register_number == "" ? (
+                                user.data.register_number == "" ? (
                                 <Text color={"gray.300"}>Not registered</Text>
                               ) : (
                                 <Box>

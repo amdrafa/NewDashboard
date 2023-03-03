@@ -55,14 +55,14 @@ const createUserFormSchema = yup.object().shape({
       [null, yup.ref("new_password")],
       "The passwords need to be the same"
     ),
-    
-    
+
+
 });
 
 export default function Settings() {
 
   const toast = useToast()
-  
+
   const [status, setStatus] = useState(0);
 
   const [changePassword, setChangePassword] = useState(false)
@@ -97,7 +97,7 @@ export default function Settings() {
     cpf
   }) => {
 
-    if(new_password?.length < 6 && changePassword){
+    if (new_password?.length < 6 && changePassword) {
       toast({
         title: "New password needs at least 6 characters",
         description: `Try a bigger password.`,
@@ -108,15 +108,15 @@ export default function Settings() {
       });
     }
 
-    
-    if(changePassword){
+
+    if (changePassword) {
       try {
         const response = await api
           .post("updatedata", {
             new_password,
             old_password,
             name,
-            phone, 
+            phone,
             new_email: email,
             current_email: user.email,
             cpf
@@ -126,7 +126,7 @@ export default function Settings() {
             new Promise(resolve => setTimeout(() => {
               window.location.reload()
             }, 2000))
-            
+
           });
       } catch (err) {
         toast({
@@ -138,14 +138,14 @@ export default function Settings() {
           position: 'top-right'
         });
       }
-    }else{
+    } else {
       try {
         const response = await api
           .post("updatedata", {
             new_password: null,
             old_password,
             name,
-            phone, 
+            phone,
             new_email: email,
             current_email: user.email,
             cpf
@@ -163,7 +163,7 @@ export default function Settings() {
       }
     }
   };
-  
+
   return (
     <Box mt={-3} >
       <Header />
@@ -220,9 +220,8 @@ export default function Settings() {
                   />
                   <Input
                     defaultValue={user?.cpf}
-                    type="number"
                     name="cpf"
-                    label="CPF"
+                    label="CPF/Passport"
                     {...register("cpf")}
                     error={errors.cpf}
                   />
@@ -233,7 +232,7 @@ export default function Settings() {
                 <Flex w={'100%'} justifyContent={'start'}>
                   <Checkbox mr={2} onChange={(e) => {
                     setChangePassword(e.target.checked)
-                  }} /> 
+                  }} />
                   <Text color={'gray.200'}>
                     Change password?
                   </Text>
@@ -258,34 +257,34 @@ export default function Settings() {
 
                 {changePassword && (
                   <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-                  <Box>
+                    <Box>
+                      <Input
+                        type={"password"}
+                        name="new_password"
+                        label="New password"
+                        {...register("new_password")}
+                        error={errors.new_password}
+                      />
+                      <Text ml={2} mt={2} color="gray.500">
+                        Minimum 6 characteres
+                      </Text>
+                    </Box>
+
                     <Input
                       type={"password"}
-                      name="new_password"
-                      label="New password"
-                      {...register("new_password")}
-                      error={errors.new_password}
+                      name="new_password_confirmation"
+                      label="New password confirmation"
+                      {...register("new_password_confirmation")}
+                      error={errors.new_password_confirmation}
                     />
-                    <Text ml={2} mt={2} color="gray.500">
-                      Minimum 6 characteres
-                    </Text>
-                  </Box>
-
-                  <Input
-                    type={"password"}
-                    name="new_password_confirmation"
-                    label="New password confirmation"
-                    {...register("new_password_confirmation")}
-                    error={errors.new_password_confirmation}
-                  />
-                </SimpleGrid>
+                  </SimpleGrid>
                 )}
               </VStack>
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
                   <Link href="home">
-                    <Button  colorScheme="whiteAlpha">
+                    <Button colorScheme="whiteAlpha">
                       Cancel
                     </Button>
                   </Link>
@@ -308,8 +307,8 @@ export default function Settings() {
       </Flex>
 
       <Flex >
-        <Flex  w={{lg: '275px'}}></Flex>
-      <Footer />
+        <Flex w={{ lg: '275px' }}></Flex>
+        <Footer />
       </Flex>
     </Box>
   );

@@ -2,19 +2,27 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { api } from "../services/axios";
 import Router from "next/router";
 import { useToast } from "@chakra-ui/react";
-import { parseCookies, destroyCookie } from "nookies";
+import { parseCookies, destroyCookie, setCookie } from "nookies";
+import { decode } from "jsonwebtoken";
 
-type User = {
-  userId: string;
+export type DecodedToken = {
+  id: string;
+  sub?: string;
+  iat: number;
+  exp: number;
+  roles: string;
   name: string;
   email: string;
-  roles: string[];
-  permissions?: string[];
-  companyRef: string;
-  driver_expiration?: string;
-  cpf: string;
-  phone: string;
-  companyName: string;
+  isForeigner: boolean;
+};
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  roles: string;
+  isForeigner: boolean;
+  companyId?: number;
 };
 
 interface LogInCreateContextProps {
@@ -35,10 +43,8 @@ type createUserProps = {
   email: string;
   password: string;
   phone: number;
-  cpf: number;
-  register_number?: number;
-  driver_category?: string;
-  expires_at?: Date;
+  document: string;
+  isForeigner: boolean;
 };
 
 type authProviderProps = {
@@ -62,13 +68,14 @@ export function LoginContextProvider({ children }: authProviderProps) {
   const [user, setUser] = useState<User>();
   const [statusRegister, setStatusRegister] = useState(0);
   const [statusLogin, setStatusLogin] = useState(0);
+
   let isAuthenticated = !!user;
 
   const toast = useToast()
 
   useEffect(() => {
     authChannel = new BroadcastChannel("auth");
-
+    
     authChannel.onmessage = (message) => {
       switch (message.data) {
         case "signout":
@@ -81,27 +88,45 @@ export function LoginContextProvider({ children }: authProviderProps) {
   }, []);
 
   useEffect(() => {
-    const { auth } = parseCookies();
+  const { auth } = parseCookies();
 
-    if (auth) {
-      api
-        .get("me")
-        .then((response) => {
-          const { name, email, roles, userId, driver_expiration, companyRef, cpf, phone, companyName, permissions } = response.data;
+  const decodedUser = decode(auth as string) as DecodedToken;
+
+  if(auth){
+    setUser({
+      id: decodedUser.id,
+      email: decodedUser.email,
+      roles: decodedUser.roles,
+      name: decodedUser.name,
+      isForeigner: decodedUser.isForeigner
+    })
+
+    api.defaults.headers["authorization"] = "Bearer " + auth;
+
+    isAuthenticated = true
+  }
+
+    // if (auth) {
+    //   api
+    //     .get("me")
+    //     .then((response) => {
+    //       const { name, email, roles, userId, driver_expiration, companyRef, cpf, phone, companyName, permissions } = response.data;
       
-          setUser({ name, email, roles, companyRef, userId, driver_expiration, cpf, phone, companyName, permissions: permissions ? permissions : [""] });
-        })
-        .catch((error) => {
-          isAuthenticated = false;
-          signOut();
-        });
-    }
+    //       setUser({ name, email, roles, companyRef, userId, driver_expiration, cpf, phone, companyName, permissions: permissions ? permissions : [""] });
+    //     })
+    //     .catch((error) => {
+    //       isAuthenticated = false;
+    //       signOut();
+    //     });
+    // }
 
     if (!auth) {
       isAuthenticated = false;
-      api.defaults.headers["authorization"] = "";
+      api.defaults.headers["authorization"] = "Bearer " + auth;
       Router.push("/");
     }
+
+
   }, [statusLogin]);
 
   useEffect(() => {
@@ -135,11 +160,26 @@ export function LoginContextProvider({ children }: authProviderProps) {
 
   async function loginAuth({ email, password }: loginProps) {
     try {
-      const response = await api.post("login", { data: email, password });
+      const response = await api.post("/user/login", { email, password });
 
-      const { auth } = parseCookies();
-      api.defaults.headers["authorization"] = auth;
+      setCookie(null, "auth", response.data.token)
+
+      api.defaults.headers["authorization"] = response?.data?.token;
       setStatusLogin(response.status);
+
+      setUser(response.data.user);
+
+      console.log(response)
+
+      toast({
+        title: "deu bom",
+        description: `Try a valid e-mail and password.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+
     } catch (err) {
       console.log(err);
       toast({
@@ -153,13 +193,25 @@ export function LoginContextProvider({ children }: authProviderProps) {
     }
   }
 
-  async function createUser({ name, email, password, cpf, phone, register_number, driver_category, expires_at }: createUserProps) {
+  async function createUser({ name, email, password, document, phone, isForeigner}: createUserProps) {
     try {
       //setUser({email, name: 'rafael'})
       await api
-        .post("createuser", { data: email, password, name, cpf, phone, register_number, driver_category, expires_at})
-        .then((response) => setStatusRegister(response.status));
+        .post("/user/create", { email, password, name, document, phone, isForeigner, roles: "user"})
+        .then((response) => {
+          toast({
+            title: "Registration successful",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          });
+
+          Router.push("/");
+
+        });
     } catch (err) {
+      console.log(err)
       setStatusRegister(err.response.status);
       toast({
         title: "E-mail already registered",

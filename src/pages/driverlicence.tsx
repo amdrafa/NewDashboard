@@ -55,14 +55,14 @@ export default function DriverLicence() {
           new Date(response.data.expires_at).getDate().toString().slice(0, 2)
             .length > 1
             ? new Date(response.data.expires_at)
-                .getDate()
-                .toString()
-                .slice(0, 2)
+              .getDate()
+              .toString()
+              .slice(0, 2)
             : "0" +
-              new Date(response.data.expires_at)
-                .getDate()
-                .toString()
-                .slice(0, 2);
+            new Date(response.data.expires_at)
+              .getDate()
+              .toString()
+              .slice(0, 2);
 
         setDefaultRegister_number(response.data.register_number);
         setDefaultDriver_category(response.data.driver_category);
@@ -70,14 +70,14 @@ export default function DriverLicence() {
         if (response?.data?.expires_at) {
           setDefaultExpires_at(
             new Date(response.data.expires_at).getFullYear().toString() +
-              "-" +
-              ("0" + (new Date(response.data.expires_at).getMonth() + 1)).slice(
-                -2
-              ) +
-              "-" +
-              day
+            "-" +
+            ("0" + (new Date(response.data.expires_at).getMonth() + 1)).slice(
+              -2
+            ) +
+            "-" +
+            day
           );
-        }        
+        }
       })
       .catch((error) => console.log(error));
   }, []);
@@ -160,9 +160,9 @@ export default function DriverLicence() {
                     defaultValue={defaultRegister_number}
                     name="register_number"
                     label="Register number"
-                    type={"number"}
                     {...register("register_number")}
                     error={errors.register_number}
+                    maxLength={20}
                   />
                 </SimpleGrid>
 

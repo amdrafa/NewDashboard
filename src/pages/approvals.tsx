@@ -19,6 +19,8 @@ import {
   HStack,
   useToast,
 } from "@chakra-ui/react";
+import { IoDiamondOutline } from "react-icons/io5";
+import { BiSearchAlt2 } from "react-icons/bi";
 import Modal from "react-modal";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
@@ -37,6 +39,7 @@ import { GetServerSideProps } from "next";
 import { decode } from "jsonwebtoken";
 import { parseCookies } from "nookies";
 import { Footer } from "../components/footer";
+import { Input } from "../components/Form/input";
 
 export type DecodedToken = {
   sub: string;
@@ -340,6 +343,7 @@ export default function Approvals() {
                   Approvals
                 </Heading>
 
+
                 <Button
                   size="sm"
                   fontSize="sm"
@@ -368,10 +372,25 @@ export default function Approvals() {
                     flexDir={"column"}
                     justifyContent="space-between"
                   >
+                    <Flex width={'14rem'} mb={'1rem'} align='center'>
+                      <HStack>
+                        <Input
+                          name="adsdsa"
+                          height='2rem'
+                          placeholder="Search"
+                          fontSize={'16'}
+                        />
+                        <BiSearchAlt2 size={'1.5rem'} />
+                      </HStack>
+                    </Flex>
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
                           <Th px={["4", "4", "6"]} color="gray.300">
+                            <Text>ID</Text>
+                          </Th>
+
+                          <Th px={["4", "4", "6"]}>
                             <Text>Test track</Text>
                           </Th>
 
@@ -383,7 +402,13 @@ export default function Approvals() {
                             <Text>Date</Text>
                           </Th>
 
-                          <Th>Slots</Th>
+                          <Th>From</Th>
+
+                          <Th>To</Th>
+
+                          <Th display={'flex'} justifyContent={'center'} px={["4", "4", "6"]} width="">
+                            <Text>Exclusive</Text>
+                          </Th>
 
                           <Th>Status</Th>
                         </Tr>
@@ -412,14 +437,13 @@ export default function Approvals() {
                             }}
                           >
                             <Td>
-                              <Box>
-                                <Text fontWeight="bold">
-                                  {appointment.data.speedway}
-                                </Text>
-                                <Text color={"gray.300"}>
-                                  {appointment.data.vehicle}
-                                </Text>
-                              </Box>
+                              <Text>0001</Text>
+                            </Td>
+                            <Td>
+                              <Text fontWeight="bold">
+                                {appointment.data.speedway}
+                              </Text>
+
                             </Td>
                             <Td>
                               <Text>{appointment.data.companyName}</Text>
@@ -432,28 +456,16 @@ export default function Approvals() {
                               </Text>
                             </Td>
                             <Td>
-                              <Flex
-                                wrap="wrap"
-                                alignSelf={"center"}
-                                alignItems={"center"}
-                              >
-                                {appointment.data.selectedSlots.map((slot) => {
-                                  return (
-                                    <Text
-                                      key={slot}
-                                      color={"gray.100"}
-                                      fontWeight={"bold"}
-                                      ml="2"
-                                      my="1"
-                                      p={2}
-                                      rounded="lg"
-                                      bg={"blue.600"}
-                                    >
-                                      {dayjs(slot).format("H")}:00 to{" "}
-                                      {Number(dayjs(slot).format("H")) + 1}:00
-                                    </Text>
-                                  );
-                                })}
+                              <Text>Feb 9, 2023 - 9:00 PM</Text>
+                            </Td>
+
+                            <Td>
+                              <Text>Feb 9, 2023 - 9:00 PM</Text>
+                            </Td>
+
+                            <Td>
+                              <Flex color={appointment.data.speedway == 'VDA' ? 'blue.500' : 'gray.600'} justify='center' align={'centers'}>
+                                <IoDiamondOutline />
                               </Flex>
                             </Td>
 
@@ -910,15 +922,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              8
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            8
+                          ).toString()
+                      )
                   }
                 />
 
@@ -944,15 +956,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              9
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            9
+                          ).toString()
+                      )
                   }
                 />
 
@@ -978,15 +990,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              10
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            10
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1012,15 +1024,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              11
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            11
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1046,15 +1058,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              12
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            12
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1080,15 +1092,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              13
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            13
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1114,15 +1126,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              14
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            14
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1148,15 +1160,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              15
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            15
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1182,15 +1194,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              16
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            16
+                          ).toString()
+                      )
                   }
                 />
 
@@ -1216,15 +1228,15 @@ export default function Approvals() {
                     isLoadingBusylots
                       ? false
                       : dataBusySlots.busySlots.some(
-                          (slot) =>
-                            slot ===
-                            new Date(
-                              Number(dayjs(selectedSlots[0]).format("YYYY")),
-                              Number(dayjs(selectedSlots[0]).format("MM")) - 1,
-                              Number(dayjs(selectedSlots[0]).format("D")),
-                              17
-                            ).toString()
-                        )
+                        (slot) =>
+                          slot ===
+                          new Date(
+                            Number(dayjs(selectedSlots[0]).format("YYYY")),
+                            Number(dayjs(selectedSlots[0]).format("MM")) - 1,
+                            Number(dayjs(selectedSlots[0]).format("D")),
+                            17
+                          ).toString()
+                      )
                   }
                 />
               </Flex>
@@ -1405,16 +1417,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                8
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              8
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1440,16 +1452,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                9
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              9
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1475,16 +1487,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                10
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              10
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1510,16 +1522,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                11
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              11
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1545,16 +1557,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                12
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              12
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1580,16 +1592,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                13
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              13
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1615,16 +1627,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                14
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              14
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1650,16 +1662,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                15
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              15
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1685,16 +1697,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                16
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              16
+                            ).toString()
+                        )
                     }
                   />
 
@@ -1720,16 +1732,16 @@ export default function Approvals() {
                       isLoadingBusylots
                         ? false
                         : dataBusySlots.busySlots.some(
-                            (slot) =>
-                              slot ===
-                              new Date(
-                                Number(dayjs(selectedSlots[0]).format("YYYY")),
-                                Number(dayjs(selectedSlots[0]).format("MM")) -
-                                  1,
-                                Number(dayjs(selectedSlots[0]).format("D")),
-                                17
-                              ).toString()
-                          )
+                          (slot) =>
+                            slot ===
+                            new Date(
+                              Number(dayjs(selectedSlots[0]).format("YYYY")),
+                              Number(dayjs(selectedSlots[0]).format("MM")) -
+                              1,
+                              Number(dayjs(selectedSlots[0]).format("D")),
+                              17
+                            ).toString()
+                        )
                     }
                   />
                 </Flex>
@@ -1737,7 +1749,7 @@ export default function Approvals() {
             </Box>
 
             {appointmentStatus == "canceled" ||
-            appointmentStatus == "rejected" ? (
+              appointmentStatus == "rejected" ? (
               <Button
                 type="submit"
                 ml={2}

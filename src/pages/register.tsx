@@ -9,6 +9,7 @@ import {
   SimpleGrid,
   Box,
   Checkbox,
+  HStack,
 } from "@chakra-ui/react";
 import { Input } from "../components/Form/input";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -27,20 +28,17 @@ import { BsFillPersonFill } from "react-icons/bs";
 type SignInFormData = {
   name: string;
   email: string;
-  cpf: number;
+  document: string;
   phone: number;
   email_confirmation: string;
   password: string;
   password_confirmation: string;
-  register_number?: number;
-  driver_category?: string;
-  expires_at?: Date;
 };
 
 const SignInFormSchema = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().required().email(),
-  cpf: yup.string().required().min(10, "Minimum 10 characteres").max(14, "Maximum 14 characteres"),
+  document: yup.string().required().min(10, "Minimum 10 characteres").max(14, "Maximum 14 characteres"),
   phone: yup.string().required().min(10, "Minimum 10 letters.").max(14, "Maximum 14 characteres"),
   email_confirmation: yup
     .string()
@@ -50,17 +48,11 @@ const SignInFormSchema = yup.object().shape({
     .string()
     .required()
     .oneOf([null, yup.ref("password")], "The passwords need to be the same"),
-  register_number: yup.string().max(11),
-  driver_category: yup.string(),
-  expires_at: yup.date(),
 });
 
 export default function Register() {
 
-  const [page, setPage] = useState(1);
-
-  const [hasDriverLicence, setHasDriverLicence] = useState(false);
-
+  const [isForeigner, setIsForeigner] = useState(false)
 
   const { createUser } = useContext(LoginContext);
 
@@ -75,53 +67,18 @@ export default function Register() {
     email,
     password,
     name,
-    cpf,
+    document,
     phone,
-    register_number,
-    driver_category,
-    expires_at,
   }) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-
-
-    if (page == 1 && hasDriverLicence) {
-
-      setPage(2)
-
-      return;
-    }
-
-    if (hasDriverLicence) {
       createUser({
         name,
         email,
         password,
         phone,
-        cpf,
-        register_number,
-        driver_category,
-        expires_at,
+        document,
+        isForeigner
       });
-      console.log("user created with driver licence");
-    } else {
-      createUser({
-        name,
-        email,
-        password,
-        phone,
-        cpf,
-        register_number: null,
-        driver_category: null,
-        expires_at: null,
-      });
-      console.log("user created without driver licence");
-    }
   };
-
-
-
-
 
   return (
     <Flex
@@ -143,8 +100,7 @@ export default function Register() {
         onSubmit={handleSubmit(handleSignin)}
       >
         <VStack spacing={4}>
-          {page == 1 ? (
-            <>
+          
               <Flex
                 w={"100%"}
                 mb={3}
@@ -155,32 +111,7 @@ export default function Register() {
                   Registration
                 </Text>
 
-                <Flex alignItems="center" justifyContent="center">
-                  {hasDriverLicence == true ? (
-                    <>
-                      <Box mr={1}>
-                        <Icon
-                          fontSize={12}
-                          mr={2}
-                          color={page == 1 ? "blue.500" : "gray.600"}
-                          as={FaCircle}
-                        />
-                        <Icon
-                          fontSize={12}
-                          as={FaCircle}
-                          color={page != 1 ? "blue.500" : "gray.600"}
-                        />
-                      </Box>
-                    </>
-                  ) : (
-                    <Icon
-                      fontSize={12}
-                      mr={2}
-                      color={page == 1 ? "blue.500" : "gray.600"}
-                      as={FaCircle}
-                    />
-                  )}
-                </Flex>
+                
               </Flex>
               <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                 <Input
@@ -191,13 +122,19 @@ export default function Register() {
                 />
               </SimpleGrid>
 
+              <HStack w={'100%'} mb='0.5rem'>
+                <Checkbox isChecked={isForeigner} onChange={(e) => setIsForeigner(e.target.checked)}/>
+                <Text>
+                  I'm foreigner
+                </Text>
+              </HStack>
+
               <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                 <Input
-                  name="cpf"
-                  label="CPF"
-                  type="number"
-                  {...register("cpf")}
-                  error={errors.cpf}
+                  name="document"
+                  label={isForeigner ? "Passport" : "CPF" }
+                  {...register("document")}
+                  error={errors.document}
                   maxLength={10}
                 />
                 <Input
@@ -243,14 +180,7 @@ export default function Register() {
                   error={errors.password_confirmation}
                 />
               </SimpleGrid>
-              <Flex w={"100%"} alignItems={"center"} mt="9">
-                <Text ml={1} mr={2}>
-                  Do you have driver licence?
-                </Text>
-                <Checkbox
-                  onChange={(e) => setHasDriverLicence(e.target.checked)}
-                />
-              </Flex>
+              
               <Flex
                 pt={10}
                 w={"100%"}
@@ -272,112 +202,12 @@ export default function Register() {
                     </Text>
                   </Button>
                 </Link>
-
-                {hasDriverLicence ? (
-                  <Button colorScheme={"twitter"} type={"submit"} isLoading={isSubmitting}>
-                    Next
-                  </Button>
-                ) : (
                   <Button colorScheme={"twitter"} type={"submit"} isLoading={isSubmitting}>
                     Submit
                   </Button>
-                )}
               </Flex>
-            </>
-          ) : (
-            <>
-              <Flex
-                w={"100%"}
-                mb={3}
-                justify="space-between"
-                alignItems={"center"}
-              >
-                <Box>
-                  <Text ml={-1} fontSize={"24"} fontWeight="200">
-                    Driver licence
-                  </Text>
-                </Box>
-
-                <Flex alignItems="center" justifyContent="center">
-                  <Box mr={1}>
-                    <Icon
-                      fontSize={12}
-                      mr={2}
-                      color={page == 1 ? "blue.500" : "gray.600"}
-                      as={FaCircle}
-                    />
-                    <Icon
-                      fontSize={12}
-                      as={FaCircle}
-                      color={page != 1 ? "blue.500" : "gray.600"}
-                    />
-                  </Box>
-                </Flex>
-              </Flex>
-
-              <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
-
-                <Input
-                  name="register_number"
-                  label="Register number"
-                  type={"number"}
-                  {...register("register_number")}
-                  error={errors.register_number}
-
-                />
-
-
-
-              </SimpleGrid>
-
-              <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
-                <Box>
-                  <Input
-                    name="driver_category"
-                    label="License"
-                    {...register("driver_category")}
-                    error={errors.driver_category}
-                    maxLength={5}
-                  />
-                  <Text mt={2} ml={1} color={"gray.300"}>
-                    Ex: AB
-                  </Text>
-                </Box>
-                <Input
-                  name="expires_at"
-                  type="date"
-                  label="Expires at"
-                  {...register("expires_at")}
-                  error={errors.expires_at}
-                  css={`
-                    ::-webkit-calendar-picker-indicator {
-                      opacity: 0.15;
-                    }
-                  `}
-                />
-              </SimpleGrid>
-
-              <Flex
-                pt={10}
-                w={"100%"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <Link href="/" >
-                  <Button
-                    bg={"gray.300"}
-                    cursor={"pointer"}
-                  >
-                    Return
-                  </Button>
-                </Link>
-
-                <Button colorScheme={"twitter"} type={"submit"} isLoading={isSubmitting}>
-                  Submit
-                </Button>
-              </Flex>
-            </>
-          )}
+            
+          
         </VStack>
 
         {/* <Button

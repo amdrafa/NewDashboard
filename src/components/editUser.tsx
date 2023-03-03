@@ -123,69 +123,69 @@ export function EditUser({
 
     register_number.toString() == ""
       ? api
-          .put("edituser", {
-            email,
-            name,
-            cpf,
-            phone,
-            register_number,
-            driver_category,
-            expires_at,
-            userId,
-          })
-          .then((response) => {
-            toast({
-              title: "User updated",
-              description: `${name} was updated successfully.`,
-              status: "success",
-              duration: 5000,
-              isClosable: true,
-              position: "top-right",
-            });
-            window.location.reload();
-          })
-          .catch((err) => {
-            toast({
-              title: "Something went wrong",
-              description: `Something went wrong when deleting ${name}.`,
-              status: "error",
-              duration: 5000,
-              isClosable: true,
-              position: "top-right",
-            });
-          })
-      : api
-          .put("edituser", {
-            email,
-            name,
-            cpf,
-            phone,
-            register_number,
-            driver_category,
-            expires_at,
-            userId,
-          })
-          .then((response) => {
-            toast({
-              title: "User updated",
-              description: `${name} was updated successfully.`,
-              status: "success",
-              duration: 5000,
-              isClosable: true,
-              position: "top-right",
-            });
-            window.location.reload();
-          })
-          .catch((err) => {
-            toast({
-              title: "Something went wrong",
-              description: `Something went wrong when deleting ${name}.`,
-              status: "error",
-              duration: 5000,
-              isClosable: true,
-              position: "top-right",
-            });
+        .put("edituser", {
+          email,
+          name,
+          cpf,
+          phone,
+          register_number,
+          driver_category,
+          expires_at,
+          userId,
+        })
+        .then((response) => {
+          toast({
+            title: "User updated",
+            description: `${name} was updated successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
           });
+          window.location.reload();
+        })
+        .catch((err) => {
+          toast({
+            title: "Something went wrong",
+            description: `Something went wrong when deleting ${name}.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
+          });
+        })
+      : api
+        .put("edituser", {
+          email,
+          name,
+          cpf,
+          phone,
+          register_number,
+          driver_category,
+          expires_at,
+          userId,
+        })
+        .then((response) => {
+          toast({
+            title: "User updated",
+            description: `${name} was updated successfully.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
+          });
+          window.location.reload();
+        })
+        .catch((err) => {
+          toast({
+            title: "Something went wrong",
+            description: `Something went wrong when deleting ${name}.`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
+          });
+        });
 
     return;
   };
@@ -245,8 +245,7 @@ export function EditUser({
           <Input
             defaultValue={cpf}
             name="cpf"
-            label="CPF"
-            type="number"
+            label="CPF/Passport"
             {...register("cpf")}
             error={errors.cpf}
             maxLength={10}
@@ -292,8 +291,8 @@ export function EditUser({
               !expires_at
                 ? ""
                 : `${dayjs(expires_at).format("YYYY")}-${dayjs(
-                    expires_at
-                  ).format("MM")}-${dayjs(expires_at).format("DD")}`
+                  expires_at
+                ).format("MM")}-${dayjs(expires_at).format("DD")}`
             }
             name="expires_at"
             type="date"
