@@ -10,6 +10,7 @@ import {
   Heading,
   HStack,
   useToast,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Input } from "../components/Form/input";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -24,59 +25,51 @@ import dayjs from "dayjs";
 type EditUserFormSchema = {
   name: string;
   email: string;
-  cpf: number;
-  phone: number;
-  register_number?: number;
-  driver_category?: string;
-  expires_at?: Date;
+  document: string;
 };
 
+interface companyProps {
+  id: number;
+  name: string;
+  cnpj: string;
+  status: string;
+  createdAt?: string;
+}
+
 type EditUserFormData = {
+  id: number;
   name: string;
   email: string;
-  cpf: number;
-  phone: number;
-  register_number?: string;
-  driver_category?: string;
-  expires_at?: string;
-  userId: string;
+  document: string;
+  companyId?: number;
+  isForeigner: boolean;
+  selectedUserCompany: companyProps[];
+  setIsForeigner: React.Dispatch<React.SetStateAction<boolean>>;
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const EditUserFormSchema = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().required().email(),
-  cpf: yup
+  document: yup
     .string()
     .required()
     .min(10, "Minimum 10 characteres")
     .max(14, "Maximum 14 characteres"),
-  phone: yup
-    .string()
-    .required()
-    .min(10, "Minimum 10 letters.")
-    .max(14, "Maximum 14 characteres"),
-  register_number: yup.string().max(11),
-  driver_category: yup.string(),
-  expires_at: yup.string(),
 });
 
 export function EditUser({
   email,
   name,
-  cpf,
-  phone,
-  register_number,
-  driver_category,
-  expires_at,
+  document,
   setIsEditMode,
-  userId,
+  isForeigner,
+  id,
+  companyId,
+  setIsForeigner,
+  selectedUserCompany
 }: EditUserFormData) {
   const toast = useToast();
-
-  const [hasDriverLicence, setHasDriverLicence] = useState(false);
-
-  const { createUser } = useContext(LoginContext);
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(EditUserFormSchema),
@@ -84,7 +77,7 @@ export function EditUser({
 
   const { errors, isSubmitting } = formState;
 
-  function deleteUser(id: string) {
+  function deleteUser() {
     api
       .delete("deleteuser", { data: { id } })
       .then((response) => {
@@ -110,82 +103,43 @@ export function EditUser({
       });
   }
 
+  // trocar para handle updateUserCompany e pegar dado somente da empresa que será vinculada ao mesmo
+
   const handleEditUser: SubmitHandler<EditUserFormSchema> = async ({
     email,
     name,
-    cpf,
-    phone,
-    register_number,
-    driver_category,
-    expires_at,
+    document,
   }) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    register_number.toString() == ""
-      ? api
-        .put("edituser", {
-          email,
-          name,
-          cpf,
-          phone,
-          register_number,
-          driver_category,
-          expires_at,
-          userId,
-        })
-        .then((response) => {
-          toast({
-            title: "User updated",
-            description: `${name} was updated successfully.`,
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-            position: "top-right",
-          });
-          window.location.reload();
-        })
-        .catch((err) => {
-          toast({
-            title: "Something went wrong",
-            description: `Something went wrong when deleting ${name}.`,
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "top-right",
-          });
-        })
-      : api
-        .put("edituser", {
-          email,
-          name,
-          cpf,
-          phone,
-          register_number,
-          driver_category,
-          expires_at,
-          userId,
-        })
-        .then((response) => {
-          toast({
-            title: "User updated",
-            description: `${name} was updated successfully.`,
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-            position: "top-right",
-          });
-          window.location.reload();
-        })
-        .catch((err) => {
-          toast({
-            title: "Something went wrong",
-            description: `Something went wrong when deleting ${name}.`,
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "top-right",
-          });
+    await api
+      .post("/user/update", {
+        id,
+        email,
+        name,
+        document,
+        isForeigner
+      })
+      .then((response) => {
+        toast({
+          title: "User updated",
+          description: `${name} was updated successfully.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
         });
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.log(err)
+        toast({
+          title: "Something went wrong",
+          description: `Something went wrong when deleting ${name}.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      });
 
     return;
   };
@@ -207,7 +161,7 @@ export function EditUser({
           </Heading>
           <Button
             onClick={() => {
-              deleteUser(userId);
+              deleteUser();
               return;
             }}
             bg="red.500"
@@ -220,6 +174,16 @@ export function EditUser({
 
         <Divider my="6" borderColor="gray.700" />
 
+        <Flex justify={"start"} w="100%" mb={"1rem"}>
+          <HStack>
+            <Checkbox
+              defaultChecked={isForeigner}
+              isDisabled
+            />
+            <Text color={'gray.500'}>Is foreigner</Text>
+          </HStack>
+        </Flex>
+
         <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
           <Input
             defaultValue={name}
@@ -227,10 +191,21 @@ export function EditUser({
             label="Full name"
             {...register("name")}
             error={errors.name}
+            isDisabled
+          />
+
+          <Input
+            defaultValue={document}
+            name="document"
+            label="Document"
+            {...register("document")}
+            error={errors.document}
+            maxLength={10}
+            isDisabled
           />
         </SimpleGrid>
 
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+        <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={'4rem'}>
           <Input
             defaultValue={email}
             name="email"
@@ -238,72 +213,18 @@ export function EditUser({
             type={"email"}
             {...register("email")}
             error={errors.email}
+            isDisabled
           />
         </SimpleGrid>
 
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={2}>
-          <Input
-            defaultValue={cpf}
-            name="cpf"
-            label="CPF/Passport"
-            {...register("cpf")}
-            error={errors.cpf}
-            maxLength={10}
-          />
-          <Input
-            defaultValue={phone}
-            name="phone"
-            label="Phone"
-            type={"number"}
-            {...register("phone")}
-            error={errors.phone}
-            placeholder="47 900000000"
-          />
-        </SimpleGrid>
+        <Divider my="6" borderColor="gray.700" />
 
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
+        <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={'4rem'}>
           <Input
-            defaultValue={register_number}
-            name="register_number"
-            label="Register number"
-            type={"number"}
-            {...register("register_number")}
-            error={errors.register_number}
-          />
-        </SimpleGrid>
-
-        <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
-          <Box>
-            <Input
-              defaultValue={driver_category}
-              name="driver_category"
-              label="License"
-              {...register("driver_category")}
-              error={errors.driver_category}
-              maxLength={5}
-            />
-            <Text mt={2} ml={1} color={"gray.300"}>
-              Ex: AB
-            </Text>
-          </Box>
-          <Input
-            defaultValue={
-              !expires_at
-                ? ""
-                : `${dayjs(expires_at).format("YYYY")}-${dayjs(
-                  expires_at
-                ).format("MM")}-${dayjs(expires_at).format("DD")}`
-            }
-            name="expires_at"
-            type="date"
-            label="Expires at"
-            {...register("expires_at")}
-            error={errors.expires_at}
-            css={`
-              ::-webkit-calendar-picker-indicator {
-                opacity: 0.15;
-              }
-            `}
+            defaultValue={selectedUserCompany[0]?.name}
+            name="company"
+            label="Associate a company"
+            placeholder="Search for a company"
           />
         </SimpleGrid>
 

@@ -29,6 +29,7 @@ import { decode } from "jsonwebtoken";
 import EditCompany from "../../components/editCompany";
 import { Footer } from "../../components/footer";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
 
 export type DecodedToken = {
   sub: string;
@@ -48,32 +49,18 @@ interface companyProps {
   createdAt?: string;
 }
 
-
 export default function CompanyList() {
 
+  const router = useRouter()
 
   const [companyId, setCompanyId] = useState(0);
-  const [company, setCompany] = useState('');
-  const [cnpj, setCnpj] = useState('false');
-  const [status, setStatus] = useState('');
-
-  const [isEditMode, setIsEditMode] = useState(false);
-
+  
   function handleEditCompany({
-    name,
-    cnpj,
-    status,
     id
   }): companyProps {
 
-
-    setCompany(name)
-    setCnpj(cnpj)
     setCompanyId(id)
-    setStatus(status)
-
-
-    setIsEditMode(true);
+    router.push(`/companies/detail/${id}`)
 
     return;
   }
@@ -108,15 +95,7 @@ export default function CompanyList() {
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        {isEditMode ? (
-          <EditCompany
-            cnpj={cnpj}
-            company={company}
-            id={companyId}
-            setIsEditMode={setIsEditMode}
-            status={status}
-          />
-        ) : (
+        
           <Box flex="1" borderRadius={8} bg="gray.800" height='100%' p="8" mt={5}>
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
@@ -169,10 +148,7 @@ export default function CompanyList() {
                         <Tr
                           onClick={() => {
                             handleEditCompany({
-                              id: company.id,
-                              cnpj: company.cnpj,
-                              name: company.name,
-                              status: company.status
+                              id: company.id
                             })
                           }}
                           _hover={{ bg: 'gray.900', color: 'gray.300', transition: '0.2s', cursor: 'pointer' }}
@@ -233,7 +209,7 @@ export default function CompanyList() {
               )
             )}
           </Box>
-        )}
+        
       </Flex>
 
       <Flex >

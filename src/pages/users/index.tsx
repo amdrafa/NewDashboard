@@ -28,6 +28,7 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import { Footer } from "../../components/footer";
+import { useRouter } from "next/router";
 
 export type DecodedToken = {
   sub: string;
@@ -38,37 +39,30 @@ export type DecodedToken = {
   name: string;
 };
 
-interface UserDataProps {
-  data: UserProps;
-  ref: {
-    "@ref": {
-      id: number;
-    };
-  };
-  ts: number;
-}
-
 interface UserProps {
+  id: number;
   name: string;
   email: string;
-  companyName: string;
-  phone: number;
-  register_number: string;
-  expires_at: string;
-  cpf: number;
-  driver_category: string;
+  document: string;
+  companyId?: number;
+  isForeigner: boolean;
+}
+
+interface companyProps {
+  id: number;
+  name: string;
+  cnpj: string;
+  status: string;
+  createdAt?: string;
 }
 
 interface UserFunctionProps {
+  id: number;
   name: string;
   email: string;
-  companyName: string;
-  phone: number;
-  register_number: string;
-  expires_at: string;
-  cpf: number;
-  driver_category: string;
-  userId: string;
+  document: string;
+  companyId?: number;
+  isForeigner: boolean;
 }
 
 export default function UserList() {
@@ -77,20 +71,12 @@ export default function UserList() {
     lg: true,
   });
 
+  const route = useRouter()
+
   const [filteredData, setFilteredData] = useState([]);
 
-  const [name, setName] = useState("");
-  const [cpf, setCpf] = useState(0);
-  const [phone, setPhone] = useState(0);
-  const [email, setEmail] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(0);
 
-  const [registerNumber, setRegisterNumber] = useState("");
-  const [expires_at, setExpires_at] = useState("");
-  const [driver_category, setDriver_category] = useState("");
-
-  const [isEditMode, setIsEditMode] = useState(false);
 
   const [page, setPage] = useState(1);
 
@@ -101,42 +87,39 @@ export default function UserList() {
   const [searchUsersValue, setSearchUsersValue] = useState("");
 
   function handleEditUser({
-    name,
-    email,
-    companyName,
-    phone,
-    register_number,
-    expires_at,
-    cpf,
-    driver_category,
-    userId,
-  }): UserFunctionProps {
-    setName(name);
-    setEmail(email);
-    setCpf(cpf);
-    setCompanyName(companyName);
-    setPhone(phone);
-    setRegisterNumber(register_number);
-    setExpires_at(expires_at);
-    setDriver_category(driver_category);
-    setUserId(userId);
+  
+    id,
 
-    setIsEditMode(true);
+  }: UserProps) {
+  
+    setUserId(id);
+    
+    route.push(`/users/detail/${id}`)
 
     return;
   }
 
-  const { data, isLoading, error, refetch } = useQuery<UserDataProps[]>(
+  const { data, isLoading, error, refetch } = useQuery<UserProps[]>(
     `userlist${page}`,
     async () => {
-      const response = await api.get(`getallusers?page=${page}&limit=${limit}`);
-      const { PaginateData: ReturnedData, totalcount } = response.data;
+      const response = await api.get(`/user/list?page=${page}&limit=${limit}`);
 
-      setTotal(totalcount);
-    
-      return ReturnedData;
+      setTotal(20);
+
+      return response.data;
     }
   );
+
+  const { data: companyData, isLoading: isCompanyLoading, error: errorCompany } = useQuery<companyProps[]>(`companylist${page}`, async () => {
+    const response = await api.get(`/company/list?page=${page}&limit=${limit}&search=${''}`)
+    
+
+    // setTotal(totalcount)
+
+    return response.data;
+  });
+
+  let selectedUserCompany = companyData?.filter(company => company.id === userId)
 
   function handleSearchUsers(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchUsersValue(event.target.value);
@@ -147,13 +130,13 @@ export default function UserList() {
       return;
     }
 
-    setFilteredData(
-      data.filter((user) => {
-        return user.data.name
-          .toLowerCase()
-          .includes(searchUsersValue.toLowerCase());
-      })
-    );
+    // setFilteredData(
+    //   data.filter((user) => {
+    //     return user.data.name
+    //       .toLowerCase()
+    //       .includes(searchUsersValue.toLowerCase());
+    //   })
+    // );
   }
 
   return (
@@ -163,19 +146,7 @@ export default function UserList() {
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
 
-        {isEditMode ? (
-          <EditUser
-            userId={userId}
-            name={name}
-            cpf={cpf}
-            email={email}
-            phone={phone}
-            driver_category={driver_category}
-            expires_at={expires_at}
-            register_number={registerNumber}
-            setIsEditMode={setIsEditMode}
-          />
-        ) : (
+        
           <Box
             flex="1"
             borderRadius={8}
@@ -234,31 +205,27 @@ export default function UserList() {
                     <Thead>
                       <Tr>
                         <Th px={["4", "4", "6"]} color="gray.300" width="">
-                          <Text>User</Text>
+                          <Text>Id</Text>
                         </Th>
-                        <Th>CPF/Passport</Th>
+                        <Th>Name</Th>
+                        <Th>Email</Th>
+                        <Th>Document</Th>
                         <Th>Company</Th>
-
-                        {isWideVersioon && <Th>Driver licence</Th>}
+                        <Th>Foreigner</Th>
                       </Tr>
                     </Thead>
                     {searchUsersValue.length > 0 ? (
                       <Tbody>
-                        {filteredData.map((user) => (
+                        {data.map((currentUser) => (
                           <Tr
                             onClick={() => {
                               handleEditUser({
-                                companyName: user.data.companyName,
-                                cpf: user.data.cpf,
-                                name: user.data.name,
-                                email: user.data.email,
-                                phone: user.data.phone,
-                                userId: user.ref["@ref"].id,
-                                driver_category: user.data.driver_category,
-                                expires_at: user.data.expires_at
-                                  ? user.data.expires_at
-                                  : "",
-                                register_number: user.data.register_number,
+                                id: currentUser.id,
+                                document: currentUser.document,
+                                email: currentUser.email,
+                                isForeigner: currentUser.isForeigner,
+                                name: currentUser.name,
+                                companyId: currentUser.companyId,
                               });
                             }}
                             _hover={{
@@ -267,48 +234,24 @@ export default function UserList() {
                               transition: "0.2s",
                               cursor: "pointer",
                             }}
-                            key={user.ts}
+                            key={currentUser.id}
                           >
                             <Td px={["4", "4", "6"]}>
                               <Box>
-                                <Text fontWeight="bold">{user.data.name}</Text>
+                                <Text fontWeight="bold">teste</Text>
                                 <Text fontSize="sm" color="gray.300">
-                                  {user.data.email}
+                                  {currentUser.email}
                                 </Text>
                               </Box>
                             </Td>
 
-                            {isWideVersioon && <Td>{user.data.cpf}</Td>}
+                            {isWideVersioon && <Td>testeeee</Td>}
 
                             <Td>
-                              {user.data.companyName ? (
-                                user.data.companyName
-                              ) : (
-                                <Text color={"gray.300"}>Not registered</Text>
-                              )}
+                              <Text color={"gray.300"}>Not regasdistered</Text>
                             </Td>
                             <Td>
-                              {!user.data.register_number ||
-                                user.data.register_number == "" ? (
-                                <Text color={"gray.300"}>Not registered</Text>
-                              ) : (
-                                <Box>
-                                  <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
-                                  <Text fontSize="sm" color="gray.300">
-                                    {dayjs(user.data.expires_at).format(
-                                      "DD/MM/YYYY"
-                                    ) > dayjs().format("DD/MM/YYYY") ? (
-                                      <Text color={"red.400"}>Expired</Text>
-                                    ) : (
-                                      <Text
-                                        color={"blue.500"}
-                                      >{`Expires at: ${dayjs(
-                                        user.data.expires_at
-                                      ).format("DD/MM/YYYY")}`}</Text>
-                                    )}
-                                  </Text>
-                                </Box>
-                              )}
+                              <Text fontWeight="bold">est</Text>
                             </Td>
                           </Tr>
                         ))}
@@ -319,15 +262,12 @@ export default function UserList() {
                           <Tr
                             onClick={() => {
                               handleEditUser({
-                                companyName: user.data.companyName,
-                                cpf: user.data.cpf,
-                                name: user.data.name,
-                                email: user.data.email,
-                                phone: user.data.phone,
-                                userId: user.ref["@ref"].id,
-                                driver_category: user.data.driver_category,
-                                expires_at: user.data.expires_at,
-                                register_number: user.data.register_number,
+                                id: user.id,
+                                document: user.document,
+                                email: user.email,
+                                isForeigner: user.isForeigner,
+                                name: user.name,
+                                companyId: user.companyId,
                               });
                             }}
                             _hover={{
@@ -336,48 +276,25 @@ export default function UserList() {
                               transition: "0.2s",
                               cursor: "pointer",
                             }}
-                            key={user.ts}
+                            key={user.id}
                           >
                             <Td px={["4", "4", "6"]}>
-                              <Box>
-                                <Text fontWeight="bold">{user.data.name}</Text>
-                                <Text fontSize="sm" color="gray.300">
-                                  {user.data.email}
-                                </Text>
-                              </Box>
+                              <Text fontWeight="bold">{user.id}</Text>
                             </Td>
 
-                            {isWideVersioon && <Td>{user.data.cpf}</Td>}
+                            {isWideVersioon && <Td>{user.name}</Td>}
 
                             <Td>
-                              {user.data.companyName ? (
-                                user.data.companyName
-                              ) : (
-                                <Text color={"gray.300"}>Not registered</Text>
-                              )}
+                              <Text color={"gray.300"}>{user.email}</Text>
                             </Td>
                             <Td>
-                              {!user.data.register_number ||
-                                user.data.register_number == "" ? (
-                                <Text color={"gray.300"}>Not registered</Text>
-                              ) : (
-                                <Box>
-                                  <Text fontWeight="bold">{`${user.data.register_number} / ${user.data.driver_category}`}</Text>
-                                  <Text fontSize="sm" color="gray.300">
-                                    {dayjs(user.data.expires_at).format(
-                                      "DD/MM/YYYY"
-                                    ) < dayjs().format("DD/MM/YYYY") ? (
-                                      <Text color={"red.400"}>Expired</Text>
-                                    ) : (
-                                      <Text
-                                        color={"blue.500"}
-                                      >{`Expires at: ${dayjs(
-                                        user.data.expires_at
-                                      ).format("DD/MM/YYYY")}`}</Text>
-                                    )}
-                                  </Text>
-                                </Box>
-                              )}
+                              <Text color={"gray.300"}>{user.document}</Text>
+                            </Td>
+                            <Td>
+                              <Text color={"gray.300"}>{user.companyId ? user.companyId : "Not registered"}</Text>
+                            </Td>
+                            <Td>
+                              <Text color={"gray.300"}>{user.isForeigner ? "Yes" : "No"}</Text>
                             </Td>
                           </Tr>
                         ))}
@@ -437,7 +354,7 @@ export default function UserList() {
               </Flex>
             )}
           </Box>
-        )}
+        
       </Flex>
 
       <Flex>
@@ -448,29 +365,29 @@ export default function UserList() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { auth } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const { auth } = parseCookies(ctx);
 
-  const decodedUser = decode(auth as string) as DecodedToken;
+//   const decodedUser = decode(auth as string) as DecodedToken;
 
-  const necessaryRoles = ["ADMINISTRATOR"];
+//   const necessaryRoles = ["ADMINISTRATOR"];
 
-  if (necessaryRoles?.length > 0) {
-    const hasAllRoles = necessaryRoles.some((role) => {
-      return decodedUser?.roles?.includes(role);
-    });
+//   if (necessaryRoles?.length > 0) {
+//     const hasAllRoles = necessaryRoles.some((role) => {
+//       return decodedUser?.roles?.includes(role);
+//     });
 
-    if (!hasAllRoles) {
-      return {
-        redirect: {
-          destination: "/home",
-          permanent: false,
-        },
-      };
-    }
-  }
+//     if (!hasAllRoles) {
+//       return {
+//         redirect: {
+//           destination: "/home",
+//           permanent: false,
+//         },
+//       };
+//     }
+//   }
 
-  return {
-    props: {},
-  };
-};
+//   return {
+//     props: {},
+//   };
+// };
