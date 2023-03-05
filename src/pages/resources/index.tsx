@@ -28,6 +28,7 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { decode } from "jsonwebtoken";
 import { Footer } from "../../components/footer";
+import { useRouter } from "next/router";
 
 export type DecodedToken = {
   sub: string;
@@ -38,48 +39,30 @@ export type DecodedToken = {
   name: string;
 };
 
-interface speedwayDataProps {
-  data: speedwayProps;
-  ref: {
-    "@ref": {
-      id: number;
-    };
-  };
-  ts: number;
-}
-
-interface speedwayProps {
-  speedway: string;
-  vehicles_limit: number;
-  description: string;
+interface resourceProps {
+  id: number;
+  name: string;
+  type: string;
+  capacity: number;
+  isActive: false;
   createdAt: string;
-  status?: string;
 }
 
-export default function Speedwaylist() {
-  const [isEditMode, setIsEditMode] = useState(false);
 
-  const [speedway, setSpeedway] = useState("");
-  const [speedwayId, setSpeedwayId] = useState("");
-  const [vehicles_limit, setVehiclesLimit] = useState(0);
-  const [speedway_status, setSpeedway_status] = useState("");
-  const [description, setDescription] = useState("");
+export default function Resources() {
 
-  function handleEditSpeedway({
-    speedway,
-    vehicles_limit,
-    createdAt,
-    description,
-    speedwayId,
-    status,
-  }): speedwayProps {
-    setSpeedway(speedway);
-    setVehiclesLimit(vehicles_limit);
-    setDescription(description);
-    setSpeedwayId(speedwayId);
-    setSpeedway_status(status);
+  const router = useRouter()
 
-    setIsEditMode(true);
+  const [ResourceId, setResourceId] = useState(0);
+ 
+
+  function handleEditResource({
+    id
+  }): resourceProps {
+    
+    setResourceId(id)
+
+    router.push(`/resources/detail/${id}`)
 
     return;
   }
@@ -95,19 +78,17 @@ export default function Speedwaylist() {
 
   const [total, setTotal] = useState(1);
 
-  const [needsLessHeight, setNeedsLessHeight] = useState("");
 
-  const { data, isLoading, error } = useQuery<speedwayDataProps[]>(
-    `speedwaylist${page}`,
+  const { data, isLoading, error } = useQuery<resourceProps[]>(
+    `resourcelist${page}`,
     async () => {
       const response = await api.get(
-        `getallspeedways?page=${page}&limit=${limit}`
+        `/resource/list?page=${page}&limit=${limit}`
       );
-      const { PaginateData: ReturnedData, totalcount } = response.data;
 
-      setTotal(totalcount);
+      setTotal(10);
 
-      return ReturnedData;
+      return response.data;
     }
   );
 
@@ -117,17 +98,6 @@ export default function Speedwaylist() {
 
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
         <Sidebar />
-
-        {isEditMode ? (
-          <EditSpeedway
-            speedway={speedway}
-            description={description}
-            vehicles_limit={vehicles_limit}
-            speedwayId={speedwayId}
-            speedway_status={speedway_status}
-            setIsEditMode={setIsEditMode}
-          />
-        ) : (
           <Box
             flex="1"
             borderRadius={8}
@@ -138,10 +108,10 @@ export default function Speedwaylist() {
           >
             <Flex mb="8" justify="space-between" align="center">
               <Heading size="lg" fontWeight="normal">
-                Test tracks list
+                Resources
               </Heading>
 
-              <Link href="/speedways/create" passHref>
+              <Link href="/resources/create" passHref>
                 <Button
                   as="a"
                   size="sm"
@@ -149,7 +119,7 @@ export default function Speedwaylist() {
                   colorScheme="blue"
                   leftIcon={<Icon as={RiAddLine} fontSize="20" />}
                 >
-                  Add a new test track
+                  Add a new resource
                 </Button>
               </Link>
             </Flex>
@@ -173,31 +143,29 @@ export default function Speedwaylist() {
                     <Thead>
                       <Tr>
                         <Th px={["4", "4", "6"]} color="gray.300" width="">
-                          <Text>Test track</Text>
+                          <Text>Id</Text>
                         </Th>
 
                         <Th px={["4", "4", "6"]} width="">
-                          <Text>Description</Text>
+                          <Text>Name</Text>
                         </Th>
 
-                        {isWideVersioon && <Th>Vehicles limit</Th>}
-                        <Th w="8">Status</Th>
+                        <Th>Type</Th>
+
+                        <Th>Capacity</Th>
+
+                        <Th>Active</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {data.map((speed) => (
+                      {data?.map((resource) => (
                         <Tr
                           onClick={() => {
-                            handleEditSpeedway({
-                              speedway: speed.data.speedway,
-                              createdAt: speed.data.createdAt,
-                              description: speed.data.description,
-                              vehicles_limit: speed.data.vehicles_limit,
-                              speedwayId: speed.ref["@ref"].id,
-                              status: speed.data.status,
+                            handleEditResource({
+                              id: resource.id
                             });
                           }}
-                          key={speed.ts}
+                          key={resource.id}
                           _hover={{
                             color: "gray.200",
                             cursor: "pointer",
@@ -206,20 +174,17 @@ export default function Speedwaylist() {
                           }}
                         >
                           <Td px={["4", "4", "6"]}>
-                            <Text>{speed.data.speedway}</Text>
+                            <Text>{resource.id}</Text>
                           </Td>
 
-                          {isWideVersioon && <Td>{speed.data.description}</Td>}
+                          <Td>{resource.name}</Td>
+
+                          <Td>{resource.type}</Td>
+
+                          <Td>{resource.capacity}</Td>
 
                           <Td>
-                            <Box>
-                              {speed.data.vehicles_limit}
-                              <Text fontSize="sm" color="gray.300"></Text>
-                            </Box>
-                          </Td>
-
-                          <Td>
-                            {speed.data.status == "active" ? (
+                            {resource.isActive ? (
                               <Text fontWeight={"medium"} color={"blue.400"}>
                                 Active
                               </Text>
@@ -282,7 +247,6 @@ export default function Speedwaylist() {
               </Flex>
             )}
           </Box>
-        )}
       </Flex>
 
       <Flex>
@@ -293,29 +257,29 @@ export default function Speedwaylist() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { auth } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const { auth } = parseCookies(ctx);
 
-  const decodedUser = decode(auth as string) as DecodedToken;
+//   const decodedUser = decode(auth as string) as DecodedToken;
 
-  const necessaryRoles = ["ADMINISTRATOR"];
+//   const necessaryRoles = ["ADMINISTRATOR"];
 
-  if (necessaryRoles?.length > 0) {
-    const hasAllRoles = necessaryRoles.some((role) => {
-      return decodedUser?.roles?.includes(role);
-    });
+//   if (necessaryRoles?.length > 0) {
+//     const hasAllRoles = necessaryRoles.some((role) => {
+//       return decodedUser?.roles?.includes(role);
+//     });
 
-    if (!hasAllRoles) {
-      return {
-        redirect: {
-          destination: "/home",
-          permanent: false,
-        },
-      };
-    }
-  }
+//     if (!hasAllRoles) {
+//       return {
+//         redirect: {
+//           destination: "/home",
+//           permanent: false,
+//         },
+//       };
+//     }
+//   }
 
-  return {
-    props: {},
-  };
-};
+//   return {
+//     props: {},
+//   };
+// };

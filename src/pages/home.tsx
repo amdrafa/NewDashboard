@@ -30,66 +30,10 @@ export default function Home() {
 
         <Box flex="1" borderRadius={8} bg="gray.800" height='100%' p="8" mt={8}>
 
-
-          <Flex mt={10} justifyContent={'space-between'} mx='auto' display={isWideVersioon ? 'flex' : 'inline'} px={6} pb={14} >
-            <Box mr={16} display='flex' flexDir={'column'} w='400px' mt={4}>
-              <Text fontSize={"5xl"} color="gray.100" fontWeight="semibold">
-                Ready for
-              </Text>
-
-              <Text
-                mt={-9}
-                fontSize={"5xl"}
-                color="gray.100"
-                fontWeight="semibold"
-              >
-                Schedule a
-              </Text>
-
-              <Text
-                mt={-8}
-                fontSize={"5xl"}
-                color="red.600"
-                fontWeight="bold"
-              >
-                TEST TRACK
-              </Text>
-
-              <Box ml={1.5}>
-                <Text
-                  fontSize={"xl"}
-                  color="gray.200"
-                  fontWeight="normal"
-                >
-                  Buy some hours and become
-                </Text>
-
-                <Text
-                  fontSize={"xl"}
-                  color="green.300"
-                  fontWeight="normal"
-                  mt={-2}
-                >
-                  Part of the group!
-                </Text>
-              </Box>
-
-              <Link href={'/schedule'}>
-                <Button ml={1.5} mt={12} colorScheme={'green'} w={'64'} h='12' rounded={'full'}>
-                  SCHEDULE NOW
-                </Button>
-              </Link>
-
-
-            </Box>
-
-            <Box mt={isWideVersioon ? '' : '20'}>
-              SOME INFORMATION
-            </Box>
-
-
-          </Flex>
-
+        <Flex>
+          RC3 COMING SOON...
+        </Flex>
+          
         </Box>
 
 

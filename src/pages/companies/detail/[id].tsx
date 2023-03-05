@@ -78,8 +78,8 @@ export default function EditCompany() {
 
   const { errors, isSubmitting } = formState;
 
-  function deleteCompany() {
-    api
+  async function deleteCompany() {
+    await api
       .delete(`/company/delete/${id}`)
       .then((response) => {
         toast({
@@ -90,7 +90,7 @@ export default function EditCompany() {
           isClosable: true,
           position: "top-right",
         });
-        window.location.reload();
+        router.push("/companies");
       })
       .catch((err) => {
         toast({

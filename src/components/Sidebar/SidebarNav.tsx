@@ -6,7 +6,7 @@ import {
   RiGitMergeLine,
   RiTimeLine,
 } from "react-icons/ri";
-import { HiOutlineHome } from "react-icons/hi";
+import { HiOutlineHome, HiOutlineNewspaper } from "react-icons/hi";
 import { VscSettingsGear } from "react-icons/vsc";
 import { BsSpeedometer2 } from "react-icons/bs";
 import { BiBuilding } from "react-icons/bi";
@@ -76,23 +76,19 @@ export function SidebarNav() {
           <NavLink hasPermission={true} hrefs="/users" icon={RiContactsLine}>
             Users
           </NavLink>
-          <NavLink
-            hasPermission={true}
-            hrefs="/administrators"
-            icon={RiContactsLine}
-          >
-            Administrators
-          </NavLink>
+
           <NavLink hasPermission={true} hrefs="/companies" icon={BiBuilding}>
             Companies
           </NavLink>
           <NavLink
             hasPermission={true}
-            hrefs="/speedways"
+            hrefs="/resources"
             icon={BsSpeedometer2}
           >
-            Test tracks
+            Resources
           </NavLink>
+
+          
         {/* </Can> */}
       </NavSection>
 
@@ -100,13 +96,21 @@ export function SidebarNav() {
         <NavLink hasPermission={true} hrefs="/settings" icon={VscSettingsGear}>
           Settings
         </NavLink>
+
         <NavLink
+            hasPermission={true}
+            hrefs="/terms"
+            icon={HiOutlineNewspaper}
+          >
+            Terms
+          </NavLink>
+        {/* <NavLink
           hasPermission={true}
           hrefs="/driverlicence"
           icon={MdOutlineBadge}
         >
           Driver Licence
-        </NavLink>
+        </NavLink> */}
         <Can roles={["ADMINISTRATOR"]}>
           <NavLink hasPermission={true} hrefs="/reports" icon={RiGitMergeLine}>
             Reports

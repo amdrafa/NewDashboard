@@ -48,14 +48,6 @@ interface UserProps {
   isForeigner: boolean;
 }
 
-interface companyProps {
-  id: number;
-  name: string;
-  cnpj: string;
-  status: string;
-  createdAt?: string;
-}
-
 interface UserFunctionProps {
   id: number;
   name: string;
@@ -71,7 +63,7 @@ export default function UserList() {
     lg: true,
   });
 
-  const route = useRouter()
+  const router = useRouter()
 
   const [filteredData, setFilteredData] = useState([]);
 
@@ -94,7 +86,7 @@ export default function UserList() {
   
     setUserId(id);
     
-    route.push(`/users/detail/${id}`)
+    router.push(`/users/detail/${id}`)
 
     return;
   }
@@ -110,16 +102,6 @@ export default function UserList() {
     }
   );
 
-  const { data: companyData, isLoading: isCompanyLoading, error: errorCompany } = useQuery<companyProps[]>(`companylist${page}`, async () => {
-    const response = await api.get(`/company/list?page=${page}&limit=${limit}&search=${''}`)
-    
-
-    // setTotal(totalcount)
-
-    return response.data;
-  });
-
-  let selectedUserCompany = companyData?.filter(company => company.id === userId)
 
   function handleSearchUsers(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchUsersValue(event.target.value);

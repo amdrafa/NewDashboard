@@ -10,7 +10,7 @@ import {
   Text,
   Spinner,
   useToast,
-  Checkbox
+  Checkbox,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Input } from "../components/Form/input";
@@ -20,152 +20,133 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "../services/axios";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "../contexts/LoginContext";
 import { Footer } from "../components/footer";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
+import { useQuery } from "react-query";
 
-type CreateSpeedwayFormData = {
+export type DecodedToken = {
+  iat: number;
+  exp: number;
+  roles: string;
   name: string;
-  phone: number;
   email: string;
-  cpf: string;
-  old_password: string;
-  old_password_confirmation: string;
-  new_password?: string;
-  new_password_confirmation?: string;
+  id: number;
 };
 
-const createUserFormSchema = yup.object().shape({
+interface UserProps {
+  id: number;
+  name: string;
+  email: string;
+  document: string;
+  companyId?: number;
+  isForeigner: boolean;
+}
+
+type EditUserFormData = {
+  name: string;
+  // phone: number;
+  email: string;
+  document: string;
+  // old_password: string;
+  // old_password_confirmation: string;
+  // new_password?: string;
+  // new_password_confirmation?: string;
+};
+
+const updateUserFormSchema = yup.object().shape({
   name: yup.string().required(),
-  phone: yup.number().required(),
-  email: yup.string().required(),
-  cpf: yup.string().required(),
-  old_password: yup.string().required(),
-  old_password_confirmation: yup
-    .string()
-    .required()
-    .oneOf(
-      [null, yup.ref("old_password")],
-      "The passwords need to be the same"
-    ),
-  new_password: yup.string().notRequired(),
-  new_password_confirmation: yup
-    .string().notRequired().oneOf(
-      [null, yup.ref("new_password")],
-      "The passwords need to be the same"
-    ),
-
-
+  email: yup.string(),
+  document: yup.string().required(),
+  // old_password: yup.string().required(),
+  // old_password_confirmation: yup
+  //   .string()
+  //   .required()
+  //   .oneOf(
+  //     [null, yup.ref("old_password")],
+  //     "The passwords need to be the same"
+  //   ),
+  // new_password: yup.string().notRequired(),
+  // new_password_confirmation: yup
+  //   .string()
+  //   .notRequired()
+  //   .oneOf(
+  //     [null, yup.ref("new_password")],
+  //     "The passwords need to be the same"
+  //   ),
 });
 
 export default function Settings() {
 
-  const toast = useToast()
+  const { auth } = parseCookies();
+
+  const decodedUser = decode(auth as string) as DecodedToken;
+
+  const router = useRouter()
+
+  const toast = useToast();
 
   const [status, setStatus] = useState(0);
 
-  const [changePassword, setChangePassword] = useState(false)
+  const [changePassword, setChangePassword] = useState(false);
 
-  useEffect(() => {
-    status == 200 && toast({
-      title: "Informations updated",
-      description: `Informations updated successfully.`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: 'top-right'
-    });
-
-    setStatus(0)
-  }, [status]);
+  const { data, isLoading, error, refetch } = useQuery<UserProps>(
+    `userlistt`,
+    async () => {
+      const response = await api.get(`/user/list/${decodedUser.id}`);
+      return response.data;
+    }
+  );
 
   const { user } = useContext(LoginContext);
 
   const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(createUserFormSchema),
+    resolver: yupResolver(updateUserFormSchema),
   });
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateSpeedwayFormData> = async ({
-    old_password,
-    new_password,
+  const handleCreateUser: SubmitHandler<EditUserFormData> = async ({
     name,
-    phone,
+    document,
     email,
-    cpf
   }) => {
-
-    if (new_password?.length < 6 && changePassword) {
+    const response = await api
+    .post("/user/update", {
+      id: decodedUser.id,
+      name,
+      document,
+      email
+    })
+    .then((response) => {
       toast({
-        title: "New password needs at least 6 characters",
-        description: `Try a bigger password.`,
+        title: "Informations updated",
+        description: `Informations updated successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      window.location.reload()
+    })
+    .catch(err => {
+      toast({
+        title: "Something went wrong",
+        description: `Error when updating informations.`,
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: 'top-right'
+        position: "top-right",
       });
-    }
-
-
-    if (changePassword) {
-      try {
-        const response = await api
-          .post("updatedata", {
-            new_password,
-            old_password,
-            name,
-            phone,
-            new_email: email,
-            current_email: user.email,
-            cpf
-          })
-          .then((response) => {
-            setStatus(response.status)
-            new Promise(resolve => setTimeout(() => {
-              window.location.reload()
-            }, 2000))
-
-          });
-      } catch (err) {
-        toast({
-          title: "Incorrect password",
-          description: `Check your password and try again.`,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right'
-        });
-      }
-    } else {
-      try {
-        const response = await api
-          .post("updatedata", {
-            new_password: null,
-            old_password,
-            name,
-            phone,
-            new_email: email,
-            current_email: user.email,
-            cpf
-          })
-          .then((response) => setStatus(response.status));
-      } catch (err) {
-        toast({
-          title: "Incorrect password",
-          description: `Check your password and try again.`,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right'
-        });
-      }
-    }
+    })
   };
 
   return (
-    <Box mt={-3} >
+    <Box mt={-3}>
       <Header />
 
       <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
@@ -190,9 +171,13 @@ export default function Settings() {
           {user ? (
             <>
               <VStack spacing="8">
+                <HStack w={"100%"}>
+                  <Checkbox />
+                  <Text>I'm foreigne FALTANDO ENVIAR VALORES DE FOREIGNER E TROCA DE PASSWORDr</Text>
+                </HStack>
                 <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
                   <Input
-                    defaultValue={user?.name}
+                    defaultValue={data?.name}
                     name="name"
                     label="Full name"
                     {...register("name")}
@@ -200,93 +185,31 @@ export default function Settings() {
                   />
 
                   <Input
-                    defaultValue={user?.phone}
-                    type="number"
-                    name="phone"
-                    label="Phone"
-                    {...register("phone")}
-                    error={errors.phone}
+                    defaultValue={data?.document}
+                    name="document"
+                    label="Document"
+                    {...register("document")}
+                    error={errors.document}
                   />
                 </SimpleGrid>
 
                 <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={4}>
                   <Input
-                    defaultValue={user?.email}
+                    defaultValue={data?.email}
                     name="email"
                     label="E-mail"
                     {...register("email")}
                     error={errors.email}
                     type="email"
-                  />
-                  <Input
-                    defaultValue={user?.cpf}
-                    name="cpf"
-                    label="CPF/Passport"
-                    {...register("cpf")}
-                    error={errors.cpf}
+                    isDisabled
                   />
                 </SimpleGrid>
-
-                <Divider mt="4" borderColor="gray.700" />
-
-                <Flex w={'100%'} justifyContent={'start'}>
-                  <Checkbox mr={2} onChange={(e) => {
-                    setChangePassword(e.target.checked)
-                  }} />
-                  <Text color={'gray.200'}>
-                    Change password?
-                  </Text>
-                </Flex>
-
-                <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-                  <Input
-                    name="old_password"
-                    label="Current password"
-                    {...register("old_password")}
-                    error={errors.old_password}
-                    type="password"
-                  />
-                  <Input
-                    type="password"
-                    name="old_password_confirmation"
-                    label="Current password confirmation"
-                    {...register("old_password_confirmation")}
-                    error={errors.old_password_confirmation}
-                  />
-                </SimpleGrid>
-
-                {changePassword && (
-                  <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
-                    <Box>
-                      <Input
-                        type={"password"}
-                        name="new_password"
-                        label="New password"
-                        {...register("new_password")}
-                        error={errors.new_password}
-                      />
-                      <Text ml={2} mt={2} color="gray.500">
-                        Minimum 6 characteres
-                      </Text>
-                    </Box>
-
-                    <Input
-                      type={"password"}
-                      name="new_password_confirmation"
-                      label="New password confirmation"
-                      {...register("new_password_confirmation")}
-                      error={errors.new_password_confirmation}
-                    />
-                  </SimpleGrid>
-                )}
               </VStack>
 
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
                   <Link href="home">
-                    <Button colorScheme="whiteAlpha">
-                      Cancel
-                    </Button>
+                    <Button colorScheme="whiteAlpha">Cancel</Button>
                   </Link>
                   <Button
                     isLoading={formState.isSubmitting}
@@ -306,8 +229,8 @@ export default function Settings() {
         </Box>
       </Flex>
 
-      <Flex >
-        <Flex w={{ lg: '275px' }}></Flex>
+      <Flex>
+        <Flex w={{ lg: "275px" }}></Flex>
         <Footer />
       </Flex>
     </Box>

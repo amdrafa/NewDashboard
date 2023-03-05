@@ -109,8 +109,8 @@ export default function EditUser() {
 
   const { errors, isSubmitting } = formState;
 
-  function deleteUser() {
-    api
+  async function deleteUser() {
+    await api
       .delete(`/user/delete/${id}`)
       .then((response) => {
         toast({
