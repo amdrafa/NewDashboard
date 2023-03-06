@@ -62,13 +62,22 @@ export function SidebarNav() {
 
         <NavLink
           hasPermission={true}
+          hrefs="/administrator/approval"
+          icon={AiOutlineAppstoreAdd}
+        >
+          Approvals
+        </NavLink>
+
+
+        <NavLink
+          hasPermission={true}
           hrefs="/bookings"
           icon={RiDashboardLine}
         >
           Bookings
         </NavLink>
 
-       <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
+        <NavLink hasPermission={true} hrefs="/schedule" icon={RiTimeLine}>
               Schedule
             </NavLink>
 

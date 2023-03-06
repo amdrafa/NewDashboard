@@ -156,7 +156,7 @@ export default function Schedule() {
 
   const [selected, setSelected] = useState([]);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const [fromDate, setFromDate] = useState<Date>();
 
@@ -235,15 +235,20 @@ export default function Schedule() {
     }
   );
 
-  const { data:TermsData, isLoading: IsTermsLoading, error: errorTerms } = useQuery<TermsProps[]>(
+  const {
+    data: TermsData,
+    isLoading: IsTermsLoading,
+    error: errorTerms,
+  } = useQuery<TermsProps[]>(
     `/terms/list`,
     async () => {
       const response = await api.get(`/terms/list`);
       const data = response.data;
 
       return data;
-    }, {
-      enabled: !!data
+    },
+    {
+      enabled: !!data,
     }
   );
 
@@ -261,8 +266,8 @@ export default function Schedule() {
     );
 
     setSelectedResources(updatedSelectedResources);
-    if(selectedResources.length  == 1){
-      setIsConfirmationModalOpen(false)
+    if (selectedResources.length == 1) {
+      setIsConfirmationModalOpen(false);
     }
     return;
   }
@@ -335,7 +340,7 @@ export default function Schedule() {
   }
 
   async function postBooking() {
-    setIsConfirmationModalOpen(false)
+    setIsConfirmationModalOpen(false);
     selectedResources.forEach((schedule) => {
       const updatedResourceList: Option[] = [];
       schedule?.resource.forEach((resource) => {
@@ -362,7 +367,7 @@ export default function Schedule() {
             setIsModalOpen(true);
             setBookingResponse(response.data);
             setIsBookingResponseLoading(false);
-            setSelectedResources([])
+            setSelectedResources([]);
           });
       });
 
@@ -469,49 +474,52 @@ export default function Schedule() {
     setIsTermOpen(false);
   }
 
-  async function handleDeleteSchedule(id: number){
-    await api.post(`/schedule/delete/${id}`, {
-      id: id,
-    })
-    .then(response => {
-      
-      const updatedSchedulesList = bookingResponse.schedules.filter(unit => unit.id !== id)
-      setBookingResponse({...bookingResponse, schedules: updatedSchedulesList})
+  async function handleDeleteSchedule(id: number) {
+    await api
+      .post(`/schedule/delete/${id}`, {
+        id: id,
+      })
+      .then((response) => {
+        const updatedSchedulesList = bookingResponse.schedules.filter(
+          (unit) => unit.id !== id
+        );
+        setBookingResponse({
+          ...bookingResponse,
+          schedules: updatedSchedulesList,
+        });
 
-      if(bookingResponse.schedules.length == 1){
-        router.push('/home')
-      }
-      
-      toast({
-              title: "Schedule deleted",
-              description: `Schedule deleted successfully.`,
-              status: "success",
-              duration: 5000,
-              isClosable: true,
-              position: 'top-right'
-            });
-    })
-    .catch(e => {
-      toast({
-        title: "Something went wrong",
-        description: `Error when deleting schedule.`,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: 'top-right'
+        if (bookingResponse.schedules.length == 1) {
+          router.push("/home");
+        }
+
+        toast({
+          title: "Schedule deleted",
+          description: `Schedule deleted successfully.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      })
+      .catch((e) => {
+        toast({
+          title: "Something went wrong",
+          description: `Error when deleting schedule.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
       });
-    })
   }
 
-  async function updateSelectedTerms(id: number){
-    
-      const termAlreadyAccepted = acceptedTerms.find(term => term == id)
-      if(termAlreadyAccepted){
-        return 
-      }
-      
-      setAcceptedTerms([...acceptedTerms, id])
-    
+  async function updateSelectedTerms(id: number) {
+    const termAlreadyAccepted = acceptedTerms.find((term) => term == id);
+    if (termAlreadyAccepted) {
+      return;
+    }
+
+    setAcceptedTerms([...acceptedTerms, id]);
   }
 
   return (
@@ -558,8 +566,8 @@ export default function Schedule() {
                 <HStack spacing={"1rem"} mb={"1rem"} w={"22rem"}>
                   <ChooseVehicle
                     onClick={() => {
-                      setCategory("Test track")
-                      setSelected([])
+                      setCategory("Test track");
+                      setSelected([]);
                     }}
                     isActive={category === "Test track"}
                     vehicleType="Test track"
@@ -567,8 +575,8 @@ export default function Schedule() {
                   />
                   <ChooseVehicle
                     onClick={() => {
-                      setCategory("Office")
-                      setSelected([])
+                      setCategory("Office");
+                      setSelected([]);
                     }}
                     isActive={category === "Office"}
                     vehicleType="Office"
@@ -576,8 +584,8 @@ export default function Schedule() {
                   />
                   <ChooseVehicle
                     onClick={() => {
-                      setCategory("Workshop")
-                      setSelected([])
+                      setCategory("Workshop");
+                      setSelected([]);
                     }}
                     isActive={category === "Workshop"}
                     vehicleType="Workshop"
@@ -608,17 +616,32 @@ export default function Schedule() {
 
                 <Flex w="100%" mb={"1rem"}>
                   {selected.length > 0 ? (
-                    <Flex justify={'space-between'} w='100%' align={'center'}>
-                      <Text mt={'0.5rem'}>
+                    <Flex justify={"space-between"} w="100%" align={"center"}>
+                      <Text mt={"0.5rem"}>
                         Selected resource:{" "}
-                        <Text ml={'0.5rem'} as={"span"} py="0.5rem" px={"0.5rem"} bg={"gray.900"} borderRadius={"base"}>
+                        <Text
+                          ml={"0.5rem"}
+                          as={"span"}
+                          py="0.5rem"
+                          px={"0.5rem"}
+                          bg={"gray.900"}
+                          borderRadius={"base"}
+                        >
                           {selected[0].label}
                         </Text>
                       </Text>
 
-                      <Flex as={"span"} _hover={{color: "red.500", cursor: "pointer"}} onClick={() => setSelected([])}>
-                        <Icon fontSize={'1.5rem'} mr='0.5rem' as={AiOutlineCloseCircle}/>
-                        </Flex>
+                      <Flex
+                        as={"span"}
+                        _hover={{ color: "red.500", cursor: "pointer" }}
+                        onClick={() => setSelected([])}
+                      >
+                        <Icon
+                          fontSize={"1.5rem"}
+                          mr="0.5rem"
+                          as={AiOutlineCloseCircle}
+                        />
+                      </Flex>
                     </Flex>
                   ) : data ? (
                     <MultiSelect
@@ -1209,7 +1232,21 @@ export default function Schedule() {
               <Link href="/home">
                 <Button colorScheme="whiteAlpha">Cancel</Button>
               </Link>
-              <Button colorScheme="blue" onClick={() => setIsConfirmationModalOpen(true)}>
+              <Button
+                colorScheme="blue"
+                onClick={() => {
+                  selectedResources.length > 0
+                    ? setIsConfirmationModalOpen(true)
+                    : toast({
+                        title: "Selecione pelo menos um recurso",
+                        description: `Você não pode fazer um booking sem recurso.`,
+                        status: "info",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "top-right",
+                      });
+                }}
+              >
                 Next
               </Button>
             </HStack>
@@ -1232,15 +1269,21 @@ export default function Schedule() {
         <Flex justifyContent="flex-start">
           {isTermOpen ? (
             <>
-            <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
-            <Text as={'span'} color='gray.300'>Answer the terms</Text> to validate your booking
-            </Text>
+              <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
+                <Text as={"span"} color="gray.300">
+                  Answer the terms
+                </Text>{" "}
+                to validate your booking
+              </Text>
             </>
           ) : (
             <>
-            <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
-            <Text as={'span'} color='gray.300'>Booking</Text> submitted!
-            </Text>
+              <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
+                <Text as={"span"} color="gray.300">
+                  Booking
+                </Text>{" "}
+                submitted!
+              </Text>
             </>
           )}
         </Flex>
@@ -1249,7 +1292,7 @@ export default function Schedule() {
 
         {isTermOpen ? (
           <>
-          <Flex
+            <Flex
               mb={"2rem"}
               maxH={"30rem"}
               flexDir={"column"}
@@ -1269,56 +1312,55 @@ export default function Schedule() {
                 },
               }}
             >
-            {TermsData.map(term => {
-              return (
-                <Box
-              my={"4"}
-              border="2px"
-              borderColor={"gray.700"}
-              p="0.5rem"
-              borderRadius={"0.5rem"}
-            >
-              <Text mb={2} fontSize={"md"}>
-                {term?.title}
-              </Text>
+              {TermsData.map((term) => {
+                return (
+                  <Box
+                    my={"4"}
+                    border="2px"
+                    borderColor={"gray.700"}
+                    p="0.5rem"
+                    borderRadius={"0.5rem"}
+                  >
+                    <Text mb={2} fontSize={"md"}>
+                      {term?.title}
+                    </Text>
 
-              <Text mb={2}>
-                {term?.text}
-              </Text>
-              <RadioGroup value={1}>
-                <Stack direction="row">
-                  <Radio value={1}>True</Radio>
-                  <Radio value={0}>False</Radio>
-                </Stack>
-              </RadioGroup>
-            </Box>
-              )
-            })}
+                    <Text mb={2}>{term?.text}</Text>
+                    <RadioGroup value={1}>
+                      <Stack direction="row">
+                        <Radio value={1}>True</Radio>
+                        <Radio value={0}>False</Radio>
+                      </Stack>
+                    </RadioGroup>
+                  </Box>
+                );
+              })}
 
+              <HStack spacing={4} justify="end">
+                <Button
+                  onClick={() => router.push("/home")}
+                  colorScheme="whiteAlpha"
+                >
+                  Cancel
+                </Button>
 
-            <HStack spacing={4} justify="end">
-              <Button onClick={() => router.push('/home')} colorScheme="whiteAlpha">
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                colorScheme="blue"
-                onClick={() => {
-                  toast({
-                    title: "Aguardando integração do sistema",
-                    description: `Previsão de entrega: 01/03/2023 `,
-                    status: "info",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-right",
-                  });
-
-                }}
-              >
-                Submit
-              </Button>
-            </HStack>
+                <Button
+                  type="submit"
+                  colorScheme="blue"
+                  onClick={() => {
+                    toast({
+                      title: "Aguardando integração final do sistema",
+                      description: `Previsão de entrega: 06/03/2023 `,
+                      status: "info",
+                      duration: 5000,
+                      isClosable: true,
+                      position: "top-right",
+                    });
+                  }}
+                >
+                  Submit
+                </Button>
+              </HStack>
             </Flex>
           </>
         ) : (
@@ -1393,7 +1435,7 @@ export default function Schedule() {
                                 minW={"7rem"}
                                 fontWeight={"semibold"}
                               >
-                                <Text mr={'0.3rem'}>Exclusive</Text>
+                                <Text mr={"0.3rem"}>Exclusive</Text>
                                 <IoDiamondOutline size={"1.2rem"} />
                               </Flex>
                             ) : (
@@ -1404,10 +1446,16 @@ export default function Schedule() {
                                 minW={"7rem"}
                                 fontWeight={"semibold"}
                               >
-                                <Text mr={'0.3rem'}>Standard</Text>
+                                <Text mr={"0.3rem"}>Standard</Text>
                               </Flex>
                             )}
-                            <Button onClick={() => handleDeleteSchedule(schedule.id)} colorScheme={"blackAlpha"} _hover={{bg: "red.500"}}>Delete</Button>
+                            <Button
+                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              colorScheme={"blackAlpha"}
+                              _hover={{ bg: "red.500" }}
+                            >
+                              Delete
+                            </Button>
                           </HStack>
                         </Td>
                       </Tr>
@@ -1443,121 +1491,118 @@ export default function Schedule() {
       >
         <Flex justifyContent="flex-start">
           <Text fontSize={24} fontWeight="bold" color={"gray.100"}>
-            <Text as={'span'} color={'blue.500'}>Confirm</Text> booking
+            <Text as={"span"} color={"blue.500"}>
+              Confirm
+            </Text>{" "}
+            booking
           </Text>
         </Flex>
         <Text>Check all resources befores continuous.</Text>
-          <>
-            <Flex
-              mb={"2rem"}
-              maxH={"30rem"}
-              flexDir={"column"}
-              mt={"1.2rem"}
-              w={"100%"}
-              overflowY={"scroll"}
-              sx={{
-                "&::-webkit-scrollbar": {
-                  width: "10px",
-                },
-                "&::-webkit-scrollbar-track": {
-                  width: "6px",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  background: "blackAlpha.500",
-                  borderRadius: "24px",
-                },
-              }}
+        <>
+          <Flex
+            mb={"2rem"}
+            maxH={"30rem"}
+            flexDir={"column"}
+            mt={"1.2rem"}
+            w={"100%"}
+            overflowY={"scroll"}
+            sx={{
+              "&::-webkit-scrollbar": {
+                width: "10px",
+              },
+              "&::-webkit-scrollbar-track": {
+                width: "6px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "blackAlpha.500",
+                borderRadius: "24px",
+              },
+            }}
+          >
+            <Table colorScheme="whiteAlpha">
+              <Thead>
+                <Tr>
+                  <Th px={["4", "4", "6"]} color="gray.300" width="">
+                    <Text>Resources</Text>
+                  </Th>
+
+                  <Th px={["4", "4", "6"]} width="">
+                    <Text>From</Text>
+                  </Th>
+
+                  <Th>To</Th>
+
+                  <Th>Exclusive</Th>
+
+                  <Th w="8"></Th>
+                </Tr>
+              </Thead>
+
+              <Tbody>
+                {selectedResources.map((resource) => {
+                  return (
+                    <Tr key={resource?.id}>
+                      <Td>
+                        {resource.resource.map((unitSelectedResource) => {
+                          return (
+                            <Text key={unitSelectedResource?.key}>
+                              {unitSelectedResource?.label}
+                            </Text>
+                          );
+                        })}
+                      </Td>
+                      <Td>
+                        {dayjs(resource.startDate).format("MMM D, YYYY ") +
+                          fromTime}
+                      </Td>
+                      <Td>
+                        {dayjs(resource.finalDate).format("MMM D, YYYY ") +
+                          toTime}
+                      </Td>
+
+                      <Td>
+                        <Text
+                          display={"flex"}
+                          align="center"
+                          justifyContent={"center"}
+                          color={resource.isExclusive ? "blue.500" : "gray.300"}
+                          fontWeight="bold"
+                        >
+                          <IoDiamondOutline fontSize={"1.2rem"} />
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Flex
+                          color={"gray.500"}
+                          fontWeight="semibold"
+                          _hover={{ color: "red.500", cursor: "pointer" }}
+                        >
+                          <BiTrash
+                            onClick={() => deleteSelectedResource(resource.id)}
+                            size={"1.2rem"}
+                          />
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </Flex>
+
+          <HStack spacing={4} justify="end">
+            <Button
+              onClick={handleCloseConfirmationModal}
+              colorScheme="whiteAlpha"
             >
-              <Table colorScheme="whiteAlpha">
-                    <Thead>
-                      <Tr>
-                        <Th px={["4", "4", "6"]} color="gray.300" width="">
-                          <Text>Resources</Text>
-                        </Th>
+              Cancel
+            </Button>
 
-                        <Th px={["4", "4", "6"]} width="">
-                          <Text>From</Text>
-                        </Th>
-
-                        <Th>To</Th>
-
-                        <Th>Exclusive</Th>
-
-                        <Th w="8"></Th>
-                      </Tr>
-                    </Thead>
-
-                    <Tbody>
-                      {selectedResources.map((resource) => {
-                        return (
-                          <Tr key={resource?.id}>
-                            <Td>
-                              {resource.resource.map((unitSelectedResource) => {
-                                return (
-                                  <Text key={unitSelectedResource?.key}>
-                                    {unitSelectedResource?.label}
-                                  </Text>
-                                );
-                              })}
-                            </Td>
-                            <Td>
-                              {dayjs(resource.startDate).format(
-                                "MMM D, YYYY "
-                              ) + fromTime}
-                            </Td>
-                            <Td>
-                              {dayjs(resource.finalDate).format(
-                                "MMM D, YYYY "
-                              ) + toTime}
-                            </Td>
-
-                            <Td>
-                              <Text
-                                display={"flex"}
-                                align="center"
-                                justifyContent={"center"}
-                                color={
-                                  resource.isExclusive ? "blue.500" : "gray.300"
-                                }
-                                fontWeight="bold"
-                              >
-                                <IoDiamondOutline fontSize={"1.2rem"} />
-                              </Text>
-                            </Td>
-                            <Td>
-                              <Flex
-                                color={"gray.500"}
-                                fontWeight="semibold"
-                                _hover={{ color: "red.500", cursor: "pointer" }}
-                              >
-                                <BiTrash
-                                  onClick={() =>
-                                    deleteSelectedResource(resource.id)
-                                  }
-                                  size={"1.2rem"}
-                                />
-                              </Flex>
-                            </Td>
-                          </Tr>
-                        );
-                      })}
-                    </Tbody>
-                  </Table>
-            </Flex>
-
-            <HStack spacing={4} justify="end">
-              <Button onClick={handleCloseConfirmationModal} colorScheme="whiteAlpha">
-                Cancel
-              </Button>
-
-              <Button
-                colorScheme="blue"
-                onClick={postBooking}
-              >
-                Next
-              </Button>
-            </HStack>
-          </>
+            <Button colorScheme="blue" onClick={postBooking}>
+              Next
+            </Button>
+          </HStack>
+        </>
       </Modal>
     </Box>
   );
