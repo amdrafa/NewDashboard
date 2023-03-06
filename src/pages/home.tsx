@@ -31,7 +31,7 @@ export default function Home() {
         <Box flex="1" borderRadius={8} bg="gray.800" height='100%' p="8" mt={8}>
 
         <Flex>
-          RC3 COMING SOON...
+          RC3 COMING SOON... *---*
         </Flex>
           
         </Box>

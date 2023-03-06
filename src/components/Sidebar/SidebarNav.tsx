@@ -62,7 +62,7 @@ export function SidebarNav() {
 
         <NavLink
           hasPermission={true}
-          hrefs="/userdashboard"
+          hrefs="/bookings"
           icon={RiDashboardLine}
         >
           Bookings
