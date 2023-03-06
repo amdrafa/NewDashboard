@@ -16,6 +16,7 @@ import {
   Th,
   Thead,
   Tr,
+  Link,
 } from "@chakra-ui/react";
 import Modal from "react-modal";
 import { Input } from "../../../components/Form/input";
@@ -35,7 +36,7 @@ import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
 interface scheduleProps {
-  id: string;
+  id: number;
   startDate: Date;
   finalDate: Date;
   isExclusive: boolean;
@@ -44,12 +45,20 @@ interface scheduleProps {
 
 interface bookingProps {
   id: number;
+  status: string;
   schedules: scheduleProps[];
 }
 
 export default function EditBooking() {
   const router = useRouter();
   const id = Number(router.query.id);
+
+  const toast = useToast();
+
+  const [isConfirmationDeleteModalOpen, setIsConfirmationDeleteModalOpen] = useState(false)
+
+  const [selectedSchedule, setSelectSchedule] = useState<scheduleProps>()
+
 
   const { data, isLoading, error } = useQuery<bookingProps>(
     `/booking/${id}/schedule`,
@@ -63,6 +72,39 @@ export default function EditBooking() {
       enabled: !!id,
     }
   );
+
+  function handleCloseConfirmationModal(){
+    setIsConfirmationDeleteModalOpen(false)
+  }
+
+  async function handleDeleteSchedule(){
+    await api.delete(`/schedule/delete/${selectedSchedule?.id}`)
+    .then(response => {
+      toast({
+        title: "Schedule deleted",
+        description: `Schedule deleted successfully.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+
+      handleCloseConfirmationModal()
+
+      window.location.reload()
+
+    })
+    .catch(err => {
+      toast({
+        title: "Something went wrong",
+        description: `Error when deleting schedule.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    })
+  }
 
   return (
     <Box mt={-3}>
@@ -109,7 +151,29 @@ export default function EditBooking() {
               },
             }}
           >
-            <Table colorScheme="whiteAlpha">
+            <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={"3rem"}>
+              <Input
+                defaultValue={data?.id}
+                name="bookingid"
+                label="Booking id"
+                isDisabled
+              />
+
+              <Input
+                defaultValue={data?.status}
+                name="status"
+                label="Status"
+                isDisabled
+              />
+            </SimpleGrid>
+            {data?.schedules.length < 1 ? (
+              <Flex w={'100%'} color='gray.400' justify={'center'} my='4rem'>
+                <Text>
+                  You don't have schedules anymore in this booking.
+                </Text>
+              </Flex>
+            ) : (
+              <Table colorScheme="whiteAlpha">
               <Thead>
                 <Tr>
                   <Th px={["4", "4", "6"]} color="gray.300" width="">
@@ -130,7 +194,6 @@ export default function EditBooking() {
                   <Th>Status</Th>
 
                   <Th></Th>
-
                 </Tr>
               </Thead>
 
@@ -140,13 +203,21 @@ export default function EditBooking() {
                     <Tr key={schedule.id}>
                       <Td>{schedule.id}</Td>
                       <Td>VDA - Fix</Td>
-                      <Td>{dayjs(schedule.startDate).format('dddd, MMMM D, YYYY h:mm A')}</Td>
-                      <Td>{dayjs(schedule.finalDate).format('dddd, MMMM D, YYYY h:mm A')}</Td>
-                      
+                      <Td>
+                        {dayjs(schedule.startDate).format(
+                          "dddd, MMMM D, YYYY h:mm A"
+                        )}
+                      </Td>
+                      <Td>
+                        {dayjs(schedule.finalDate).format(
+                          "dddd, MMMM D, YYYY h:mm A"
+                        )}
+                      </Td>
+
                       <Td>
                         <Text
                           ml={"1.5rem"}
-                          color={schedule.isExclusive ? "blue.500" : 'gray.400'}
+                          color={schedule.isExclusive ? "blue.500" : "gray.400"}
                           fontWeight="bold"
                         >
                           <IoDiamondOutline fontSize={"1.2rem"} />
@@ -159,6 +230,10 @@ export default function EditBooking() {
                           color={"gray.500"}
                           fontWeight="semibold"
                           _hover={{ color: "red.500", cursor: "pointer" }}
+                          onClick={() => {
+                            setIsConfirmationDeleteModalOpen(true)
+                            setSelectSchedule(schedule)
+                          }}
                         >
                           <BiTrash size={"1.2rem"} />
                         </Flex>
@@ -168,9 +243,78 @@ export default function EditBooking() {
                 })}
               </Tbody>
             </Table>
+            )}
           </Flex>
+          <Flex w={"100%"} mt="3rem" justify="flex-end">
+              <HStack spacing="4">
+                <Link href="/bookings">
+                  <Button colorScheme="whiteAlpha">Cancel</Button>
+                </Link>
+              </HStack>
+            </Flex>
         </Box>
       </Flex>
+
+      <Modal
+        isOpen={isConfirmationDeleteModalOpen}
+        onRequestClose={handleCloseConfirmationModal}
+        overlayClassName="react-modal-overlay"
+        className="react-modal-content-slots-confirmation"
+        ariaHideApp={false}
+      >
+        <Flex justifyContent="flex-start">
+          <Text fontSize={24} fontWeight="bold" color={"gray.100"}>
+            <Text as={'span'} color={'red.500'}>Delete</Text> schedule
+          </Text>
+        </Flex>
+        <Text>Check all informations before continuous.</Text>
+          <>
+          <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={"3rem"} mt='2rem'>
+              <Input
+                defaultValue={selectedSchedule?.id}
+                name="scheduleid"
+                label="Id"
+                isDisabled
+              />
+
+              <Input
+                defaultValue={selectedSchedule?.status}
+                name="selectedScheduleStatus"
+                label="Status"
+                isDisabled
+              />
+            </SimpleGrid>
+            
+            <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={"3rem"}>
+              <Input
+                defaultValue={dayjs(selectedSchedule?.startDate).format('MMMM D, YYYY h:mm A')}
+                name="scheduleStartDate"
+                label="From"
+                isDisabled
+              />
+
+              <Input
+                defaultValue={dayjs(selectedSchedule?.startDate).format('MMMM D, YYYY h:mm A')}
+                name="scheduleFinalDate"
+                label="To"
+                isDisabled
+              />
+            </SimpleGrid>
+
+            <HStack spacing={4} justify="end">
+              <Button onClick={handleCloseConfirmationModal} colorScheme="whiteAlpha">
+                Cancel
+              </Button>
+
+              <Button
+                colorScheme="red"
+                onClick={() => handleDeleteSchedule()}
+              >
+                Delete
+              </Button>
+            </HStack>
+          </>
+      </Modal>
     </Box>
   );
 }

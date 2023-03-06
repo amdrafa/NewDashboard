@@ -1239,7 +1239,7 @@ export default function Schedule() {
           ) : (
             <>
             <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
-            <Text as={'span'} color='gray.300'>Booking</Text> confirmed!
+            <Text as={'span'} color='gray.300'>Booking</Text> submitted!
             </Text>
             </>
           )}
