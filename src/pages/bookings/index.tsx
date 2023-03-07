@@ -42,8 +42,19 @@ import {
   import { Footer } from "../../components/footer";
   import EditBooking from "../../components/editBooking";
   import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { decode } from "jsonwebtoken";
   
-  
+export type DecodedToken = {
+  id: string;
+  sub?: string;
+  iat: number;
+  exp: number;
+  roles: string;
+  name: string;
+  email: string;
+  isForeigner: boolean;
+};
   interface bookingProps {
     id: number;
     bookingId?: string;
@@ -68,28 +79,14 @@ import {
   }
   
   export default function UserBookings() {
+
+    const { auth } = parseCookies();
+
+    const decodedUser = decode(auth as string) as DecodedToken;
   
     const router = useRouter()
   
     const toast = useToast()
-  
-    const [isEditModeOpen, setIsEditModeOpen] = useState(false);
-  
-    const [isConfirmMessageOpen, setIsConfirmMessageOpen] = useState(false);
-  
-    const [speedway, setSpeedway] = useState("");
-  
-    const [appointmentStatus, setAppointmentStatus] = useState("");
-  
-    const [appointmentId, setAppointmentId] = useState(0);
-  
-    const [vehicle, setVehicle] = useState("");
-  
-    const [selectedSlots, setSelectedSlots] = useState(["20/02/2022"]);
-  
-    const [companyName, setCompanyName] = useState("");
-  
-    const [companyRef, setCompanyRef] = useState("");
   
     const [page, setPage] = useState(1);
   
@@ -102,12 +99,15 @@ import {
       `booking${page}`,
       async () => {
         const response = await api.get(
-          `/booking/list`
+          `/booking/user/${decodedUser.id}`
         );
         const data = response.data;
         // set total count coming from response to paginate correctly
           console.log(data)
         return data;
+      },
+      {
+        enabled: !!decodedUser
       }
     );
   

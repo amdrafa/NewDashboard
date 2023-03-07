@@ -51,7 +51,6 @@ import { BsCartX } from "react-icons/bs";
 import { MultiSelect, Option } from "react-multi-select-component";
 import { v4 } from "uuid";
 import { MdDownloadDone, MdOutlineDone } from "react-icons/md";
-import updatedata from "./api/updatedata";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
 interface scheduleResponse {
@@ -101,7 +100,7 @@ interface resourceLibraryType {
 
 interface SelectedResourceProps {
   id: string;
-  resource: Option[];
+  resources: Option[];
   startDate: Date;
   finalDate: Date;
   fromTime: string;
@@ -164,12 +163,12 @@ export default function Schedule() {
 
   const [acceptedTerms, setAcceptedTerms] = useState([]);
 
-  const [fromTime, setFromTime] = useState<string>("- 07:00 AM");
+  const [fromTime, setFromTime] = useState<string>(" 07:00 ");
 
   const [isSelectedResourceExclusive, setIsSelectedResourceExclusive] =
     useState(false);
 
-  const [toTime, setToTime] = useState<string>("- 18:00 PM");
+  const [toTime, setToTime] = useState<string>(" 07:00 ");
 
   const [selectedResources, setSelectedResources] = useState<
     SelectedResourceProps[]
@@ -275,6 +274,8 @@ export default function Schedule() {
   function updateSelectedResource() {
     console.log(fromDate, toDate, fromTime, toTime, selected);
 
+    
+
     if (
       fromDate === undefined ||
       fromTime === undefined ||
@@ -293,13 +294,24 @@ export default function Schedule() {
       return;
     }
 
+    if(new Date(dayjs(fromDate).format('MMMM D, YYYY') + fromTime) > new Date(dayjs(toDate).format('MMMM D, YYYY') + toTime)){
+      toast({
+        title: "Select a valid date",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return ;
+    }
+
     const isRepeatedResource = selectedResources.find((resourceSelected) => {
       return (
         resourceSelected.startDate === fromDate &&
         resourceSelected.fromTime === fromTime &&
         resourceSelected.finalDate === toDate &&
         resourceSelected.toTime === toTime &&
-        resourceSelected.resource.every((src) => {
+        resourceSelected.resources.every((src) => {
           const sameResource = selected.filter(
             (srcSelected) => srcSelected === src
           );
@@ -312,10 +324,10 @@ export default function Schedule() {
         ...selectedResources,
         {
           id: v4(),
-          resource: selected,
-          startDate: fromDate,
+          resources: selected,
+          startDate: new Date(dayjs(fromDate).format('MMMM D, YYYY') + fromTime),
           fromTime: fromTime,
-          finalDate: toDate,
+          finalDate: new Date(dayjs(toDate).format('MMMM D, YYYY') + toTime),
           toTime: toTime,
           isExclusive: isSelectedResourceExclusive,
         },
@@ -343,10 +355,10 @@ export default function Schedule() {
     setIsConfirmationModalOpen(false);
     selectedResources.forEach((schedule) => {
       const updatedResourceList: Option[] = [];
-      schedule?.resource.forEach((resource) => {
+      schedule?.resources.forEach((resource) => {
         updatedResourceList.push(resource?.value);
       });
-      schedule.resource = updatedResourceList;
+      schedule.resources = updatedResourceList;
     });
 
     await api
@@ -355,7 +367,7 @@ export default function Schedule() {
           userId: user.id,
           dataInicial: selectedResources[0].startDate,
           dataFinal: selectedResources[0].finalDate,
-          status: "Pre-approved",
+          status: "Pending",
           terms: [2],
         },
         scheduleArray: selectedResources,
@@ -700,7 +712,13 @@ export default function Schedule() {
                     color={"gray.300"}
                     type={"date"}
                     width="12rem"
-                    onChange={(e) => setFromDate(new Date(e.target.value))}
+                    onChange={(e) =>
+                      setFromDate(
+                        new Date(
+                          dayjs(e.target.value).format('MMMM D, YYYY')
+                        )
+                      )
+                    }
                     sx={{
                       "&::-webkit-calendar-picker-indicator": {
                         filter: "invert(1)",
@@ -717,29 +735,29 @@ export default function Schedule() {
                     bg={"gray.900"}
                     color={"gray.300"}
                   >
-                    <option value={"- 07:00"}>7:00</option>
-                    <option value={"- 07:30"}>7:30</option>
-                    <option value={"- 08:00"}>8:00</option>
-                    <option value={"- 08:30"}>8:30</option>
-                    <option value={"- 09:00"}>9:00</option>
-                    <option value={"- 09:30"}>9:30</option>
-                    <option value={"- 10:00"}>10:00</option>
-                    <option value={"- 10:30"}>10:30</option>
-                    <option value={"- 11:00"}>11:00</option>
-                    <option value={"- 11:30"}>11:30</option>
-                    <option value={"- 12:00"}>12:00</option>
-                    <option value={"- 12:30"}>12:30</option>
-                    <option value={"- 13:00"}>13:00</option>
-                    <option value={"- 13:30"}>13:30</option>
-                    <option value={"- 14:00"}>14:00</option>
-                    <option value={"- 14:30"}>14:30</option>
-                    <option value={"- 15:00"}>15:00</option>
-                    <option value={"- 15:30"}>15:30</option>
-                    <option value={"- 16:00"}>16:00</option>
-                    <option value={"- 16:30"}>16:30</option>
-                    <option value={"- 17:00"}>17:00</option>
-                    <option value={"- 17:30"}>17:30</option>
-                    <option value={"- 18:00"}>18:00</option>
+                    <option value={" 07:00"}>7:00</option>
+                    <option value={" 07:30"}>7:30</option>
+                    <option value={" 08:00"}>8:00</option>
+                    <option value={" 08:30"}>8:30</option>
+                    <option value={" 09:00"}>9:00</option>
+                    <option value={" 09:30"}>9:30</option>
+                    <option value={" 10:00"}>10:00</option>
+                    <option value={" 10:30"}>10:30</option>
+                    <option value={" 11:00"}>11:00</option>
+                    <option value={" 11:30"}>11:30</option>
+                    <option value={" 12:00"}>12:00</option>
+                    <option value={" 12:30"}>12:30</option>
+                    <option value={" 13:00"}>13:00</option>
+                    <option value={" 13:30"}>13:30</option>
+                    <option value={" 14:00"}>14:00</option>
+                    <option value={" 14:30"}>14:30</option>
+                    <option value={" 15:00"}>15:00</option>
+                    <option value={" 15:30"}>15:30</option>
+                    <option value={" 16:00"}>16:00</option>
+                    <option value={" 16:30"}>16:30</option>
+                    <option value={" 17:00"}>17:00</option>
+                    <option value={" 17:30"}>17:30</option>
+                    <option value={" 18:00"}>18:00</option>
                   </Select>
                 </HStack>
 
@@ -790,7 +808,13 @@ export default function Schedule() {
                     color={"gray.300"}
                     type={"date"}
                     width="12rem"
-                    onChange={(e) => setToDate(new Date(e.target.value))}
+                    onChange={(e) =>
+                      setToDate(
+                        new Date(
+                          dayjs(e.target.value).format('MMMM D, YYYY')
+                        )
+                      )
+                    }
                     sx={{
                       "&::-webkit-calendar-picker-indicator": {
                         filter: "invert(1)",
@@ -809,29 +833,29 @@ export default function Schedule() {
                     bg={"gray.900"}
                     color={"gray.300"}
                   >
-                    <option value={"- 07:00"}>7:00</option>
-                    <option value={"- 07:30"}>7:30</option>
-                    <option value={"- 08:00"}>8:00</option>
-                    <option value={"- 08:30"}>8:30</option>
-                    <option value={"- 09:00"}>9:00</option>
-                    <option value={"- 09:30"}>9:30</option>
-                    <option value={"- 10:00"}>10:00</option>
-                    <option value={"- 10:30"}>10:30</option>
-                    <option value={"- 11:00"}>11:00</option>
-                    <option value={"- 11:30"}>11:30</option>
-                    <option value={"- 12:00"}>12:00</option>
-                    <option value={"- 12:30"}>12:30</option>
-                    <option value={"- 13:00"}>13:00</option>
-                    <option value={"- 13:30"}>13:30</option>
-                    <option value={"- 14:00"}>14:00</option>
-                    <option value={"- 14:30"}>14:30</option>
-                    <option value={"- 15:00"}>15:00</option>
-                    <option value={"- 15:30"}>15:30</option>
-                    <option value={"- 16:00"}>16:00</option>
-                    <option value={"- 16:30"}>16:30</option>
-                    <option value={"- 17:00"}>17:00</option>
-                    <option value={"- 17:30"}>17:30</option>
-                    <option value={"- 18:00"}>18:00</option>
+                     <option value={" 07:00"}>7:00</option>
+                    <option value={" 07:30"}>7:30</option>
+                    <option value={" 08:00"}>8:00</option>
+                    <option value={" 08:30"}>8:30</option>
+                    <option value={" 09:00"}>9:00</option>
+                    <option value={" 09:30"}>9:30</option>
+                    <option value={" 10:00"}>10:00</option>
+                    <option value={" 10:30"}>10:30</option>
+                    <option value={" 11:00"}>11:00</option>
+                    <option value={" 11:30"}>11:30</option>
+                    <option value={" 12:00"}>12:00</option>
+                    <option value={" 12:30"}>12:30</option>
+                    <option value={" 13:00"}>13:00</option>
+                    <option value={" 13:30"}>13:30</option>
+                    <option value={" 14:00"}>14:00</option>
+                    <option value={" 14:30"}>14:30</option>
+                    <option value={" 15:00"}>15:00</option>
+                    <option value={" 15:30"}>15:30</option>
+                    <option value={" 16:00"}>16:00</option>
+                    <option value={" 16:30"}>16:30</option>
+                    <option value={" 17:00"}>17:00</option>
+                    <option value={" 17:30"}>17:30</option>
+                    <option value={" 18:00"}>18:00</option>
                   </Select>
                 </HStack>
 
@@ -890,7 +914,7 @@ export default function Schedule() {
                         return (
                           <Tr key={resource?.id}>
                             <Td>
-                              {resource.resource.map((unitSelectedResource) => {
+                              {resource.resources.map((unitSelectedResource) => {
                                 return (
                                   <Text key={unitSelectedResource?.key}>
                                     {unitSelectedResource?.label}
@@ -900,13 +924,13 @@ export default function Schedule() {
                             </Td>
                             <Td>
                               {dayjs(resource.startDate).format(
-                                "MMM D, YYYY "
-                              ) + fromTime}
+                                "MMMM D, YYYY h:mm A"
+                              )}
                             </Td>
                             <Td>
                               {dayjs(resource.finalDate).format(
-                                "MMM D, YYYY "
-                              ) + toTime}
+                                "MMMM D, YYYY h:mm A"
+                              )}
                             </Td>
 
                             <Td>
@@ -1410,7 +1434,7 @@ export default function Schedule() {
                       <Tr
                         key={schedule.id}
                         background={
-                          schedule.status === "Pre-approved" ? "" : "red.500"
+                          schedule.status === "Pending" ? "" : "red.500"
                         }
                       >
                         <Td>{schedule.id}</Td>
@@ -1543,7 +1567,7 @@ export default function Schedule() {
                   return (
                     <Tr key={resource?.id}>
                       <Td>
-                        {resource.resource.map((unitSelectedResource) => {
+                        {resource.resources.map((unitSelectedResource) => {
                           return (
                             <Text key={unitSelectedResource?.key}>
                               {unitSelectedResource?.label}

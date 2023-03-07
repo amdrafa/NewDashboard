@@ -46,6 +46,7 @@ import {
   
   interface bookingProps {
     id: number;
+    userId: number;
     status: string;
     schedules: scheduleProps[];
   }
@@ -53,14 +54,16 @@ import {
   export default function AdminEditBooking() {
     const router = useRouter();
     const id = Number(router.query.id);
-  
+    
     const toast = useToast();
   
     const [isConfirmationDeleteModalOpen, setIsConfirmationDeleteModalOpen] = useState(false)
   
     const [selectedSchedule, setSelectSchedule] = useState<scheduleProps>()
 
-    const [selectedDeletedSchedules, setSelectedDeletedSchedules] = useState<number[]>([])
+    const [updatedDeletedSchedules, setUpdatedDeletedSchedules] = useState<scheduleProps[]>([])
+
+    const [updatedData, setUpdatedData] = useState<bookingProps>()
   
   
     const { data, isLoading, error } = useQuery<bookingProps>(
@@ -68,13 +71,15 @@ import {
       async () => {
         const response = await api.get(`/booking/${id}/schedule`);
         const data = response.data;
-  
+        setUpdatedData(data)
         return data;
       },
       {
         enabled: !!id,
       }
     );
+
+   
   
     function handleCloseConfirmationModal(){
       setIsConfirmationDeleteModalOpen(false)
@@ -109,29 +114,49 @@ import {
       })
     }
 
-    function updateSelectedDeletedSchedules(id:number){
+    function handleUpdateSelectedDeletedSchedules(schedule: scheduleProps){
 
-        const selectedIdAlreadyExists = selectedDeletedSchedules.find(item => item == id)
-        
-        const updatedDeletedSchedules = selectedDeletedSchedules;
+        const scheduleIsDeleted = updatedDeletedSchedules.find(item => item.id == schedule.id)
 
-        if(selectedIdAlreadyExists){
-
-            updatedDeletedSchedules.filter(item => item !== id)
-            console.log(updatedDeletedSchedules)
-            setSelectedDeletedSchedules(updatedDeletedSchedules)
-            return ;
-        }else{
-            updatedDeletedSchedules.push(id)
-            setSelectedDeletedSchedules(updatedDeletedSchedules)
-    
+        if(!scheduleIsDeleted){
+            setUpdatedDeletedSchedules([...updatedDeletedSchedules, schedule])
             return ;
         }
 
-
-        
+        setUpdatedDeletedSchedules(updatedDeletedSchedules.filter(item => item.id !== schedule.id))
+        return ;    
     }
-  
+
+    async function handleUpdateBooking(){
+
+        data.schedules.forEach(schedule => {
+            if(updatedDeletedSchedules.includes(schedule)){
+                schedule.status = "Rejected"
+            }else{
+                schedule.status = "Approved"
+            }
+        })
+
+        console.log({
+            booking: {
+                id: data.id,
+                status: "Approved",
+                userId: data.userId,
+                scheduleArray: data.schedules
+            }
+        })
+        
+
+        await api.put('/booking/update/schedules', {
+            booking: {
+                id: data.id,
+                status: "Approved",
+            },
+            scheduleArray: data.schedules
+        })
+        .then(response => console.log(response))
+    }
+    
     return (
       <Box mt={-3}>
         <Header />
@@ -154,26 +179,11 @@ import {
               >
                 Booking approval
               </Heading>
-
-              <HStack>
-              <Button
-                color={'gray.400'}
-                bg="gray.900"
-                _hover={{ bg: "blue.500", color: 'white'}}
-              >
-                <Icon mr={1.5} as={IoMdClose} />
-                Approve
-              </Button>
-              <Button
-                color={'gray.400'}
-                bg="gray.900"
-                _hover={{ bg: "red.500", color: 'white'}}
-              >
-                <Icon mr={1.5} as={IoMdClose} />
-                Reject
-              </Button>
-              </HStack>
             </Flex>
+
+            <Text color={'gray.400'}>
+                Please m
+            </Text>
   
             <Divider my="6" borderColor="gray.700" />
   
@@ -197,10 +207,10 @@ import {
               }}
             >
                 <Flex>
-                    {selectedDeletedSchedules.map(item => {
+                    {updatedDeletedSchedules.map(item => {
                         return (
                             <Text>
-                                {item}
+                                {item.id}  {item.status} ||| 
                             </Text>
                         )
                     })}
@@ -220,7 +230,7 @@ import {
                   isDisabled
                 />
               </SimpleGrid>
-              {data?.schedules.length < 1 ? (
+              {data?.schedules?.length < 1 ? (
                 <Flex w={'100%'} color='gray.400' justify={'center'} my='4rem'>
                   <Text>
                     You don't have schedules anymore in this booking.
@@ -283,7 +293,7 @@ import {
                           <Flex
                           justify={'center'}
                           >
-                            <Checkbox onChange={() => updateSelectedDeletedSchedules(schedule.id)} />
+                            <Checkbox onChange={() => handleUpdateSelectedDeletedSchedules(schedule)} />
                           </Flex>
                         </Td>
                       </Tr>
@@ -295,9 +305,10 @@ import {
             </Flex>
             <Flex w={"100%"} mt="3rem" justify="flex-end">
                 <HStack spacing="4">
-                  <Link href="/bookings">
+                  <Link href="/administrator/approval">
                     <Button colorScheme="whiteAlpha">Cancel</Button>
                   </Link>
+                  <Button onClick={() => handleUpdateBooking()} colorScheme="blue">Confirm</Button>
                 </HStack>
               </Flex>
           </Box>
