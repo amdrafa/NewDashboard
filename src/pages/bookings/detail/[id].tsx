@@ -43,10 +43,35 @@ interface scheduleProps {
   status: string;
 }
 
+interface termProps {
+  id: number;
+  title: string;
+  text: string;
+}
+
+interface vehicleTypeProps {
+  id: number;
+  passangerCar: number;
+  urbanLightBus: number;
+  coachBus: number;
+  lightDutyTruck: number;
+  urbanHeavyBus: number;
+  others: number
+}
+
+interface inviteProps {
+  id: number;
+  guestName: string;
+  guestEmail: string;
+}
+
 interface bookingProps {
   id: number;
   status: string;
   schedules: scheduleProps[];
+  terms: termProps[];
+  vehicleType: vehicleTypeProps;
+  invite: inviteProps[];
 }
 
 export default function EditBooking() {
@@ -54,6 +79,8 @@ export default function EditBooking() {
   const id = Number(router.query.id);
 
   const toast = useToast();
+
+  const [selectedTab, setSelectedTab] = useState("Schedules");
 
   const [isConfirmationDeleteModalOpen, setIsConfirmationDeleteModalOpen] = useState(false)
 
@@ -128,11 +155,35 @@ export default function EditBooking() {
             >
               Edit booking
             </Heading>
+
+            <HStack spacing={"1rem"}>
+              <Button
+                w={"10rem"}
+                background={
+                  selectedTab === "Schedules" ? "blue.500" : "gray.900"
+                }
+                _hover={{ opacity: 0.7 }}
+                onClick={() => setSelectedTab("Schedules")}
+              >
+                Schedules
+              </Button>
+              <Button
+                w={"10rem"}
+                background={
+                  selectedTab === "InvitedPeople" ? "blue.500" : "gray.900"
+                }
+                _hover={{ opacity: 0.7 }}
+                onClick={() => setSelectedTab("InvitedPeople")}
+              >
+                Atendees | Vehicles
+              </Button>
+            </HStack>
           </Flex>
 
           <Divider my="6" borderColor="gray.700" />
 
-          <Flex
+          {selectedTab == "Schedules" ? (
+            <Flex
             height={"100%"}
             maxHeight={"26rem"}
             flexDir={"column"}
@@ -245,6 +296,122 @@ export default function EditBooking() {
             </Table>
             )}
           </Flex>
+          ) : (
+            <>
+              <Flex
+                w={"100%"}
+                justifyContent={"center"}
+                borderRadius="2xl"
+                mb={"2.5rem"}
+              pl={'4rem'}
+              >
+                <VStack>
+                  <HStack>
+                    <Text w={"20rem"}>Passanger car</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="passangerCar" defaultValue={data?.vehicleType?.passangerCar}/>
+                    <Text w={"20rem"}>Light duty truck</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="lightDutyTruck" defaultValue={data?.vehicleType?.lightDutyTruck}/>
+                  </HStack>
+                  <HStack>
+                    <Text w={"20rem"}>Urban light bus</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="urbanlightbus" defaultValue={data?.vehicleType?.urbanLightBus}/>
+                    <Text w={"20rem"}>Urban heavy bus</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="urbanheavybus" defaultValue={data?.vehicleType?.urbanHeavyBus}/>
+                  </HStack>
+                  <HStack>
+                    <Text w={"20rem"}>Coach bus</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="coachbus" defaultValue={data?.vehicleType?.coachBus}/>
+                    <Text w={"20rem"}>Others</Text>
+                    <Input textAlign={'center'} w={"4rem"} name="others" defaultValue={data?.vehicleType?.others}/>
+                  </HStack>
+                </VStack>
+              </Flex>
+              <Flex
+                height={"100%"}
+                maxHeight={"22rem"}
+                flexDir={"column"}
+                mt={"1.5rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
+                { selectedTab == "InvitedPeople" ? (
+                  <Table colorScheme="whiteAlpha">
+                  <Thead>
+                    <Tr>
+
+                      <Th px={["4", "4", "6"]} color="gray.300" width="">
+                        <Text>Id</Text>
+                      </Th>
+
+                      <Th px={["4", "4", "6"]} color="gray.300" width="">
+                        <Text>Name</Text>
+                      </Th>
+
+                      <Th px={["4", "4", "6"]} width="">
+                        <Text>Email</Text>
+                      </Th>
+
+
+                    </Tr>
+                  </Thead>
+
+                  <Tbody>
+                    {data?.invite?.map(invited => {
+                      return (
+                        <Tr key={invited.id}>
+                          <Td>{invited?.id}</Td>
+                          <Td>{invited?.guestName}</Td>
+                          <Td>{invited?.guestEmail}</Td>
+                        </Tr>
+                  
+                      )
+                    })}
+
+                    {/* <Tr>
+                      <Td>João Silva Pereira</Td>
+                      <Td>joaopereira@gmail.com</Td>
+                      <Td>07384617819</Td>
+                      <Td w={"26rem"}>
+                        <Flex
+                          cursor={"pointer"}
+                          color={"blue.500"}
+                          justify={"center"}
+                          alignItems="center"
+                          w={"100%"}
+                          _hover={{ color: "blue.700" }}
+                        >
+                          <GoPlus />
+                          <Text ml={"0.5rem"}>Add e-mail</Text>
+                        </Flex>
+                      </Td>
+                    </Tr> */}
+                    
+                  </Tbody>
+                </Table>
+                ) : (
+                  <Flex w={'100%'} justify='center'>
+                    <Text color={'gray.500'}>
+                      Add all people who are going to be part of the booking.
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+            </>
+          )}
+
+          
           <Flex w={"100%"} mt="3rem" justify="flex-end">
               <HStack spacing="4">
                 <Link href="/bookings">

@@ -53,6 +53,16 @@ import { v4 } from "uuid";
 import { MdDownloadDone, MdOutlineDone } from "react-icons/md";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
+interface userProps {
+  id: number | string;
+  name: string;
+  email: string;
+  companyId: number;
+  document: string;
+  isGuest?: boolean;
+  notifyByEmail?: boolean;
+}
+
 interface scheduleResponse {
   startDate: string;
   finalDate: string;
@@ -76,22 +86,6 @@ interface resourceProps {
   isActive: boolean;
 }
 
-interface testtrackType {
-  label?: string;
-  value?: number;
-  disabled?: boolean;
-}
-interface officeType {
-  label?: string;
-  value?: number;
-  disabled?: boolean;
-}
-interface workshopType {
-  label?: string;
-  value?: number;
-  disabled?: boolean;
-}
-
 interface resourceLibraryType {
   testtrack?: Option[];
   office?: Option[];
@@ -100,7 +94,7 @@ interface resourceLibraryType {
 
 interface SelectedResourceProps {
   id: string;
-  resources: Option[];
+  resource: Option[];
   startDate: Date;
   finalDate: Date;
   fromTime: string;
@@ -122,6 +116,7 @@ interface TermsProps {
   title: string;
   text: string;
   createdAt: string;
+  isAccepted?: boolean;
 }
 
 export default function Schedule() {
@@ -132,6 +127,27 @@ export default function Schedule() {
     useState(true);
 
   const [isResourceUpdated, setIsResourceUpdated] = useState(false);
+
+  const [passangerCar, setPassangerCar] = useState(0)
+  const [lightDutyTruck, setLightDutyTruck] = useState(0)
+  const [urbanLightBus, setUrbanLightBus] = useState(0)
+  const [urbanHeavyBus, setUrbanHeavyBus] = useState(0)
+  const [coachBus, setCoachBus] = useState(0)
+  const [others, setOthers] = useState(0)
+
+  const [guestName, setGuestName] = useState('')
+
+  const [updatedTerms, setUpdatedTerms] = useState<TermsProps[]>([])
+
+  const [terms, setTerms] = useState<number[]>([])
+
+  const [guestEmail, setGuestEmail] = useState('')
+
+  const [guestDocument, setGuestDocument] = useState('')
+
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false)
+
+  const [selectedUserField, setSelectedUserField] = useState('')
 
   const [isTermOpen, setIsTermOpen] = useState(false);
 
@@ -173,6 +189,8 @@ export default function Schedule() {
   const [selectedResources, setSelectedResources] = useState<
     SelectedResourceProps[]
   >([]);
+
+  const [selectedInvitedUsers, setSelectedInvitedUsers] = useState<userProps[]>([])
 
   const [testTrackOptions, setTestTrackOptions] = useState([]);
 
@@ -244,6 +262,24 @@ export default function Schedule() {
       const response = await api.get(`/terms/list`);
       const data = response.data;
 
+      setUpdatedTerms(data)
+      return data;
+    },
+    {
+      enabled: !!data,
+    }
+  );
+
+  const {
+    data: UserListData,
+    isLoading: isUserListLoading,
+    error: errorUserList,
+  } = useQuery<userProps[]>(
+    `/user/list`,
+    async () => {
+      const response = await api.get(`/user/list`);
+      const data = response.data;
+
       return data;
     },
     {
@@ -274,8 +310,6 @@ export default function Schedule() {
   function updateSelectedResource() {
     console.log(fromDate, toDate, fromTime, toTime, selected);
 
-    
-
     if (
       fromDate === undefined ||
       fromTime === undefined ||
@@ -294,7 +328,10 @@ export default function Schedule() {
       return;
     }
 
-    if(new Date(dayjs(fromDate).format('MMMM D, YYYY') + fromTime) > new Date(dayjs(toDate).format('MMMM D, YYYY') + toTime)){
+    if (
+      new Date(dayjs(fromDate).format("MMMM D, YYYY") + fromTime) >
+      new Date(dayjs(toDate).format("MMMM D, YYYY") + toTime)
+    ) {
       toast({
         title: "Select a valid date",
         status: "info",
@@ -302,7 +339,7 @@ export default function Schedule() {
         isClosable: true,
         position: "top-right",
       });
-      return ;
+      return;
     }
 
     const isRepeatedResource = selectedResources.find((resourceSelected) => {
@@ -311,7 +348,7 @@ export default function Schedule() {
         resourceSelected.fromTime === fromTime &&
         resourceSelected.finalDate === toDate &&
         resourceSelected.toTime === toTime &&
-        resourceSelected.resources.every((src) => {
+        resourceSelected.resource.every((src) => {
           const sameResource = selected.filter(
             (srcSelected) => srcSelected === src
           );
@@ -324,10 +361,12 @@ export default function Schedule() {
         ...selectedResources,
         {
           id: v4(),
-          resources: selected,
-          startDate: new Date(dayjs(fromDate).format('MMMM D, YYYY') + fromTime),
+          resource: selected,
+          startDate: new Date(
+            dayjs(fromDate).format("MMMM D, YYYY") + fromTime
+          ),
           fromTime: fromTime,
-          finalDate: new Date(dayjs(toDate).format('MMMM D, YYYY') + toTime),
+          finalDate: new Date(dayjs(toDate).format("MMMM D, YYYY") + toTime),
           toTime: toTime,
           isExclusive: isSelectedResourceExclusive,
         },
@@ -355,82 +394,109 @@ export default function Schedule() {
     setIsConfirmationModalOpen(false);
     selectedResources.forEach((schedule) => {
       const updatedResourceList: Option[] = [];
-      schedule?.resources.forEach((resource) => {
+      schedule?.resource.forEach((resource) => {
         updatedResourceList.push(resource?.value);
       });
-      schedule.resources = updatedResourceList;
+      schedule.resource = updatedResourceList;
     });
+
+    selectedInvitedUsers.forEach(invited => {
+      if(invited.isGuest){
+        invited.id = null
+      }
+    })
+
+    
+
+    selectedResources.forEach(item => {
+      delete item['id'];
+    })
+
+  
+
+    const updatedInvitedArray = []
+
+    selectedInvitedUsers.forEach(invited => {
+      updatedInvitedArray.push({
+          guestName: invited.name,
+          guestEmail: invited.email
+      })
+    })
+
+    console.log({
+      booking: {
+      userId: Number(user.id),
+      dataInicial: selectedResources[0].startDate,
+      dataFinal: selectedResources[0].finalDate,
+      status: "Pending",
+      terms: [2],
+    },
+    scheduleArray: selectedResources,
+    inviteArray: updatedInvitedArray,
+    vehicleType: {
+      passangerCar,
+      urbanLightBus,
+      coachBus,
+      lightDutyTruck,
+      urbanHeavyBus,
+      others
+    }
+});
 
     await api
       .post<bookingAndScheduleResponse>("/booking/create/schedules", {
         booking: {
-          userId: user.id,
+          userId: Number(user.id),
           dataInicial: selectedResources[0].startDate,
           dataFinal: selectedResources[0].finalDate,
           status: "Pending",
           terms: [2],
         },
         scheduleArray: selectedResources,
+        inviteArray: updatedInvitedArray,
+        vehicleType: {
+          passangerCar,
+          urbanLightBus,
+          coachBus,
+          lightDutyTruck,
+          urbanHeavyBus,
+          others
+        }
       })
       .then(async (response) => {
         await api
           .get(`/booking/${response.data.id}/schedule`)
           .then((response) => {
-            setIsModalOpen(true);
+
+            toast({
+              title: "Booking created",
+              description: `Booking was created successfully.`,
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+              position: "top-right",
+            });
+            
             setBookingResponse(response.data);
             setIsBookingResponseLoading(false);
+            setIsModalOpen(true);
             setSelectedResources([]);
+            setSelectedInvitedUsers([])
           });
-      });
+      })
+      .catch(e => {
+        toast({
+          title: "Something went wrong",
+          description: `Error when confirming booking.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
 
-    // console.log(
-    //   {
-    //     booking: {
-    //       userId: user.id,
-    //       dataInicial: selectedResources[0].startDate,
-    //       dataFinal: selectedResources[selectedResources.length - 1].finalDate,
-    //       status: "Pre-approved",
-    //       terms: [
-    //         2
-    //       ]
-    //     },
-    //     scheduleArray: [
-    //       {
-    //         startDate: "2023-03-24T14:04:50.458Z",
-    //         finalDate: "2023-03-26T11:04:50.458Z",
-    //         listResource: [
-    //           2
-    //         ],
-    //         isExclusive: false
-    //       },
-    //       {
-    //         startDate: "2023-04-24T14:04:50.458Z",
-    //         finalDate: "2023-04-26T17:04:50.458Z",
-    //         listResource: [
-    //           2
-    //         ],
-    //         isExclusive:  true
-    //       }
-    //     ]
-    //   }
-    // )
-
-    // console.log({
-    //     userId: user.id,
-    //     dataInicial: selectedResources[0].startDate,
-    //     dataFinal: selectedResources[selectedResources.length - 1].finalDate,
-    //     schedules: selectedResources,
-    //     status: "Pre-approved",
-    //     term: [],
-    //   })
-    // const response = await api.post("/booking/create/schedules", {
-    //   booking: {
-    //     userId: user.id,
-    //     dataInicial: selectedResources[0].startDate,
-    //     dataFinal: selectedResources[selectedResources.length - 1].finalDate,
-    //     schedules: selectedResources
-    //   }
-    // })
+        setSelectedResources([]);
+            setSelectedInvitedUsers([])
+      })
   }
 
   const isWideVersioon = useBreakpointValue({
@@ -479,11 +545,17 @@ export default function Schedule() {
   function handleCloseModal() {
     setIsModalOpen(false);
     setIsTermOpen(false);
+    setSelectedResources([])
+  }
+
+  function handleCloseGuestModal() {
+    setIsGuestModalOpen(false)
   }
 
   function handleCloseConfirmationModal() {
     setIsConfirmationModalOpen(false);
     setIsTermOpen(false);
+    
   }
 
   async function handleDeleteSchedule(id: number) {
@@ -533,6 +605,140 @@ export default function Schedule() {
 
     setAcceptedTerms([...acceptedTerms, id]);
   }
+
+  function updateSelectedInvitedUsers(id: number){
+   
+
+    if(!id){
+      toast({
+        title: "Choose a valid user",
+        description: `Click on the list user options to select a valid user.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      return ;
+    }
+
+    const invitedUser = UserListData.find(user => user.id == id)
+
+    if(!invitedUser){
+      toast({
+        title: "User id not found",
+        description: `Select a valid user to proceed.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      return ;
+    }
+
+    const isUserAlreadyAddedToList = selectedInvitedUsers.find(user => user === invitedUser)
+
+
+    if(isUserAlreadyAddedToList){
+      toast({
+        title: "User already selected",
+        description: `Please select a new user to proceed.`,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      return ;
+    }
+
+   setSelectedInvitedUsers([...selectedInvitedUsers, {
+    id: invitedUser.id,
+    document: invitedUser.document,
+    email: invitedUser.email,
+    name: invitedUser.name,
+    isGuest: false,
+    companyId: invitedUser.companyId
+   }]);
+   setSelectedUserField('')
+  }
+
+  function handleAddGuest(){
+
+    if(guestName.length < 4 || guestDocument.length < 5 || !guestEmail.includes("@")){
+      toast({
+        title: "Complete the field correctly",
+        description: `Something is wrong with the data entered.`,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      return ;
+    }
+
+    const invitedUser:userProps = {
+      id: v4().substring(0, 3),
+      name: guestName,
+      document: guestDocument,
+      email: guestEmail,
+      companyId: null,
+      isGuest: true
+    }
+
+    setSelectedInvitedUsers([...selectedInvitedUsers, invitedUser]);
+    setIsGuestModalOpen(false);
+  }
+
+  function deleteInvitedUser(id: number | string){
+    const updatedInvitedUsers = selectedInvitedUsers.filter(user => user.id != id)
+
+    setSelectedInvitedUsers(updatedInvitedUsers)
+  }
+
+  async function handleUpdateTerms(){
+    await api.put(`/booking/update/${bookingResponse.id}/terms`, {
+      terms
+    })
+    .then((response) => {
+      toast({
+        title: "Booking validated",
+        description: `Wait an administrator approve your booking.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      router.push('/bookings')
+    })
+    .catch(e => {
+      toast({
+        title: "Something went wrong",
+        description: `Error when updating terms.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    })
+  }
+
+  function handleUpdateAcceptedTerms(idTerms: number){
+    
+      setTerms([...terms, idTerms])
+      return ;
+
+  }
+
+  function handleDeleteAcceptedTerms(idTerms: number){
+    
+    setTerms(terms.filter(item => item != idTerms))
+    return ;
+
+}
+
 
   return (
     <Box mt={-3}>
@@ -714,9 +920,7 @@ export default function Schedule() {
                     width="12rem"
                     onChange={(e) =>
                       setFromDate(
-                        new Date(
-                          dayjs(e.target.value).format('MMMM D, YYYY')
-                        )
+                        new Date(dayjs(e.target.value).format("MMMM D, YYYY"))
                       )
                     }
                     sx={{
@@ -810,9 +1014,7 @@ export default function Schedule() {
                     width="12rem"
                     onChange={(e) =>
                       setToDate(
-                        new Date(
-                          dayjs(e.target.value).format('MMMM D, YYYY')
-                        )
+                        new Date(dayjs(e.target.value).format("MMMM D, YYYY"))
                       )
                     }
                     sx={{
@@ -833,7 +1035,7 @@ export default function Schedule() {
                     bg={"gray.900"}
                     color={"gray.300"}
                   >
-                     <option value={" 07:00"}>7:00</option>
+                    <option value={" 07:00"}>7:00</option>
                     <option value={" 07:30"}>7:30</option>
                     <option value={" 08:00"}>8:00</option>
                     <option value={" 08:30"}>8:30</option>
@@ -910,17 +1112,11 @@ export default function Schedule() {
                     </Thead>
 
                     <Tbody>
-                      {selectedResources.map((resource) => {
+                      {selectedResources?.map((resource) => {
                         return (
                           <Tr key={resource?.id}>
                             <Td>
-                              {resource.resources.map((unitSelectedResource) => {
-                                return (
-                                  <Text key={unitSelectedResource?.key}>
-                                    {unitSelectedResource?.label}
-                                  </Text>
-                                );
-                              })}
+                              {resource?.resource[0]?.label}
                             </Td>
                             <Td>
                               {dayjs(resource.startDate).format(
@@ -1074,15 +1270,42 @@ export default function Schedule() {
                 Invite participants:
               </Text>
 
-              <Flex w={"100%"} justify="space-between" mb={"2rem"}>
-                <Flex flexDir={"column"}>
-                  <Input name="Participant" label="Participant name" />
+              <SimpleGrid>
+
+                <Flex flexDir={"column"} >
+                  <Input
+                    list="userdatalist"
+                    name="Participant"
+                    label="Participant name"
+                    value={selectedUserField}
+                    onChange={(e) => {
+                      setSelectedUserField(e.target.value)
+                    }}
+                  />
+                  <datalist id="userdatalist">
+                    {UserListData?.map((user) => {
+                      return (
+                        <option key={user?.id} value={user?.id + " " + user?.name}>
+                          {user?.email}
+                        </option>
+                      );
+                    })}
+                  </datalist>
+                  <Button 
+                  colorScheme={'blue'}
+                  mt={'1rem'}
+                  onClick={() => updateSelectedInvitedUsers(Number(selectedUserField.split(" ")[0]))}
+                  >
+                    Add
+                  </Button>
                   <Flex
                     mt={"1.5rem"}
                     color={"blue.500"}
                     justify={"start"}
                     alignItems="center"
                     w={"100%"}
+                    onClick={() => setIsGuestModalOpen(true)}
+                    mb='2rem'
                   >
                     <GoPlus cursor={"pointer"} />
                     <Text
@@ -1090,6 +1313,7 @@ export default function Schedule() {
                       cursor={"pointer"}
                       color={"blue.500"}
                       ml={"0.5rem"}
+                      
                     >
                       Add non registered participants
                     </Text>
@@ -1098,31 +1322,33 @@ export default function Schedule() {
                 <Flex
                   w={"100%"}
                   background={"gray.800"}
-                  justifyContent={"end"}
+                  justifyContent={"center"}
                   borderRadius="2xl"
+                  mb={'2rem'}
+                  ml='4rem'
                 >
                   <VStack>
                     <HStack>
                       <Text w={"20rem"}>Passanger car</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="passangerCar" onChange={e => setPassangerCar(Number(e.target.value))}/>
                       <Text w={"20rem"}>Light duty truck</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="lightDutyTruck" onChange={e => setLightDutyTruck(Number(e.target.value))} />
                     </HStack>
                     <HStack>
                       <Text w={"20rem"}>Urban light bus</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="urbanlightbus" onChange={e => setUrbanLightBus(Number(e.target.value))}/>
                       <Text w={"20rem"}>Urban heavy bus</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="urbanheavybus" onChange={e => setUrbanHeavyBus(Number(e.target.value))}/>
                     </HStack>
                     <HStack>
                       <Text w={"20rem"}>Coach bus</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="coachbus" onChange={e => setCoachBus(Number(e.target.value))}/>
                       <Text w={"20rem"}>Others</Text>
-                      <Input w={"4rem"} name="passangerCar" />
+                      <Input w={"4rem"} name="others" onChange={e => setOthers(Number(e.target.value))}/>
                     </HStack>
                   </VStack>
                 </Flex>
-              </Flex>
+              </SimpleGrid>
 
               <Flex
                 height={"100%"}
@@ -1145,9 +1371,15 @@ export default function Schedule() {
                   },
                 }}
               >
-                <Table colorScheme="whiteAlpha">
+                {selectedInvitedUsers.length > 0 ? (
+                  <Table colorScheme="whiteAlpha">
                   <Thead>
                     <Tr>
+
+                      <Th px={["4", "4", "6"]} color="gray.300" width="">
+                        <Text>Id</Text>
+                      </Th>
+
                       <Th px={["4", "4", "6"]} color="gray.300" width="">
                         <Text>Name</Text>
                       </Th>
@@ -1156,26 +1388,51 @@ export default function Schedule() {
                         <Text>Email</Text>
                       </Th>
 
-                      <Th>CPF</Th>
+                      <Th>Document</Th>
 
+                      <Th>Guest</Th>
+
+                      {/* <Th w="8"></Th> */}
                       <Th w="8"></Th>
                     </Tr>
                   </Thead>
 
                   <Tbody>
-                    <Tr>
-                      <Td>João Silva Pereira</Td>
-                      <Td>joaopereira@gmail.com</Td>
-                      <Td>07384617819</Td>
-                      <Td w={"26rem"}>
-                        <Flex justify={"center"} alignItems="center" w={"100%"}>
-                          <Checkbox mr={"0.5rem"} />
-                          <Text>Notify by e-mail</Text>
-                        </Flex>
-                      </Td>
+                    
+                    {selectedInvitedUsers.map(invited => {
+                      return (
+                        <Tr key={invited?.id}>
+                          <Td>{invited?.id}</Td>
+                          <Td>{invited?.name}</Td>
+                          <Td>{invited?.email}</Td>
+                          <Td>{invited?.document}</Td>
+                          <Td>{invited?.isGuest ? "Yes" : "No"}</Td>
+                          {/* <Td w={"26rem"}>
+                            <Flex justify={"center"} alignItems="center" w={"100%"}>
+                              <Checkbox mr={"0.5rem"} />
+                              <Text>Notify by e-mail</Text>
+                            </Flex>
+                          </Td> */}
+                          <Td>
+                              <Flex
+                                color={"gray.500"}
+                                fontWeight="semibold"
+                                _hover={{ color: "red.500", cursor: "pointer" }}
+                              >
+                                <BiTrash
+                                  onClick={() =>
+                                    deleteInvitedUser(invited?.id)
+                                  }
+                                  size={"1.2rem"}
+                                />
+                              </Flex>
+                            </Td>
+                          
                     </Tr>
+                      )
+                    })}
 
-                    <Tr>
+                    {/* <Tr>
                       <Td>João Silva Pereira</Td>
                       <Td>joaopereira@gmail.com</Td>
                       <Td>07384617819</Td>
@@ -1192,64 +1449,22 @@ export default function Schedule() {
                           <Text ml={"0.5rem"}>Add e-mail</Text>
                         </Flex>
                       </Td>
-                    </Tr>
-
-                    <Tr>
-                      <Td>João Silva Pereira</Td>
-                      <Td>joaopereira@gmail.com</Td>
-                      <Td>07384617819</Td>
-                      <Td w={"26rem"}>
-                        <Flex justify={"center"} alignItems="center" w={"100%"}>
-                          <Checkbox mr={"0.5rem"} />
-                          <Text>Notify by e-mail</Text>
-                        </Flex>
-                      </Td>
-                    </Tr>
-
-                    <Tr>
-                      <Td>João Silva Pereira</Td>
-                      <Td>joaopereira@gmail.com</Td>
-                      <Td>07384617819</Td>
-                      <Td w={"26rem"}>
-                        <Flex
-                          cursor={"pointer"}
-                          color={"blue.500"}
-                          justify={"center"}
-                          alignItems="center"
-                          w={"100%"}
-                          _hover={{ color: "blue.700" }}
-                        >
-                          <GoPlus />
-                          <Text ml={"0.5rem"}>Add e-mail</Text>
-                        </Flex>
-                      </Td>
-                    </Tr>
-
-                    <Tr>
-                      <Td>João Silva Pereira</Td>
-                      <Td>joaopereira@gmail.com</Td>
-                      <Td>07384617819</Td>
-                      <Td w={"26rem"}>
-                        <Flex
-                          cursor={"pointer"}
-                          color={"blue.500"}
-                          justify={"center"}
-                          alignItems="center"
-                          w={"100%"}
-                          _hover={{ color: "blue.700" }}
-                        >
-                          <GoPlus />
-                          <Text ml={"0.5rem"}>Add e-mail</Text>
-                        </Flex>
-                      </Td>
-                    </Tr>
+                    </Tr> */}
+                    
                   </Tbody>
                 </Table>
+                ) : (
+                  <Flex w={'100%'} justify='center'>
+                    <Text color={'gray.500'}>
+                      Add all people who are going to be part of the booking.
+                    </Text>
+                  </Flex>
+                )}
               </Flex>
             </VStack>
           )}
 
-          <Divider mt="2.5rem" borderColor="gray.700" />
+          {/* <Divider mt="2.5rem" borderColor="gray.700" /> */}
 
           <Flex mt="2rem" justify="flex-end">
             <HStack spacing="4">
@@ -1287,10 +1502,10 @@ export default function Schedule() {
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
         overlayClassName="react-modal-overlay"
-        className="react-modal-content-slots-confirmation"
+        className="react-modal-content-terms"
         ariaHideApp={false}
       >
-        <Flex justifyContent="flex-start">
+        <Flex justifyContent="flex-start" >
           {isTermOpen ? (
             <>
               <Text fontSize={24} fontWeight="bold" color={"blue.500"}>
@@ -1318,7 +1533,7 @@ export default function Schedule() {
           <>
             <Flex
               mb={"2rem"}
-              maxH={"30rem"}
+              maxH={"20rem"}
               flexDir={"column"}
               mt={"1.2rem"}
               w={"100%"}
@@ -1336,7 +1551,8 @@ export default function Schedule() {
                 },
               }}
             >
-              {TermsData.map((term) => {
+              
+              {updatedTerms.map((term) => {
                 return (
                   <Box
                     my={"4"}
@@ -1350,12 +1566,10 @@ export default function Schedule() {
                     </Text>
 
                     <Text mb={2}>{term?.text}</Text>
-                    <RadioGroup value={1}>
-                      <Stack direction="row">
-                        <Radio value={1}>True</Radio>
-                        <Radio value={0}>False</Radio>
-                      </Stack>
-                    </RadioGroup>
+                    
+                    <Checkbox onChange={(e) => {
+                      !e.target.checked ? handleDeleteAcceptedTerms(term?.id) : handleUpdateAcceptedTerms(term?.id)
+                    }}/>
                   </Box>
                 );
               })}
@@ -1369,17 +1583,9 @@ export default function Schedule() {
                 </Button>
 
                 <Button
-                  type="submit"
                   colorScheme="blue"
                   onClick={() => {
-                    toast({
-                      title: "Aguardando integração final do sistema",
-                      description: `Previsão de entrega: 06/03/2023 `,
-                      status: "info",
-                      duration: 5000,
-                      isClosable: true,
-                      position: "top-right",
-                    });
+                    handleUpdateTerms()
                   }}
                 >
                   Submit
@@ -1422,9 +1628,11 @@ export default function Schedule() {
 
                     <Th>To</Th>
 
-                    {isWideVersioon && <Th>Recursos</Th>}
+                    {isWideVersioon && <Th>Resource</Th>}
 
-                    <Th w="8"></Th>
+                    {isWideVersioon && <Th>Modality</Th>}
+
+
                   </Tr>
                 </Thead>
 
@@ -1448,12 +1656,12 @@ export default function Schedule() {
                             "MMMM D, YYYY h:mm A"
                           )}
                         </Td>
-                        <Td>VDA</Td>
+                        <Td>{schedule.id}</Td>
                         <Td>
                           <HStack spacing={"0.8rem"}>
                             {schedule.isExclusive ? (
                               <Flex
-                                color={"blue.500"}
+                                color={schedule.status == "NotAvaiable" ? "white" : "blue.500"}
                                 justifyContent={"center"}
                                 alignItems={"center"}
                                 minW={"7rem"}
@@ -1470,7 +1678,7 @@ export default function Schedule() {
                                 minW={"7rem"}
                                 fontWeight={"semibold"}
                               >
-                                <Text mr={"0.3rem"}>Standard</Text>
+                                <Text mr={"0.3rem"} color={schedule.status === "NotAvaiable" ? "white" : ""}>Standard</Text>
                               </Flex>
                             )}
                             <Button
@@ -1567,7 +1775,7 @@ export default function Schedule() {
                   return (
                     <Tr key={resource?.id}>
                       <Td>
-                        {resource.resources.map((unitSelectedResource) => {
+                        {resource.resource.map((unitSelectedResource) => {
                           return (
                             <Text key={unitSelectedResource?.key}>
                               {unitSelectedResource?.label}
@@ -1627,6 +1835,58 @@ export default function Schedule() {
             </Button>
           </HStack>
         </>
+      </Modal>
+
+      <Modal
+        isOpen={isGuestModalOpen}
+        onRequestClose={handleCloseGuestModal}
+        overlayClassName="react-modal-overlay"
+        className="react-modal-content-slots-confirmation"
+        ariaHideApp={false}
+      >
+        <Flex justifyContent="flex-start">
+          <Text fontSize={24} fontWeight="bold" color={"gray.100"}>
+            <Text as={'span'} color={'blue.500'}>Add</Text> a non registered <Text as={'span'} color={'blue.500'}>participant</Text>
+          </Text>
+        </Flex>
+        <Text>Check all informations before continuous.</Text>
+          <>
+          <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={"3rem"} mt='2rem'>
+              <Input
+                name="guestName"
+                label="Name"
+                onChange={(e) => setGuestName(e.target.value)}
+              />
+
+              <Input
+                name="guestDocument"
+                label="Document"
+                onChange={(e) => setGuestDocument(e.target.value)}
+              />
+            </SimpleGrid>
+            
+            <SimpleGrid minChildWidth="240px" spacing="8" w="100%" mb={"3rem"}>
+              <Input
+                name="guestEmail"
+                label="E-mail"
+                onChange={(e) => setGuestEmail(e.target.value)}
+              />
+
+            </SimpleGrid>
+
+            <HStack spacing={4} justify="end">
+              <Button onClick={handleCloseGuestModal} colorScheme="whiteAlpha">
+                Cancel
+              </Button>
+
+              <Button
+                colorScheme="blue"
+                onClick={() => handleAddGuest()}
+              >
+                Add participant
+              </Button>
+            </HStack>
+          </>
       </Modal>
     </Box>
   );

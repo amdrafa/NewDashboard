@@ -10,10 +10,11 @@ import { HiOutlineHome, HiOutlineNewspaper } from "react-icons/hi";
 import { VscSettingsGear } from "react-icons/vsc";
 import { BsSpeedometer2 } from "react-icons/bs";
 import { BiBuilding } from "react-icons/bi";
+import { GrCertificate } from "react-icons/gr";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { NavLink } from "./NavLink";
 import { NavSection } from "./NavSection";
-import { MdOutlineBadge } from "react-icons/md";
+import { TiDocumentText } from "react-icons/ti";
 import { Can } from "../can";
 import { LoginContext } from "../../contexts/LoginContext";
 import { useContext, useEffect } from "react";
@@ -112,6 +113,15 @@ export function SidebarNav() {
             icon={HiOutlineNewspaper}
           >
             Terms
+          </NavLink>
+          
+          <NavLink
+            hasPermission={true}
+            hrefs="/certificates"
+            color={'white'}
+            icon={TiDocumentText}
+          >
+            Certificates
           </NavLink>
         {/* <NavLink
           hasPermission={true}

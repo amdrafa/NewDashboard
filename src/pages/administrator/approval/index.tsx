@@ -53,23 +53,14 @@ interface bookingProps {
   status: string;
 }
 
-interface busySlotsProps {
-  busySlots: [];
-}
-
-interface appointmentFunctionProps {
-  speedway: string;
-  vehicle: string;
-  selectedSlots: string[];
-  companyName: string;
-  appointmentId: number;
-  status: string;
-  companyRef: string;
-}
 
 export default function AdmApprovals() {
 
   const router = useRouter()
+
+  const [searchUsersValue, setSearchUsersValue] = useState("");
+
+  const [filteredData, setFilteredData] = useState<bookingProps[]>([]);
 
   const toast = useToast()
 
@@ -88,10 +79,34 @@ export default function AdmApprovals() {
       );
       const data = response.data;
       // set total count coming from response to paginate correctly
-        console.log(data)
+      setFilteredData(data)
       return data;
     }
   );
+
+  function handleSearchBookings(event: React.ChangeEvent<HTMLInputElement>){
+    setSearchUsersValue(event.target.value);
+
+    if (event.target.value.length == 1 || event.target.value.length == 0 ) {
+      setSearchUsersValue("");
+      setFilteredData(data)
+      return;
+    }
+
+    setFilteredData(
+      data?.filter((booking) => {
+        return booking.id
+          .toString()
+          .includes(searchUsersValue.toLowerCase()) || dayjs(booking?.dataInicial).format('dddd, MMMM D, YYYY h:mm A')
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || dayjs(booking?.dataFinal).format('dddd, MMMM D, YYYY h:mm A')
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || booking.status
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase())
+      })
+    );
+  }
 
   return (
     <>
@@ -100,8 +115,6 @@ export default function AdmApprovals() {
 
         <Flex w="100%" my="6" maxWidth={1600} mx="auto" px="6">
           <Sidebar />
-
-          
             <Box
               flex="1"
               borderRadius={8}
@@ -127,6 +140,30 @@ export default function AdmApprovals() {
                 </Link>
               </Flex>
 
+              <Flex
+                as="label"
+                flex="1"
+                py="2"
+                px="8"
+                maxWidth={230}
+                alignSelf="center"
+                color="gray.200"
+                position="relative"
+                bg="gray.900"
+                borderRadius="full"
+              >
+                <Input
+                  color="gray.50"
+                  variant="unstyled"
+                  px="4"
+                  mr="4"
+                  placeholder="Search for a user"
+                  _placeholder={{ color: "gray.400" }}
+                  onChange={handleSearchBookings}
+                />
+                <Icon as={RiSearchLine} fontSize="20" />
+              </Flex>
+
               {isLoading ? (
                 <Flex justify="center">
                   <Spinner mt="10" mb="80px" />
@@ -135,9 +172,29 @@ export default function AdmApprovals() {
                 <Flex justify="center">
                   <Text>The requisition failed</Text>
                 </Flex>
-              ) : total > 0 ? (
+              ) : data?.length > 0 ? (
                 <>
                   <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                  <Flex
+                height={"100%"}
+                maxHeight={"24rem"}
+                flexDir={"column"}
+                mt={"1.2rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
                     <Table colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
@@ -164,7 +221,7 @@ export default function AdmApprovals() {
 
                         {data ? (
                           <>
-                            {data.map((booking) => (
+                            {filteredData.map((booking) => (
                           <Tr
                             key={booking.id}
                             _hover={{
@@ -206,11 +263,12 @@ export default function AdmApprovals() {
                         )}
                       </Tbody>
                     </Table>
-                    <Pagination
+                    </Flex>
+                    {/* <Pagination
                       totalCountOfRegisters={total}
                       currentPage={page}
-                      onPageChanges={setPage}
-                    />
+                      onPageChanges={setPage} 
+                    /> */}
                   </Flex>
                 </>
               ) : total == -1 ? (

@@ -14,10 +14,11 @@ import {
   useBreakpointValue,
   Spinner,
   Image,
+  Input,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useState } from "react";
-import { RiAddLine, RiPencilLine } from "react-icons/ri";
+import { RiAddLine, RiPencilLine, RiSearchLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
@@ -54,6 +55,10 @@ export default function Resources() {
   const router = useRouter()
 
   const [ResourceId, setResourceId] = useState(0);
+
+  const [searchUsersValue, setSearchUsersValue] = useState("");
+
+  const [filteredData, setFilteredData] = useState<resourceProps[]>([]);
  
 
   function handleEditResource({
@@ -86,11 +91,38 @@ export default function Resources() {
         `/resource/list?page=${page}&limit=${limit}`
       );
 
-      setTotal(10);
+      // setTotal(10);
+      setFilteredData(response.data)
 
       return response.data;
     }
   );
+
+  function handleSearchResources(event: React.ChangeEvent<HTMLInputElement>){
+    setSearchUsersValue(event.target.value);
+
+    if (event.target.value.length == 1 || event.target.value.length == 0 ) {
+      setSearchUsersValue("");
+      setFilteredData(data)
+      return;
+    }
+
+    setFilteredData(
+      data?.filter((resource) => {
+        return resource.id
+          .toString()
+          .includes(searchUsersValue.toLowerCase()) || resource.isActive
+          .toString().toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || resource.name
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || resource.type
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || resource.capacity
+          .toString()
+          .includes(searchUsersValue.toLowerCase())
+      })
+    );
+  }
 
   return (
     <Box mt={-3}>
@@ -124,6 +156,30 @@ export default function Resources() {
               </Link>
             </Flex>
 
+            <Flex
+                as="label"
+                flex="1"
+                py="2"
+                px="8"
+                maxWidth={230}
+                alignSelf="center"
+                color="gray.200"
+                position="relative"
+                bg="gray.900"
+                borderRadius="full"
+              >
+                <Input
+                  color="gray.50"
+                  variant="unstyled"
+                  px="4"
+                  mr="4"
+                  placeholder="Search for a user"
+                  _placeholder={{ color: "gray.400" }}
+                  onChange={handleSearchResources}
+                />
+                <Icon as={RiSearchLine} fontSize="20" />
+              </Flex>
+
             {isLoading ? (
               <Flex justify="center">
                 <Spinner mt="70px" mb="110px" />
@@ -132,13 +188,33 @@ export default function Resources() {
               <Flex justify="center">
                 <Text>The requisition failed</Text>
               </Flex>
-            ) : total > 0 ? (
+            ) : data?.length > 0 ? (
               <>
                 <Flex
                   minHeight={"400px"}
                   flexDir={"column"}
                   justifyContent="space-between"
                 >
+                  <Flex
+                height={"100%"}
+                maxHeight={"24rem"}
+                flexDir={"column"}
+                mt={"1.2rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
                   <Table colorScheme="whiteAlpha">
                     <Thead>
                       <Tr>
@@ -158,7 +234,7 @@ export default function Resources() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {data?.map((resource) => (
+                      {filteredData?.map((resource) => (
                         <Tr
                           onClick={() => {
                             handleEditResource({
@@ -202,11 +278,12 @@ export default function Resources() {
                       ))}
                     </Tbody>
                   </Table>
-                  <Pagination
+                  </Flex>
+                  {/* <Pagination
                     totalCountOfRegisters={total}
                     currentPage={page}
                     onPageChanges={setPage}
-                  />
+                  /> */}
                 </Flex>
               </>
             ) : (

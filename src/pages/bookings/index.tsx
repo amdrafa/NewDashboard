@@ -83,6 +83,10 @@ export type DecodedToken = {
     const { auth } = parseCookies();
 
     const decodedUser = decode(auth as string) as DecodedToken;
+
+    const [searchUsersValue, setSearchUsersValue] = useState("");
+
+    const [filteredData, setFilteredData] = useState<bookingProps[]>([]);
   
     const router = useRouter()
   
@@ -103,13 +107,37 @@ export type DecodedToken = {
         );
         const data = response.data;
         // set total count coming from response to paginate correctly
-          console.log(data)
+        setFilteredData(data)
         return data;
       },
       {
         enabled: !!decodedUser
       }
     );
+
+    function handleSearchBookings(event: React.ChangeEvent<HTMLInputElement>){
+      setSearchUsersValue(event.target.value);
+  
+      if (event.target.value.length == 1 || event.target.value.length == 0 ) {
+        setSearchUsersValue("");
+        setFilteredData(data)
+        return;
+      }
+  
+      setFilteredData(
+        data?.filter((booking) => {
+          return booking.id
+            .toString()
+            .includes(searchUsersValue.toLowerCase()) || dayjs(booking?.dataInicial).format('dddd, MMMM D, YYYY h:mm A')
+            .toLowerCase()
+            .includes(searchUsersValue.toLowerCase()) || dayjs(booking?.dataFinal).format('dddd, MMMM D, YYYY h:mm A')
+            .toLowerCase()
+            .includes(searchUsersValue.toLowerCase()) || booking.status
+            .toLowerCase()
+            .includes(searchUsersValue.toLowerCase())
+        })
+      );
+    }
   
     return (
       <>
@@ -144,6 +172,30 @@ export type DecodedToken = {
                     </Button>
                   </Link>
                 </Flex>
+
+                <Flex
+                as="label"
+                flex="1"
+                py="2"
+                px="8"
+                maxWidth={230}
+                alignSelf="center"
+                color="gray.200"
+                position="relative"
+                bg="gray.900"
+                borderRadius="full"
+              >
+                <Input
+                  color="gray.50"
+                  variant="unstyled"
+                  px="4"
+                  mr="4"
+                  placeholder="Search for a user"
+                  _placeholder={{ color: "gray.400" }}
+                  onChange={handleSearchBookings}
+                />
+                <Icon as={RiSearchLine} fontSize="20" />
+              </Flex>
   
                 {isLoading ? (
                   <Flex justify="center">
@@ -153,9 +205,29 @@ export type DecodedToken = {
                   <Flex justify="center">
                     <Text>The requisition failed</Text>
                   </Flex>
-                ) : total > 0 ? (
+                ) : data?.length > 0 ? (
                   <>
                     <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                    <Flex
+                height={"100%"}
+                maxHeight={"24rem"}
+                flexDir={"column"}
+                mt={"1.2rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
                       <Table colorScheme="whiteAlpha">
                         <Thead>
                           <Tr>
@@ -182,7 +254,7 @@ export type DecodedToken = {
   
                           {data ? (
                             <>
-                              {data.map((booking) => (
+                              {filteredData.map((booking) => (
                             <Tr
                               key={booking.id}
                               _hover={{
@@ -230,6 +302,7 @@ export type DecodedToken = {
                         onPageChanges={setPage}
                       />
                     </Flex>
+                    </Flex>
                   </>
                 ) : total == -1 ? (
                   <Flex justify="center">
@@ -255,7 +328,6 @@ export type DecodedToken = {
                   </Flex>
                 )}
               </Box>
-            
           </Flex>
   
           {/* <Modal

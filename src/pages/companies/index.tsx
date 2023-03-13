@@ -13,12 +13,13 @@ import {
   Text,
   useBreakpointValue,
   Spinner,
-  Image
+  Image,
+  Input
 } from "@chakra-ui/react";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
-import { RiAddLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
@@ -54,6 +55,10 @@ export default function CompanyList() {
   const router = useRouter()
 
   const [companyId, setCompanyId] = useState(0);
+
+  const [searchUsersValue, setSearchUsersValue] = useState("");
+
+  const [filteredData, setFilteredData] = useState<companyProps[]>([]);
   
   function handleEditCompany({
     id
@@ -83,9 +88,36 @@ export default function CompanyList() {
     
 
     // setTotal(totalcount)
+    setFilteredData(response.data)
 
     return response.data;
   });
+
+  function handleSearchCompanies(event: React.ChangeEvent<HTMLInputElement>){
+    setSearchUsersValue(event.target.value);
+
+    if (event.target.value.length == 1 || event.target.value.length == 0 ) {
+      setSearchUsersValue("");
+      setFilteredData(data)
+      return;
+    }
+
+    setFilteredData(
+      data?.filter((company) => {
+        return company.id
+          .toString()
+          .includes(searchUsersValue.toLowerCase()) || company.name
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || company.cnpj
+          .toString()
+          .includes(searchUsersValue.toLowerCase()) || company.status
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || company.cnpj
+          .toString()
+          .includes(searchUsersValue.toLowerCase())
+      })
+    );
+  }
 
 
   return (
@@ -115,6 +147,30 @@ export default function CompanyList() {
               </Link>
             </Flex>
 
+            <Flex
+                as="label"
+                flex="1"
+                py="2"
+                px="8"
+                maxWidth={230}
+                alignSelf="center"
+                color="gray.200"
+                position="relative"
+                bg="gray.900"
+                borderRadius="full"
+              >
+                <Input
+                  color="gray.50"
+                  variant="unstyled"
+                  px="4"
+                  mr="4"
+                  placeholder="Search for a user"
+                  _placeholder={{ color: "gray.400" }}
+                  onChange={handleSearchCompanies}
+                />
+                <Icon as={RiSearchLine} fontSize="20" />
+              </Flex>
+
             {isLoading ? (
               <Flex justify="center">
                 <Spinner mt="70px" mb="110px" />
@@ -124,8 +180,28 @@ export default function CompanyList() {
                 <Text>The requisition failed</Text>
               </Flex>
             ) : (
-              total > 0 ? (<>
+              data?.length > 0 ? (<>
                 <Flex minHeight={'400px'} flexDir={'column'} justifyContent='space-between'>
+                <Flex
+                height={"100%"}
+                maxHeight={"24rem"}
+                flexDir={"column"}
+                mt={"1.2rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
                   <Table colorScheme="whiteAlpha">
                     <Thead>
                       <Tr>
@@ -144,7 +220,7 @@ export default function CompanyList() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {data.map((company) => (
+                      {filteredData.map((company) => (
                         <Tr
                           onClick={() => {
                             handleEditCompany({
@@ -182,11 +258,12 @@ export default function CompanyList() {
                       ))}
                     </Tbody>
                   </Table>
-                  <Pagination
+                  </Flex>
+                  {/* <Pagination
                     totalCountOfRegisters={total}
                     currentPage={page}
                     onPageChanges={setPage}
-                  />
+                  /> */}
                 </Flex>
               </>) : (
                 <Flex w="100%" alignItems={'center'} justifyContent="center" minH={'400px'} cursor={'not-allowed'}>

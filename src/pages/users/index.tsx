@@ -65,7 +65,7 @@ export default function UserList() {
 
   const router = useRouter()
 
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState<UserProps[]>([]);
 
   const [userId, setUserId] = useState(0);
 
@@ -98,6 +98,8 @@ export default function UserList() {
 
       setTotal(20);
 
+      setFilteredData(response.data)
+
       return response.data;
     }
   );
@@ -112,13 +114,19 @@ export default function UserList() {
       return;
     }
 
-    // setFilteredData(
-    //   data.filter((user) => {
-    //     return user.data.name
-    //       .toLowerCase()
-    //       .includes(searchUsersValue.toLowerCase());
-    //   })
-    // );
+    setFilteredData(
+      data.filter((user) => {
+        return user.name
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || user.document
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || user.email
+          .toLowerCase()
+          .includes(searchUsersValue.toLowerCase()) || user.id
+          .toString()
+          .includes(searchUsersValue.toLowerCase())
+      })
+    );
   }
 
   return (
@@ -176,13 +184,33 @@ export default function UserList() {
               <Flex justify="center">
                 <Text>The requisition failed</Text>
               </Flex>
-            ) : total > 0 ? (
+            ) : data?.length > 0 ? (
               <>
                 <Flex
                   minHeight={"400px"}
                   flexDir={"column"}
                   justifyContent="space-between"
                 >
+                   <Flex
+                height={"100%"}
+                maxHeight={"24rem"}
+                flexDir={"column"}
+                mt={"1.2rem"}
+                w={"100%"}
+                overflowY={"scroll"}
+                sx={{
+                  "&::-webkit-scrollbar": {
+                    width: "10px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "blackAlpha.500",
+                    borderRadius: "24px",
+                  },
+                }}
+              >
                   <Table colorScheme="whiteAlpha">
                     <Thead>
                       <Tr>
@@ -196,48 +224,49 @@ export default function UserList() {
                         <Th>Foreigner</Th>
                       </Tr>
                     </Thead>
-                    {searchUsersValue.length > 0 ? (
+                    {searchUsersValue.length > 1 ? (
                       <Tbody>
-                        {data.map((currentUser) => (
-                          <Tr
-                            onClick={() => {
-                              handleEditUser({
-                                id: currentUser.id,
-                                document: currentUser.document,
-                                email: currentUser.email,
-                                isForeigner: currentUser.isForeigner,
-                                name: currentUser.name,
-                                companyId: currentUser.companyId,
-                              });
-                            }}
-                            _hover={{
-                              bg: "gray.900",
-                              color: "gray.300",
-                              transition: "0.2s",
-                              cursor: "pointer",
-                            }}
-                            key={currentUser.id}
-                          >
-                            <Td px={["4", "4", "6"]}>
-                              <Box>
-                                <Text fontWeight="bold">teste</Text>
-                                <Text fontSize="sm" color="gray.300">
-                                  {currentUser.email}
-                                </Text>
-                              </Box>
-                            </Td>
+                      {filteredData.map((user) => (
+                        <Tr
+                          onClick={() => {
+                            handleEditUser({
+                              id: user.id,
+                              document: user.document,
+                              email: user.email,
+                              isForeigner: user.isForeigner,
+                              name: user.name,
+                              companyId: user.companyId,
+                            });
+                          }}
+                          _hover={{
+                            bg: "gray.900",
+                            color: "gray.300",
+                            transition: "0.2s",
+                            cursor: "pointer",
+                          }}
+                          key={user.id}
+                        >
+                          <Td px={["4", "4", "6"]}>
+                            <Text fontWeight="bold">{user.id}</Text>
+                          </Td>
 
-                            {isWideVersioon && <Td>testeeee</Td>}
+                          {isWideVersioon && <Td>{user.name}</Td>}
 
-                            <Td>
-                              <Text color={"gray.300"}>Not regasdistered</Text>
-                            </Td>
-                            <Td>
-                              <Text fontWeight="bold">est</Text>
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
+                          <Td>
+                            <Text color={"gray.300"}>{user.email}</Text>
+                          </Td>
+                          <Td>
+                            <Text color={"gray.300"}>{user.document}</Text>
+                          </Td>
+                          <Td>
+                            <Text color={"gray.300"}>{user.companyId ? user.companyId : "Not registered"}</Text>
+                          </Td>
+                          <Td>
+                            <Text color={"gray.300"}>{user.isForeigner ? "Yes" : "No"}</Text>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
                     ) : (
                       <Tbody>
                         {data.map((user) => (
@@ -283,7 +312,7 @@ export default function UserList() {
                       </Tbody>
                     )}
                   </Table>
-                  {searchUsersValue.length > 0 ? (
+                  {/* {searchUsersValue.length > 0 ? (
                     <Pagination
                       totalCountOfRegisters={filteredData.length}
                       currentPage={page}
@@ -295,7 +324,8 @@ export default function UserList() {
                       currentPage={page}
                       onPageChanges={setPage}
                     />
-                  )}
+                  )} */}
+                </Flex>
                 </Flex>
               </>
             ) : (
