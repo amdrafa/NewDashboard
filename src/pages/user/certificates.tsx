@@ -99,6 +99,24 @@ export default function UserCertificates() {
     console.log(selectedFiles)
     console.log(selectedCertificate)
 
+    const data = new FormData()
+
+    data.append("certificate", selectedFiles)
+
+    console.log(data)
+
+    await api.post(`/user/6/approve/${selectedCertificate}`, data)
+    .then(response => {
+        toast({
+            title: "deu bom"
+        })
+    })
+    .catch(e => {
+        toast({
+            title: "deu ruimmmm"
+        })
+    })
+
   }
 
   return (
