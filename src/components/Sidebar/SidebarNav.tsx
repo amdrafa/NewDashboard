@@ -117,6 +117,15 @@ export function SidebarNav() {
           
           <NavLink
             hasPermission={true}
+            hrefs="/user/certificates"
+            color={'white'}
+            icon={TiDocumentText}
+          >
+            User Certificates
+          </NavLink>
+
+          <NavLink
+            hasPermission={true}
             hrefs="/certificates"
             color={'white'}
             icon={TiDocumentText}

@@ -29,6 +29,7 @@ import { Header } from "../../../components/Header";
 import { Sidebar } from "../../../components/Sidebar";
 import { MdDone } from "react-icons/md";
 import { AiOutlineClose } from "react-icons/ai";
+import { TiDocumentText } from "react-icons/ti";
 
 type EditUserFormSchema = {
   name: string;
@@ -211,6 +212,18 @@ export default function EditUser() {
               <Heading size="lg" fontWeight="normal">
                 Edit user
               </Heading>
+              <HStack>
+              <Button
+                color={'gray.400'}
+                onClick={() => {
+                  router.push(`/users/detail/certificates/${id}`)
+                }}
+                bg="gray.900"
+                _hover={{ bg: "blue.500", color: 'white'}}
+              >
+                <Icon mr={1.5} as={TiDocumentText} />
+                Certificates
+              </Button>
               <Button
                 color={'gray.400'}
                 onClick={deleteUser}
@@ -220,6 +233,7 @@ export default function EditUser() {
                 <Icon mr={1.5} as={FiTrash2} />
                 Delete user
               </Button>
+              </HStack>
             </Flex>
 
             <Divider my="6" borderColor="gray.700" />
